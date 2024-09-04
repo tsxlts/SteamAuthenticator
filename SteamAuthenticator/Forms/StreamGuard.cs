@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Steam_Authenticator.Internal;
 using SteamKit;
 
 namespace Steam_Authenticator.Forms
@@ -71,6 +71,28 @@ namespace Steam_Authenticator.Forms
 
         private void exportGuardBtn_Click(object sender, EventArgs e)
         {
+            if (Appsetting.Instance.Manifest.Encrypted)
+            {
+                string tips = "请输入访问密码";
+                Input input;
+                while (true)
+                {
+                    input = new Input("导出令牌", tips, true);
+                    if (input.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    string password = input.InputValue;
+                    if (!Appsetting.Instance.Manifest.CheckPassword(password))
+                    {
+                        tips = "访问密码错误，请重新输入";
+                        continue;
+                    }
+                    break;
+                }
+            }
+
             string account = Users.SelectedItem?.ToString();
             if (string.IsNullOrWhiteSpace(account))
             {
@@ -80,21 +102,73 @@ namespace Steam_Authenticator.Forms
 
             var guard = Appsetting.Instance.Manifest.GetGuard(account);
 
-            string json = JsonConvert.SerializeObject(guard, Formatting.Indented);
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            string encryptPassword = null;
+            if (MessageBox.Show($"导出的令牌文件是否需要加密", "导出令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                Title = "导出令牌",
-                Filter = "JSON (*.json)|*.json",
-                DefaultExt = ".json",
-                FileName = $"{account}.guard.json",
-                InitialDirectory = @"C:\"
-            };
+                string tips = "请输入加密密码";
+                Input input;
+                while (true)
+                {
+                    input = new Input("导出令牌", tips, true);
+                    if (input.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    encryptPassword = input.InputValue;
+                    if (string.IsNullOrWhiteSpace(encryptPassword))
+                    {
+                        tips = "加密密码不能为空，请重新输入";
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+
+            bool encrypt = !string.IsNullOrWhiteSpace(encryptPassword);
+
+            byte[] dataBuffer;
+            using (var stream = guard.Serialize())
             {
-                string filePath = saveFileDialog.FileName;
-                File.WriteAllText(filePath, json);
+                dataBuffer = new byte[stream.Length];
+                stream.Read(dataBuffer);
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                stream.WriteBoolean(encrypt);
+
+                if (encrypt)
+                {
+                    var iv = FileEncryptor.GetInitializationVector();
+                    var salt = FileEncryptor.GetRandomSalt();
+                    dataBuffer = FileEncryptor.EncryptData(encryptPassword, salt, iv, dataBuffer);
+
+                    stream.WriteInt32(iv.Length);
+                    stream.Write(iv);
+
+                    stream.WriteInt32(salt.Length);
+                    stream.Write(salt);
+                }
+
+                stream.WriteInt32(dataBuffer.Length);
+                stream.Write(dataBuffer);
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Title = "导出令牌",
+                    Filter = "令牌文件 (*.entry)|*.entry",
+                    DefaultExt = ".entry",
+                    FileName = $"{account}.guard.entry",
+                    InitialDirectory = AppContext.BaseDirectory,
+                };
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    File.WriteAllBytes(filePath, stream.ToArray());
+                }
             }
         }
     }

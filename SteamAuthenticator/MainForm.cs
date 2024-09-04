@@ -1,13 +1,11 @@
-
-using Newtonsoft.Json;
+using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
+using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
-using Steam_Authenticator.Forms;
-using Steam_Authenticator.Model;
 using System.Text;
 using System.Web;
 using static SteamKit.SteamEnum;
-using Steam_Authenticator.Internal;
 
 namespace Steam_Authenticator
 {
@@ -725,8 +723,8 @@ namespace Steam_Authenticator
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Title = "导入令牌",
-                Filter = "JSON (*.json)|*.json",
-                DefaultExt = ".json",
+                Filter = "令牌文件 (*.entry)|*.entry",
+                DefaultExt = ".entry",
                 InitialDirectory = AppContext.BaseDirectory,
                 Multiselect = true
             };
@@ -737,6 +735,8 @@ namespace Steam_Authenticator
                 {
                     return;
                 }
+                string tips = "请输入访问密码";
+                Input input;
 
                 List<string> error = new List<string>();
                 List<string> success = new List<string>();
@@ -745,17 +745,52 @@ namespace Steam_Authenticator
                     FileInfo fileInfo = new FileInfo(item);
                     try
                     {
-                        string filePath = item;// openFileDialog.FileName;
-                        string json = File.ReadAllText(filePath, Encoding.UTF8);
-                        Guard guard = JsonConvert.DeserializeObject<Guard>(json);
-                        Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
+                        using (FileStream stream = fileInfo.OpenRead())
+                        {
+                            bool encrypt = stream.ReadBoolean();
+                            byte[] dataBuffer = new byte[0];
 
-                        success.Add(fileInfo.Name);
+                            if (encrypt)
+                            {
+                                tips = $"请输入解密密码" +
+                                    $"{Environment.NewLine}" +
+                                    $"{fileInfo.Name}";
+
+                                input = new Input($"导出令牌[{fileInfo.Name}]", tips, true);
+                                input.ShowDialog();
+                                string password = input.InputValue;
+
+                                byte[] iv = new byte[stream.ReadInt32()];
+                                stream.Read(iv);
+
+                                byte[] salt = new byte[stream.ReadInt32()];
+                                stream.Read(salt);
+
+                                dataBuffer = new byte[stream.ReadInt32()];
+                                stream.Read(dataBuffer);
+
+                                dataBuffer = FileEncryptor.DecryptData(password, salt, iv, dataBuffer);
+                            }
+                            else
+                            {
+                                dataBuffer = new byte[stream.ReadInt32()];
+                                stream.Read(dataBuffer);
+                            }
+
+                            Guard guard = new Guard();
+                            guard.Deserialize(new MemoryStream(dataBuffer));
+                            guard = guard.Value;
+
+                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
+
+                            success.Add(fileInfo.Name);
+                        }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        MessageBox.Show($"文件格式错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                        MessageBox.Show($"{fileInfo.FullName}" +
+                            $"{Environment.NewLine}" +
+                            $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         error.Add(fileInfo.Name);
                     }
                 }

@@ -84,8 +84,15 @@ namespace Steam_Authenticator.Internal
                 aes256.Key = key;
                 using (ICryptoTransform decryptor = aes256.CreateDecryptor(aes256.Key, aes256.IV))
                 {
-                    byte[] cipherBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
-                    return cipherBytes;
+                    try
+                    {
+                        byte[] cipherBytes = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        return cipherBytes;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FileDecryptException("解密文件失败，请验证密码是否正确或者文件是否损坏", ex);
+                    }
                 }
             }
         }
@@ -119,8 +126,15 @@ namespace Steam_Authenticator.Internal
 
                 using (ICryptoTransform encryptor = aes256.CreateEncryptor(aes256.Key, aes256.IV))
                 {
-                    byte[] cipherBytes = encryptor.TransformFinalBlock(buffer, 0, buffer.Length);
-                    return cipherBytes;
+                    try
+                    {
+                        byte[] cipherBytes = encryptor.TransformFinalBlock(buffer, 0, buffer.Length);
+                        return cipherBytes;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FileEncryptException("加密文件失败", ex);
+                    }
                 }
             }
         }

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using SteamKit.Client;
-using SteamKit.WebClient;
 using Steam_Authenticator.Model;
+using SteamKit.WebClient;
 
 namespace Steam_Authenticator
 {

@@ -100,16 +100,12 @@ namespace Steam_Authenticator.Internal
             {
                 return true;
             }
-            var manifestEntry = Entries.FirstOrDefault();
-            if (manifestEntry == null)
-            {
-                return true;
-            }
 
             try
             {
-                byte[] decrypted = FileEncryptor.DecryptData(password, Salt, IV, manifestEntry.Data);
-                return decrypted != null;
+                byte[] decrypted = FileEncryptor.DecryptData(password, Salt, IV, Sign);
+                var sign = Encoding.UTF8.GetString(decrypted);
+                return sign == password;
             }
             catch
             {
@@ -145,8 +141,16 @@ namespace Steam_Authenticator.Internal
 
             Encrypted = !string.IsNullOrWhiteSpace(newPassword);
             Entries = entries;
-            return Save();
 
+            Sign = new byte[0];
+            if (Encrypted)
+            {
+                var signBuffer = Encoding.UTF8.GetBytes(newPassword);
+                signBuffer = FileEncryptor.EncryptData(newPassword, Salt, IV, signBuffer);
+                Sign = signBuffer;
+            }
+
+            return Save();
         }
 
         private bool Save()
@@ -170,6 +174,9 @@ namespace Steam_Authenticator.Internal
 
                     stream.Write(IV);
                     stream.Write(Salt);
+
+                    stream.WriteInt32(Sign.Length);
+                    stream.Write(Sign);
 
                     stream.Write(new byte[] { 0x0A });
 
@@ -218,6 +225,10 @@ namespace Steam_Authenticator.Internal
                 IV = ivBuffer;
                 Salt = saltBuffer;
 
+                byte[] signBuffer = new byte[stream.ReadInt32()];
+                stream.Read(signBuffer);
+                Sign = signBuffer;
+
                 stream.ReadByte();
 
                 byte[] pathBuffer;
@@ -252,6 +263,8 @@ namespace Steam_Authenticator.Internal
         public byte[] IV { get; set; } = new byte[0];
 
         public byte[] Salt { get; set; } = new byte[0];
+
+        public byte[] Sign { get; set; } = new byte[0];
 
         public string FileName { get; set; }
 

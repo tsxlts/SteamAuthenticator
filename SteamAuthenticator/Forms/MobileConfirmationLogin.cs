@@ -1,6 +1,6 @@
 ﻿
-using SteamKit;
 using Steam_Authenticator.Model;
+using SteamKit;
 using SteamKit.WebClient;
 
 namespace Steam_Authenticator.Forms

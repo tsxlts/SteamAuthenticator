@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using SteamKit;
 using Steam_Authenticator.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
