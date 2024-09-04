@@ -1,6 +1,6 @@
 ﻿namespace Steam_Authenticator.Forms
 {
-    partial class Confirmation
+    partial class Confirmations
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Confirmation));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Confirmations));
             ConfirmationsView = new SplitContainer();
             refreshBtn = new Button();
             autoRefreshTimer = new System.Windows.Forms.Timer(components);
@@ -82,7 +82,7 @@
             Name = "Confirmation";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "令牌确认";
-            Load += Confirmation_Load;
+            Load += Confirmations_Load;
             ConfirmationsView.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)ConfirmationsView).EndInit();
             ConfirmationsView.ResumeLayout(false);

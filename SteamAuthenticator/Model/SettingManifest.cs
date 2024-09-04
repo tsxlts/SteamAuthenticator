@@ -68,6 +68,12 @@ namespace Steam_Authenticator.Model
             /// </summary>
             [JsonProperty("auto_confirm_market")]
             public bool AutoConfirmMarket { get; set; }
+
+            /// <summary>
+            /// 是否自动接收报价
+            /// </summary>
+            [JsonProperty("auto_accept_offer")]
+            public bool AutoAcceptOffer { get; set; }
         }
     }
 }

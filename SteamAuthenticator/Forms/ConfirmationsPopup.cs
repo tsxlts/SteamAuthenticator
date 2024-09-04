@@ -3,15 +3,16 @@ using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
 using System.Text;
+using static Steam_Authenticator.Internal.Utils;
 
 namespace Steam_Authenticator.Forms
 {
-    public partial class ConfirmationPopup : Form
+    public partial class ConfirmationsPopup : Form
     {
         private readonly SteamCommunityClient webClient;
         private readonly List<SteamKit.Model.Confirmation> confirmations;
 
-        public ConfirmationPopup(SteamCommunityClient webClient, IEnumerable<SteamKit.Model.Confirmation> confirmations)
+        public ConfirmationsPopup(SteamCommunityClient webClient, IEnumerable<SteamKit.Model.Confirmation> confirmations)
         {
             InitializeComponent();
 
@@ -19,7 +20,7 @@ namespace Steam_Authenticator.Forms
             this.confirmations = confirmations.ToList();
         }
 
-        private void ConfirmationPopup_Load(object sender, EventArgs e)
+        private void ConfirmationsPopup_Load(object sender, EventArgs e)
         {
             int tradeCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.Trade);
             int marketCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.MarketListing);
@@ -35,7 +36,8 @@ namespace Steam_Authenticator.Forms
             }
             stringBuilder.AppendLine("待确认");
 
-            TipsLabel.Text = stringBuilder.ToString();
+            userLabel.Text = webClient.Account;
+            tipsLabel.Text = stringBuilder.ToString();
         }
 
         private async void accept_decline_Click(object sender, EventArgs e)
@@ -54,33 +56,22 @@ namespace Steam_Authenticator.Forms
 
                 using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
                 {
-                    bool success = false;
-                    while (true)
+                    bool accept = false;
+                    if (button.Tag?.ToString() == "accept")
                     {
-                        if (button.Tag?.ToString() == "accept")
-                        {
-                            msgLabel.Text = "正在确认...";
-
-                            success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                        }
-                        else if (button.Tag?.ToString() == "decline")
-                        {
-                            msgLabel.Text = "正在拒绝...";
-
-                            success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                        }
-
-                        if (cts.IsCancellationRequested || success)
-                        {
-                            break;
-                        }
-                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        accept = true;
+                        msgLabel.Text = "正在确认...";
+                    }
+                    else if (button.Tag?.ToString() == "decline")
+                    {
+                        accept = false;
+                        msgLabel.Text = "正在拒绝...";
                     }
 
+                    bool success = await HandleConfirmation(webClient, guard, confirmations, accept, cts.Token);
                     if (success)
                     {
                         confirmations.Clear();
-
                         Close();
                     }
                     else
@@ -103,7 +94,7 @@ namespace Steam_Authenticator.Forms
 
         private void detailBtn_Click(object sender, EventArgs e)
         {
-            Confirmation confirmation = new Confirmation(webClient);
+            Confirmations confirmation = new Confirmations(webClient);
             confirmation.ShowDialog();
         }
     }

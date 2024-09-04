@@ -5,6 +5,7 @@ using SteamKit;
 using SteamKit.Model;
 using System.Text;
 using System.Web;
+using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator
@@ -60,7 +61,11 @@ namespace Steam_Authenticator
                 var user = chooseAccount.User;
                 if (user != null)
                 {
-                    await Login(user.RefreshToken);
+                    var webClient = Appsetting.Instance.CurrentClient;
+                    if (webClient.SteamId != user.SteamId || !webClient.LoggedIn)
+                    {
+                        await Login(user.RefreshToken);
+                    }
                     return;
                 }
 
@@ -258,7 +263,10 @@ namespace Steam_Authenticator
                                     "提示",
                                     MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
                                 {
-                                    return;
+                                    if (MessageBox.Show("是否要退出绑定令牌？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    {
+                                        return;
+                                    }
                                 }
 
                                 var waitingForEmailConfirmation = await SteamApi.IsAccountWaitingForEmailConfirmationAsync(webClient.WebApiToken);
@@ -530,6 +538,11 @@ namespace Steam_Authenticator
                                 $"请输入你收到的手机验证码");
                             if (input.ShowDialog() != DialogResult.OK)
                             {
+                                if (MessageBox.Show("是否要退出绑定令牌？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                {
+                                    return;
+                                }
+
                                 continue;
                             }
 
@@ -708,13 +721,21 @@ namespace Steam_Authenticator
 
         private void confirmMenuItem_Click(object sender, EventArgs e)
         {
-            if (!Appsetting.Instance.CurrentClient.LoggedIn)
+            var webClient = Appsetting.Instance.CurrentClient;
+            if (!webClient.LoggedIn)
             {
                 MessageBox.Show("请先登录Steam帐号");
                 return;
             }
 
-            Forms.Confirmation confirmation = new Forms.Confirmation(Appsetting.Instance.CurrentClient);
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            if (guard == null)
+            {
+                MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Forms.Confirmations confirmation = new Forms.Confirmations(webClient);
             confirmation.Show();
         }
 
@@ -803,6 +824,84 @@ namespace Steam_Authenticator
             }
         }
 
+        private void offersBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var webClient = Appsetting.Instance.CurrentClient;
+                if (!webClient.LoggedIn)
+                {
+                    MessageBox.Show("请先登录Steam帐号");
+                    return;
+                }
+
+                Offers offersForm = new Offers(webClient);
+                offersForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void acceptOfferBtn_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("你确定要接受所有报价吗？", "接受报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                var webClient = Appsetting.Instance.CurrentClient;
+                if (!webClient.LoggedIn)
+                {
+                    return;
+                }
+
+                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
+                if (offers == null || !offers.Any())
+                {
+                    return;
+                }
+
+                await HandleOffer(webClient, offers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void declineOfferBtn_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("你确定要拒绝所有报价吗？", "拒绝报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                var webClient = Appsetting.Instance.CurrentClient;
+                if (!webClient.LoggedIn)
+                {
+                    return;
+                }
+
+                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
+                if (offers == null || !offers.Any())
+                {
+                    return;
+                }
+
+                await HandleOffer(webClient, offers, false, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void RefreshClientMsg(object _)
         {
             try
@@ -813,6 +912,8 @@ namespace Steam_Authenticator
                 {
                     tasks.Add(QueryAuthSessionsForAccount(tokenSource.Token));
                     tasks.Add(NotificationsReceived(tokenSource.Token));
+
+                    tasks.Add(QueryOffers(tokenSource.Token));
                     tasks.Add(QueryConfirmations(tokenSource.Token));
                 }
 
@@ -832,11 +933,11 @@ namespace Steam_Authenticator
         {
             try
             {
-                UserImg.Image = Properties.Resources.userimg;
+                ClearUser();
+
                 loginMenuItem.Enabled = false;
                 UserName.ForeColor = Color.FromArgb(128, 128, 128);
                 UserName.Text = "正在登录...";
-                Balance.Text = "￥0.00";
 
                 await Appsetting.Instance.CurrentClient.LoginAsync(token);
 
@@ -860,17 +961,12 @@ namespace Steam_Authenticator
             {
                 var webClient = Appsetting.Instance.CurrentClient;
 
-                var querySteamNotifications = await SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false, countOnly: false,
+                var querySteamNotifications = await SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false, countOnly: true,
                       includeConfirmation: true, includePinned: false, includeRead: false,
                       cancellationToken: cancellationToken);
 
                 var body = querySteamNotifications.Body;
-                var notifications = body?.Notifications ?? new List<Notification>();
-                var offers = notifications.Where(c => c.NotificationType == SteamNotificationType.ReceivedTradeOffer && !c.Read && !c.Hidden).ToList();
-
-                OfferCountLabel.Text = $"{offers.Count}";
                 ConfirmationCountLable.Text = $"{body?.ConfirmationCount ?? 0}";
-
             }
             catch
             {
@@ -931,6 +1027,32 @@ namespace Steam_Authenticator
             }
         }
 
+        private async Task QueryOffers(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var setting = Appsetting.Instance.AppSetting.Entry;
+
+                var webClient = Appsetting.Instance.CurrentClient;
+
+                var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true,
+                      cancellationToken: cancellationToken);
+
+                var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+
+                OfferCountLabel.Text = $"{offers.Count}";
+                OfferCountLabel.Tag = offers;
+
+                if (setting.AutoAcceptOffer)
+                {
+                    await HandleOffer(webClient, offers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+                }
+            }
+            catch
+            {
+            }
+        }
+
         private async Task QueryConfirmations(CancellationToken cancellationToken)
         {
             if (!confirmationPopupLocker.Wait(0))
@@ -955,10 +1077,10 @@ namespace Steam_Authenticator
                 }
 
                 var queryConfirmations = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, cancellationToken);
-                var confirmations = queryConfirmations.Confirmations ?? new List<SteamKit.Model.Confirmation>();
+                var confirmations = queryConfirmations.Confirmations ?? new List<Confirmation>();
 
-                List<SteamKit.Model.Confirmation> autoConfirm = new List<SteamKit.Model.Confirmation>();
-                List<SteamKit.Model.Confirmation> waitConfirm = new List<SteamKit.Model.Confirmation>();
+                List<Confirmation> autoConfirm = new List<Confirmation>();
+                List<Confirmation> waitConfirm = new List<Confirmation>();
 
                 foreach (var conf in confirmations)
                 {
@@ -976,7 +1098,7 @@ namespace Steam_Authenticator
                 {
                     try
                     {
-                        var autoConfirmResult = await webClient.Confirmation.AllowConfirmationAsync(autoConfirm, guard.DeviceId, guard.IdentitySecret, cancellationToken);
+                        bool accept = await HandleConfirmation(webClient, guard, autoConfirm, true, cancellationToken);
                     }
                     catch
                     {
@@ -986,7 +1108,7 @@ namespace Steam_Authenticator
 
                 if (waitConfirm.Any())
                 {
-                    ConfirmationPopup confirmationPopup = new ConfirmationPopup(webClient, waitConfirm);
+                    ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(webClient, waitConfirm);
                     confirmationPopup.ShowDialog();
                 }
             }
@@ -1003,25 +1125,14 @@ namespace Steam_Authenticator
         {
             ResetTimer(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
-            Text = $"Steam验证器";
-            loginMenuItem.Text = "登录";
-
-            copyCookieMenuItem.Enabled = false;
-            copyRefreshTokenMenuItem.Enabled = false;
-            copyAccessTokenToolItem.Enabled = false;
-
-            UserImg.Image = Properties.Resources.userimg;
-            UserName.ForeColor = Color.Black;
-            UserName.Text = "---";
-            Balance.Text = "￥0.00";
-
-            OfferCountLabel.Text = "0";
-            ConfirmationCountLable.Text = "0";
+            ClearUser();
 
             await Task.Run(() =>
             {
                 if (Appsetting.Instance.CurrentClient.LoggedIn)
                 {
+                    Appsetting.Instance.CurrentClient.SetLanguage(Language.Schinese);
+
                     Text = $"Steam验证器[{Appsetting.Instance.CurrentClient.Account}]";
                     loginMenuItem.Text = "切换帐号";
 
@@ -1071,6 +1182,24 @@ namespace Steam_Authenticator
                     ResetTimer(TimeSpan.Zero, timerPeriod);
                 }
             });
+        }
+
+        private void ClearUser()
+        {
+            Text = $"Steam验证器";
+            loginMenuItem.Text = "登录";
+
+            copyCookieMenuItem.Enabled = false;
+            copyRefreshTokenMenuItem.Enabled = false;
+            copyAccessTokenToolItem.Enabled = false;
+
+            UserImg.Image = Properties.Resources.userimg;
+            UserName.ForeColor = Color.Black;
+            UserName.Text = "---";
+            Balance.Text = "￥0.00";
+
+            OfferCountLabel.Text = "0";
+            ConfirmationCountLable.Text = "0";
         }
 
         private void ResetTimer(TimeSpan dueTime, TimeSpan period)

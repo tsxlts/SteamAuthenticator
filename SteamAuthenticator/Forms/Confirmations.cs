@@ -3,28 +3,29 @@ using Steam_Authenticator.Model;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using System.Drawing.Drawing2D;
+using static Steam_Authenticator.Internal.Utils;
 
 namespace Steam_Authenticator.Forms
 {
-    public partial class Confirmation : Form
+    public partial class Confirmations : Form
     {
         private readonly SteamCommunityClient webClient;
-        bool refreshing = false;
+        private bool refreshing = false;
 
-        public Confirmation(SteamCommunityClient webClient)
+        public Confirmations(SteamCommunityClient webClient)
         {
             InitializeComponent();
             this.webClient = webClient;
         }
 
-        private async void Confirmation_Load(object sender, EventArgs e)
+        private async void Confirmations_Load(object sender, EventArgs e)
         {
             if (!webClient.LoggedIn)
             {
                 return;
             }
 
-            await RefreshConfirmation(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+            await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
             autoRefreshTimer.Interval = 5000;
             autoRefreshTimer.Enabled = true;
@@ -38,7 +39,7 @@ namespace Steam_Authenticator.Forms
 
             autoRefreshTimer.Enabled = false;
 
-            await RefreshConfirmation(false, new CancellationTokenSource(TimeSpan.FromSeconds(3)).Token);
+            await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(3)).Token);
 
             autoRefreshTimer.Interval = 5000;
             autoRefreshTimer.Enabled = true;
@@ -52,7 +53,7 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            await RefreshConfirmation(true, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+            await RefreshConfirmations(true, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
         }
 
         private async void btnAccept_Click(object sender, EventArgs e)
@@ -65,7 +66,7 @@ namespace Steam_Authenticator.Forms
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
                 if (guard == null)
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -73,31 +74,14 @@ namespace Steam_Authenticator.Forms
 
                 using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
                 {
-                    bool accept;
-                    while (true)
-                    {
-                        accept = await webClient.Confirmation.AllowConfirmationAsync(new[]
-                        {
-                            new ConfirmationBase
-                            {
-                                Id = confirmation.Id,
-                                Key=confirmation.Key
-                            }
-                        }, guard.DeviceId, guard.IdentitySecret);
-
-                        if (cts.IsCancellationRequested || accept)
-                        {
-                            break;
-                        }
-                        await Task.Delay(TimeSpan.FromSeconds(2));
-                    }
+                    bool accept = await HandleConfirmation(webClient, guard, new[] { confirmation }, true, cts.Token);
                     if (!accept)
                     {
                         MessageBox.Show("操作失败,请重新操作");
                     }
                 }
 
-                await RefreshConfirmation(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+                await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
             }
             catch (Exception ex)
             {
@@ -126,31 +110,14 @@ namespace Steam_Authenticator.Forms
                 var confirmation = button.Confirmation;
                 using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
                 {
-                    bool cancel;
-                    while (true)
-                    {
-                        cancel = await webClient.Confirmation.CancelConfirmationAsync(new[]
-                        {
-                            new ConfirmationBase
-                            {
-                                Id = confirmation.Id,
-                                Key=confirmation.Key
-                            }
-                        }, guard.DeviceId, guard.IdentitySecret);
-
-                        if (cts.IsCancellationRequested || cancel)
-                        {
-                            break;
-                        }
-                        await Task.Delay(TimeSpan.FromSeconds(2));
-                    }
+                    bool cancel = await HandleConfirmation(webClient, guard, new[] { confirmation }, false, cts.Token);
                     if (!cancel)
                     {
                         MessageBox.Show("操作失败,请重新操作");
                     }
                 }
 
-                await RefreshConfirmation(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+                await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
             }
             catch (Exception ex)
             {
@@ -185,7 +152,7 @@ namespace Steam_Authenticator.Forms
             browser.LoadHtlm(detail);
         }
 
-        private async Task RefreshConfirmation(bool showError, CancellationToken cancellationToken)
+        private async Task RefreshConfirmations(bool showError, CancellationToken cancellationToken)
         {
             if (refreshing)
             {
@@ -249,9 +216,10 @@ namespace Steam_Authenticator.Forms
                             Label errorLabel = new Label()
                             {
                                 Text = "当前没有任何确认信息",
-                                AutoSize = true,
+                                AutoSize = false,
                                 ForeColor = Color.FromArgb(255, 140, 0),
-                                Location = new Point(10, 10)
+                                TextAlign = ContentAlignment.TopCenter,
+                                Dock = DockStyle.Fill
                             };
                             ConfirmationsView.Panel2.Controls.Add(errorLabel);
                             return;
@@ -317,7 +285,7 @@ namespace Steam_Authenticator.Forms
 
                             ConfirmationButton detailButton = new ConfirmationButton()
                             {
-                                Text = "详情",
+                                Text = "查看",
                                 Location = new Point(270, 60),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },

@@ -32,14 +32,15 @@
             menuStrip1 = new MenuStrip();
             UserToolStripMenuItem = new ToolStripMenuItem();
             loginMenuItem = new ToolStripMenuItem();
+            settingMenuItem = new ToolStripMenuItem();
             proxySettingMenuItem = new ToolStripMenuItem();
             passwordMenuItem = new ToolStripMenuItem();
             copyCookieMenuItem = new ToolStripMenuItem();
             copyRefreshTokenMenuItem = new ToolStripMenuItem();
             copyAccessTokenToolItem = new ToolStripMenuItem();
             authenticatorMenu = new ToolStripMenuItem();
-            confirmMenuItem = new ToolStripMenuItem();
             guardMenuItem = new ToolStripMenuItem();
+            confirmMenuItem = new ToolStripMenuItem();
             addAuthenticatorMenuItem = new ToolStripMenuItem();
             moveAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
@@ -48,11 +49,14 @@
             UserName = new Label();
             Balance = new Label();
             panel1 = new Panel();
+            declineOfferBtn = new Label();
+            acceptOfferBtn = new Label();
+            offersBtn = new Label();
             ConfirmationCountLable = new Label();
             OfferCountLabel = new Label();
             label2 = new Label();
             label1 = new Label();
-            settingMenuItem = new ToolStripMenuItem();
+            confirmationBtn = new Label();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -63,7 +67,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(444, 25);
+            menuStrip1.Size = new Size(708, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -80,6 +84,13 @@
             loginMenuItem.Size = new Size(180, 22);
             loginMenuItem.Text = "登录";
             loginMenuItem.Click += loginMenuItem_Click;
+            // 
+            // settingMenuItem
+            // 
+            settingMenuItem.Name = "settingMenuItem";
+            settingMenuItem.Size = new Size(180, 22);
+            settingMenuItem.Text = "用户设置";
+            settingMenuItem.Click += settingMenuItem_Click;
             // 
             // proxySettingMenuItem
             // 
@@ -121,50 +132,50 @@
             // 
             // authenticatorMenu
             // 
-            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { confirmMenuItem, guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, removeAuthenticatorMenuItem, importAuthenticatorMenuItem });
+            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, confirmMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, removeAuthenticatorMenuItem, importAuthenticatorMenuItem });
             authenticatorMenu.Name = "authenticatorMenu";
             authenticatorMenu.Size = new Size(80, 21);
             authenticatorMenu.Text = "令牌验证器";
             // 
-            // confirmMenuItem
-            // 
-            confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(136, 22);
-            confirmMenuItem.Text = "令牌确认";
-            confirmMenuItem.Click += confirmMenuItem_Click;
-            // 
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(136, 22);
-            guardMenuItem.Text = "Steam令牌";
+            guardMenuItem.Size = new Size(124, 22);
+            guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
+            // 
+            // confirmMenuItem
+            // 
+            confirmMenuItem.Name = "confirmMenuItem";
+            confirmMenuItem.Size = new Size(124, 22);
+            confirmMenuItem.Text = "确认";
+            confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(136, 22);
+            addAuthenticatorMenuItem.Size = new Size(124, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(136, 22);
+            moveAuthenticatorMenuItem.Size = new Size(124, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(136, 22);
+            removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "删除令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
             // importAuthenticatorMenuItem
             // 
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(136, 22);
+            importAuthenticatorMenuItem.Size = new Size(124, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             importAuthenticatorMenuItem.Click += importAuthenticatorMenuItem_Click;
             // 
@@ -200,14 +211,54 @@
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            panel1.Controls.Add(confirmationBtn);
+            panel1.Controls.Add(declineOfferBtn);
+            panel1.Controls.Add(acceptOfferBtn);
+            panel1.Controls.Add(offersBtn);
             panel1.Controls.Add(ConfirmationCountLable);
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(283, 38);
+            panel1.Location = new Point(488, 38);
             panel1.Name = "panel1";
-            panel1.Size = new Size(149, 100);
+            panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
+            // 
+            // declineOfferBtn
+            // 
+            declineOfferBtn.AutoSize = true;
+            declineOfferBtn.Cursor = Cursors.Hand;
+            declineOfferBtn.ForeColor = Color.Red;
+            declineOfferBtn.Location = new Point(173, 5);
+            declineOfferBtn.Name = "declineOfferBtn";
+            declineOfferBtn.Size = new Size(32, 17);
+            declineOfferBtn.TabIndex = 6;
+            declineOfferBtn.Text = "拒绝";
+            declineOfferBtn.Click += declineOfferBtn_Click;
+            // 
+            // acceptOfferBtn
+            // 
+            acceptOfferBtn.AutoSize = true;
+            acceptOfferBtn.Cursor = Cursors.Hand;
+            acceptOfferBtn.ForeColor = Color.Green;
+            acceptOfferBtn.Location = new Point(136, 5);
+            acceptOfferBtn.Name = "acceptOfferBtn";
+            acceptOfferBtn.Size = new Size(32, 17);
+            acceptOfferBtn.TabIndex = 5;
+            acceptOfferBtn.Text = "接受";
+            acceptOfferBtn.Click += acceptOfferBtn_Click;
+            // 
+            // offersBtn
+            // 
+            offersBtn.AutoSize = true;
+            offersBtn.Cursor = Cursors.Hand;
+            offersBtn.ForeColor = Color.Green;
+            offersBtn.Location = new Point(97, 5);
+            offersBtn.Name = "offersBtn";
+            offersBtn.Size = new Size(32, 17);
+            offersBtn.TabIndex = 4;
+            offersBtn.Text = "查看";
+            offersBtn.Click += offersBtn_Click;
             // 
             // ConfirmationCountLable
             // 
@@ -249,18 +300,23 @@
             label1.Text = "报价:";
             label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // settingMenuItem
+            // confirmationBtn
             // 
-            settingMenuItem.Name = "settingMenuItem";
-            settingMenuItem.Size = new Size(180, 22);
-            settingMenuItem.Text = "用户设置";
-            settingMenuItem.Click += settingMenuItem_Click;
+            confirmationBtn.AutoSize = true;
+            confirmationBtn.Cursor = Cursors.Hand;
+            confirmationBtn.ForeColor = Color.Green;
+            confirmationBtn.Location = new Point(97, 33);
+            confirmationBtn.Name = "confirmationBtn";
+            confirmationBtn.Size = new Size(32, 17);
+            confirmationBtn.TabIndex = 7;
+            confirmationBtn.Text = "查看";
+            confirmationBtn.Click += confirmMenuItem_Click;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(444, 361);
+            ClientSize = new Size(708, 383);
             Controls.Add(panel1);
             Controls.Add(Balance);
             Controls.Add(UserName);
@@ -309,5 +365,9 @@
         private ToolStripMenuItem proxySettingMenuItem;
         private ToolStripMenuItem passwordMenuItem;
         private ToolStripMenuItem settingMenuItem;
+        private Label offersBtn;
+        private Label acceptOfferBtn;
+        private Label declineOfferBtn;
+        private Label confirmationBtn;
     }
 }

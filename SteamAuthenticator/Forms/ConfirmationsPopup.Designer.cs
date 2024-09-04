@@ -1,6 +1,6 @@
 ﻿namespace Steam_Authenticator.Forms
 {
-    partial class ConfirmationPopup
+    partial class ConfirmationsPopup
     {
         /// <summary>
         /// Required designer variable.
@@ -30,9 +30,9 @@
         {
             acceptBtn = new Button();
             declineBtn = new Button();
-            label1 = new Label();
+            userLabel = new Label();
             panel1 = new Panel();
-            TipsLabel = new Label();
+            tipsLabel = new Label();
             detailBtn = new Button();
             panel2 = new Panel();
             msgLabel = new Label();
@@ -66,19 +66,19 @@
             declineBtn.UseVisualStyleBackColor = false;
             declineBtn.Click += accept_decline_Click;
             // 
-            // label1
+            // userLabel
             // 
-            label1.Location = new Point(12, 9);
-            label1.Name = "label1";
-            label1.Size = new Size(214, 23);
-            label1.TabIndex = 2;
-            label1.Text = "steam user";
-            label1.TextAlign = ContentAlignment.MiddleCenter;
+            userLabel.Location = new Point(12, 9);
+            userLabel.Name = "userLabel";
+            userLabel.Size = new Size(214, 23);
+            userLabel.TabIndex = 2;
+            userLabel.Text = "steam user";
+            userLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // panel1
             // 
             panel1.AutoScroll = true;
-            panel1.Controls.Add(TipsLabel);
+            panel1.Controls.Add(tipsLabel);
             panel1.Location = new Point(13, 35);
             panel1.Name = "panel1";
             panel1.Size = new Size(213, 111);
@@ -86,13 +86,13 @@
             // 
             // TipsLabel
             // 
-            TipsLabel.Dock = DockStyle.Fill;
-            TipsLabel.Location = new Point(0, 0);
-            TipsLabel.Name = "TipsLabel";
-            TipsLabel.Size = new Size(213, 111);
-            TipsLabel.TabIndex = 2;
-            TipsLabel.Text = "你有0个报价待确认";
-            TipsLabel.TextAlign = ContentAlignment.MiddleCenter;
+            tipsLabel.Dock = DockStyle.Fill;
+            tipsLabel.Location = new Point(0, 0);
+            tipsLabel.Name = "TipsLabel";
+            tipsLabel.Size = new Size(213, 111);
+            tipsLabel.TabIndex = 2;
+            tipsLabel.Text = "你有0个报价待确认";
+            tipsLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // detailBtn
             // 
@@ -125,7 +125,7 @@
             msgLabel.Text = "等待确认";
             msgLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // ConfirmationPopup
+            // ConfirmationsPopup
             // 
             AcceptButton = acceptBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -134,16 +134,16 @@
             Controls.Add(panel2);
             Controls.Add(detailBtn);
             Controls.Add(panel1);
-            Controls.Add(label1);
+            Controls.Add(userLabel);
             Controls.Add(declineBtn);
             Controls.Add(acceptBtn);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "ConfirmationPopup";
+            Name = "ConfirmationsPopup";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "令牌确认";
-            Load += ConfirmationPopup_Load;
+            Load += ConfirmationsPopup_Load;
             panel1.ResumeLayout(false);
             panel2.ResumeLayout(false);
             ResumeLayout(false);
@@ -153,9 +153,9 @@
 
         private Button acceptBtn;
         private Button declineBtn;
-        private Label label1;
+        private Label userLabel;
         private Panel panel1;
-        private Label TipsLabel;
+        private Label tipsLabel;
         private Button detailBtn;
         private Panel panel2;
         private Label msgLabel;
