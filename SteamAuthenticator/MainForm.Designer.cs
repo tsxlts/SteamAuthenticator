@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
             UserToolStripMenuItem = new ToolStripMenuItem();
-            loginMenuItem = new ToolStripMenuItem();
             settingMenuItem = new ToolStripMenuItem();
             proxySettingMenuItem = new ToolStripMenuItem();
             passwordMenuItem = new ToolStripMenuItem();
@@ -49,6 +48,7 @@
             UserName = new Label();
             Balance = new Label();
             panel1 = new Panel();
+            confirmationBtn = new Label();
             declineOfferBtn = new Label();
             acceptOfferBtn = new Label();
             offersBtn = new Label();
@@ -56,7 +56,7 @@
             OfferCountLabel = new Label();
             label2 = new Label();
             label1 = new Label();
-            confirmationBtn = new Label();
+            UsersPanel = new Panel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -67,23 +67,16 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(708, 25);
+            menuStrip1.Size = new Size(684, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
             // UserToolStripMenuItem
             // 
-            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loginMenuItem, settingMenuItem, proxySettingMenuItem, passwordMenuItem, copyCookieMenuItem, copyRefreshTokenMenuItem, copyAccessTokenToolItem });
+            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingMenuItem, proxySettingMenuItem, passwordMenuItem, copyCookieMenuItem, copyRefreshTokenMenuItem, copyAccessTokenToolItem });
             UserToolStripMenuItem.Name = "UserToolStripMenuItem";
             UserToolStripMenuItem.Size = new Size(44, 21);
-            UserToolStripMenuItem.Text = "用户";
-            // 
-            // loginMenuItem
-            // 
-            loginMenuItem.Name = "loginMenuItem";
-            loginMenuItem.Size = new Size(180, 22);
-            loginMenuItem.Text = "登录";
-            loginMenuItem.Click += loginMenuItem_Click;
+            UserToolStripMenuItem.Text = "文件";
             // 
             // settingMenuItem
             // 
@@ -191,19 +184,21 @@
             // 
             // UserName
             // 
+            UserName.AutoEllipsis = true;
             UserName.Location = new Point(118, 40);
             UserName.Name = "UserName";
-            UserName.Size = new Size(100, 23);
+            UserName.Size = new Size(200, 23);
             UserName.TabIndex = 2;
             UserName.Text = "---";
             UserName.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // Balance
             // 
+            Balance.AutoEllipsis = true;
             Balance.ForeColor = Color.Green;
             Balance.Location = new Point(118, 68);
             Balance.Name = "Balance";
-            Balance.Size = new Size(100, 23);
+            Balance.Size = new Size(200, 23);
             Balance.TabIndex = 4;
             Balance.Text = "￥0.00";
             Balance.TextAlign = ContentAlignment.MiddleLeft;
@@ -219,10 +214,22 @@
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(488, 38);
+            panel1.Location = new Point(464, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
+            // 
+            // confirmationBtn
+            // 
+            confirmationBtn.AutoSize = true;
+            confirmationBtn.Cursor = Cursors.Hand;
+            confirmationBtn.ForeColor = Color.Green;
+            confirmationBtn.Location = new Point(97, 33);
+            confirmationBtn.Name = "confirmationBtn";
+            confirmationBtn.Size = new Size(32, 17);
+            confirmationBtn.TabIndex = 7;
+            confirmationBtn.Text = "查看";
+            confirmationBtn.Click += confirmMenuItem_Click;
             // 
             // declineOfferBtn
             // 
@@ -300,31 +307,31 @@
             label1.Text = "报价:";
             label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // confirmationBtn
+            // UsersPanel
             // 
-            confirmationBtn.AutoSize = true;
-            confirmationBtn.Cursor = Cursors.Hand;
-            confirmationBtn.ForeColor = Color.Green;
-            confirmationBtn.Location = new Point(97, 33);
-            confirmationBtn.Name = "confirmationBtn";
-            confirmationBtn.Size = new Size(32, 17);
-            confirmationBtn.TabIndex = 7;
-            confirmationBtn.Text = "查看";
-            confirmationBtn.Click += confirmMenuItem_Click;
+            UsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            UsersPanel.AutoScroll = true;
+            UsersPanel.BorderStyle = BorderStyle.FixedSingle;
+            UsersPanel.Location = new Point(12, 156);
+            UsersPanel.Name = "UsersPanel";
+            UsersPanel.Size = new Size(660, 293);
+            UsersPanel.TabIndex = 7;
+            UsersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(708, 383);
+            ClientSize = new Size(684, 461);
+            Controls.Add(UsersPanel);
             Controls.Add(panel1);
             Controls.Add(Balance);
             Controls.Add(UserName);
             Controls.Add(UserImg);
             Controls.Add(menuStrip1);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
+            MinimumSize = new Size(700, 500);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Steam验证器";
@@ -345,7 +352,6 @@
         private ToolStripMenuItem UserToolStripMenuItem;
         private PictureBox UserImg;
         private Label UserName;
-        private ToolStripMenuItem loginMenuItem;
         private ToolStripMenuItem copyCookieMenuItem;
         private ToolStripMenuItem copyRefreshTokenMenuItem;
         private Label Balance;
@@ -369,5 +375,6 @@
         private Label acceptOfferBtn;
         private Label declineOfferBtn;
         private Label confirmationBtn;
+        private Panel UsersPanel;
     }
 }

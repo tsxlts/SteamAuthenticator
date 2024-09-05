@@ -42,6 +42,15 @@ namespace Steam_Authenticator.Model
                 };
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            [JsonProperty("current_user")]
+            public string CurrentUser { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
             [JsonProperty("domain")]
             public Domain Domain { get; set; }
 

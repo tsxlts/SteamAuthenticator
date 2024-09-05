@@ -34,6 +34,7 @@
             // 
             // UsersPanel
             // 
+            UsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             UsersPanel.Location = new Point(10, 20);
             UsersPanel.Name = "UsersPanel";
             UsersPanel.Size = new Size(480, 240);

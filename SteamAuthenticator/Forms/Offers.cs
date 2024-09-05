@@ -1,5 +1,4 @@
 ﻿using Steam_Authenticator.Controls;
-using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
@@ -7,7 +6,6 @@ using System.Data;
 using System.Drawing.Drawing2D;
 using System.Text;
 using static Steam_Authenticator.Internal.Utils;
-using static SteamKit.Model.BeginAuthSessionViaCredentialsResponse;
 
 namespace Steam_Authenticator.Forms
 {

@@ -74,8 +74,17 @@ namespace Steam_Authenticator.Internal
                     Data = encrypted
                 };
 
+                int index = Entries.FindIndex(c => c.Path.Equals(path, StringComparison.OrdinalIgnoreCase) && c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
                 Entries.RemoveAll(c => c.Path.Equals(path, StringComparison.OrdinalIgnoreCase) && c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-                Entries.Add(manifestEntry);
+
+                if (index >= 0)
+                {
+                    Entries.Insert(index, manifestEntry);
+                }
+                else
+                {
+                    Entries.Add(manifestEntry);
+                }
 
                 return Save();
             }

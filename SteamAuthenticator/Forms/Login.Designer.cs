@@ -41,7 +41,7 @@
             // 
             User.Location = new Point(62, 20);
             User.Name = "User";
-            User.Size = new Size(134, 23);
+            User.Size = new Size(135, 23);
             User.TabIndex = 0;
             // 
             // label1
@@ -67,14 +67,14 @@
             Password.Location = new Point(62, 62);
             Password.Name = "Password";
             Password.PasswordChar = '*';
-            Password.Size = new Size(134, 23);
+            Password.Size = new Size(135, 23);
             Password.TabIndex = 2;
             // 
             // loginBtn
             // 
-            loginBtn.Location = new Point(133, 107);
+            loginBtn.Location = new Point(127, 110);
             loginBtn.Name = "loginBtn";
-            loginBtn.Size = new Size(63, 23);
+            loginBtn.Size = new Size(70, 28);
             loginBtn.TabIndex = 4;
             loginBtn.Text = "登录";
             loginBtn.UseVisualStyleBackColor = true;
@@ -82,9 +82,9 @@
             // 
             // cancelBtn
             // 
-            cancelBtn.Location = new Point(62, 107);
+            cancelBtn.Location = new Point(47, 110);
             cancelBtn.Name = "cancelBtn";
-            cancelBtn.Size = new Size(63, 23);
+            cancelBtn.Size = new Size(70, 28);
             cancelBtn.TabIndex = 5;
             cancelBtn.Text = "取消";
             cancelBtn.UseVisualStyleBackColor = true;
@@ -95,7 +95,7 @@
             AcceptButton = loginBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(205, 140);
+            ClientSize = new Size(209, 150);
             Controls.Add(cancelBtn);
             Controls.Add(loginBtn);
             Controls.Add(label2);

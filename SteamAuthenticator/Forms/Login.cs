@@ -7,9 +7,11 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Login : Form
     {
-        public Login()
+        public Login(string account)
         {
             InitializeComponent();
+
+            User.Text = account ?? "";
         }
 
         private async void loginBtn_Click(object sender, EventArgs e)
@@ -49,7 +51,7 @@ namespace Steam_Authenticator.Forms
                             if (loginSuccess)
                             {
                                 cts.Cancel();
-                                Appsetting.Instance.SetWebClient(steamWebClient);
+                                Client = steamWebClient;
                                 DialogResult = DialogResult.OK;
                                 return true;
                             }
@@ -141,5 +143,7 @@ namespace Steam_Authenticator.Forms
         {
             DialogResult = DialogResult.Cancel;
         }
+
+        public SteamCommunityClient Client { get; private set; }
     }
 }

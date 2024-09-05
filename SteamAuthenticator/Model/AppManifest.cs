@@ -15,22 +15,22 @@ namespace Steam_Authenticator.Model
             manifest = Manifest.FromFile(file);
         }
 
-        public void AddGuard(string name, Guard entry)
+        public void AddGuard(string accountName, Guard entry)
         {
             string password = GetPassword();
-            manifest.SaveEntry(guardPath, name, password, entry);
+            manifest.SaveEntry(guardPath, accountName, password, entry);
         }
 
-        public bool RemoveGuard(string name, out Guard entry)
+        public bool RemoveGuard(string accountName, out Guard entry)
         {
             string password = GetPassword();
-            return manifest.RemoveEntry(guardPath, name, password, out entry);
+            return manifest.RemoveEntry(guardPath, accountName, password, out entry);
         }
 
-        public Guard GetGuard(string name)
+        public Guard GetGuard(string accountName)
         {
             string password = GetPassword();
-            return manifest.GetEntry<Guard>(guardPath, name, password)?.Value;
+            return manifest.GetEntry<Guard>(guardPath, accountName, password)?.Value;
         }
 
         public IEnumerable<string> GetGuards()
@@ -38,16 +38,16 @@ namespace Steam_Authenticator.Model
             return manifest.GetEntries(guardPath);
         }
 
-        public void AddUser(string name, User entry)
+        public void AddUser(string steamId, User entry)
         {
             string password = GetPassword();
-            manifest.SaveEntry(userPath, name, password, entry);
+            manifest.SaveEntry(userPath, steamId, password, entry);
         }
 
-        public bool RemoveUser(string name, out User entry)
+        public bool RemoveUser(string steamId, out User entry)
         {
             string password = GetPassword();
-            return manifest.RemoveEntry(userPath, name, password, out entry);
+            return manifest.RemoveEntry(userPath, steamId, password, out entry);
         }
 
         public User GetUser(string name)
