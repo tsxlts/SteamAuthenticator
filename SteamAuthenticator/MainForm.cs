@@ -1,4 +1,5 @@
 
+using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
@@ -6,7 +7,9 @@ using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
+using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
@@ -18,6 +21,7 @@ namespace Steam_Authenticator
         private readonly System.Threading.Timer timer;
         private readonly TimeSpan timerInterval = TimeSpan.FromSeconds(1);
         private readonly TimeSpan timerPeriod = TimeSpan.FromSeconds(20);
+        private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
         private readonly ContextMenuStrip contextMenuStrip;
 
         private UserClient currentClient = null;
@@ -46,6 +50,8 @@ namespace Steam_Authenticator
             {
                 SetCurrentClient(user);
             }
+
+            CheckVersion();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -165,6 +171,16 @@ namespace Steam_Authenticator
 
             Appsetting.Instance.AppSetting.Password = newPassword;
             MessageBox.Show(Appsetting.Instance.Manifest.Encrypted ? "密码设置成功" : "已移除访问密码", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private async void checkVersionMenuItem_Click(object sender, EventArgs e)
+        {
+            await CheckVersion();
+        }
+
+        private void quitMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         private void guardMenuItem_Click(object sender, EventArgs e)
@@ -1529,6 +1545,53 @@ namespace Steam_Authenticator
                 });
 
             return panel;
+        }
+
+        private async Task CheckVersion()
+        {
+            if (!checkVersionLocker.Wait(0))
+            {
+                return;
+            }
+
+            try
+            {
+                var result = await SteamApi.GetAsync<JObject>("https://api.github.com/repos/tsxlts/SteamAuthenticator/releases/latest");
+                var resultObj = result.Body;
+                if (!(resultObj?.TryGetValue("tag_name", out var tag_name) ?? false))
+                {
+                    return;
+                }
+
+                var match = Regex.Match(Application.ProductVersion, @"[\d.]+");
+                var currentVersion = new Version(match.Value);
+
+                match = Regex.Match(tag_name.Value<string>(), @"[\d.]+");
+                var newVersion = new Version(match.Value);
+
+                if (currentVersion < newVersion)
+                {
+                    var assets = resultObj.Value<JArray>("assets");
+                    string updateUrl = assets.FirstOrDefault()?.Value<string>("browser_download_url");
+
+                    if (!string.IsNullOrWhiteSpace(updateUrl))
+                    {
+                        DialogResult updateDialog = MessageBox.Show($"有最新版本可用（{tag_name}），是否立即更新", "版本更新", MessageBoxButtons.YesNo);
+                        if (updateDialog == DialogResult.Yes)
+                        {
+                            Process.Start("explorer.exe", updateUrl);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                checkVersionLocker.Release();
+            }
         }
     }
 }

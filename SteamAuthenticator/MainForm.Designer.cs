@@ -37,6 +37,7 @@
             copyCookieMenuItem = new ToolStripMenuItem();
             copyRefreshTokenMenuItem = new ToolStripMenuItem();
             copyAccessTokenToolItem = new ToolStripMenuItem();
+            checkVersionMenuItem = new ToolStripMenuItem();
             authenticatorMenu = new ToolStripMenuItem();
             guardMenuItem = new ToolStripMenuItem();
             confirmMenuItem = new ToolStripMenuItem();
@@ -57,6 +58,7 @@
             label2 = new Label();
             label1 = new Label();
             UsersPanel = new Panel();
+            quitMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -73,7 +75,7 @@
             // 
             // UserToolStripMenuItem
             // 
-            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingMenuItem, proxySettingMenuItem, passwordMenuItem, copyCookieMenuItem, copyRefreshTokenMenuItem, copyAccessTokenToolItem });
+            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingMenuItem, proxySettingMenuItem, passwordMenuItem, copyCookieMenuItem, copyRefreshTokenMenuItem, copyAccessTokenToolItem, checkVersionMenuItem, quitMenuItem });
             UserToolStripMenuItem.Name = "UserToolStripMenuItem";
             UserToolStripMenuItem.Size = new Size(44, 21);
             UserToolStripMenuItem.Text = "文件";
@@ -122,6 +124,13 @@
             copyAccessTokenToolItem.Size = new Size(180, 22);
             copyAccessTokenToolItem.Text = "复制AccessToken";
             copyAccessTokenToolItem.Click += copyAccessTokenMenuItem_Click;
+            // 
+            // checkVersionMenuItem
+            // 
+            checkVersionMenuItem.Name = "checkVersionMenuItem";
+            checkVersionMenuItem.Size = new Size(180, 22);
+            checkVersionMenuItem.Text = "检查更新";
+            checkVersionMenuItem.Click += checkVersionMenuItem_Click;
             // 
             // authenticatorMenu
             // 
@@ -318,6 +327,13 @@
             UsersPanel.TabIndex = 7;
             UsersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
+            // quitMenuItem
+            // 
+            quitMenuItem.Name = "quitMenuItem";
+            quitMenuItem.Size = new Size(180, 22);
+            quitMenuItem.Text = "退出";
+            quitMenuItem.Click += quitMenuItem_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -376,5 +392,7 @@
         private Label declineOfferBtn;
         private Label confirmationBtn;
         private Panel UsersPanel;
+        private ToolStripMenuItem checkVersionMenuItem;
+        private ToolStripMenuItem quitMenuItem;
     }
 }
