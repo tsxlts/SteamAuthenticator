@@ -37,6 +37,7 @@
             label5 = new Label();
             label6 = new Label();
             panel1 = new Panel();
+            deleteGuardBtn = new Button();
             exportGuardBtn = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -114,18 +115,28 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(deleteGuardBtn);
             panel1.Controls.Add(exportGuardBtn);
             panel1.Location = new Point(0, 123);
             panel1.Name = "panel1";
             panel1.Size = new Size(195, 33);
             panel1.TabIndex = 7;
             // 
+            // deleteGuardBtn
+            // 
+            deleteGuardBtn.Location = new Point(0, 0);
+            deleteGuardBtn.Name = "deleteGuardBtn";
+            deleteGuardBtn.Size = new Size(92, 33);
+            deleteGuardBtn.TabIndex = 1;
+            deleteGuardBtn.Text = "删除令牌";
+            deleteGuardBtn.UseVisualStyleBackColor = true;
+            deleteGuardBtn.Click += deleteGuardBtn_Click;
+            // 
             // exportGuardBtn
             // 
-            exportGuardBtn.Dock = DockStyle.Fill;
-            exportGuardBtn.Location = new Point(0, 0);
+            exportGuardBtn.Location = new Point(103, 0);
             exportGuardBtn.Name = "exportGuardBtn";
-            exportGuardBtn.Size = new Size(195, 33);
+            exportGuardBtn.Size = new Size(92, 33);
             exportGuardBtn.TabIndex = 0;
             exportGuardBtn.Text = "导出令牌";
             exportGuardBtn.UseVisualStyleBackColor = true;
@@ -168,5 +179,6 @@
         private Label label6;
         private Panel panel1;
         private Button exportGuardBtn;
+        private Button deleteGuardBtn;
     }
 }

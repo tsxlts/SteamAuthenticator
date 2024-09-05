@@ -169,7 +169,7 @@ namespace Steam_Authenticator
 
         private void guardMenuItem_Click(object sender, EventArgs e)
         {
-            StreamGuard streamGuard = new StreamGuard(currentClient.Client.Account);
+            StreamGuard streamGuard = new StreamGuard(currentClient?.Client?.Account);
             streamGuard.Show();
         }
 

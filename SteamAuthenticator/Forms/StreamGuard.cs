@@ -69,6 +69,49 @@ namespace Steam_Authenticator.Forms
             Clipboard.SetText(GuardText.Text);
         }
 
+        private void deleteGuardBtn_Click(object sender, EventArgs e)
+        {
+            string account = Users.SelectedItem?.ToString();
+            if (string.IsNullOrWhiteSpace(account))
+            {
+                MessageBox.Show("请选择要删除的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (Appsetting.Instance.Manifest.Encrypted)
+            {
+                string tips = "请输入访问密码";
+                Input input;
+                while (true)
+                {
+                    input = new Input("删除令牌", tips, true);
+                    if (input.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    string password = input.InputValue;
+                    if (!Appsetting.Instance.Manifest.CheckPassword(password))
+                    {
+                        tips = "访问密码错误，请重新输入";
+                        continue;
+                    }
+                    break;
+                }
+            }
+
+            if (MessageBox.Show($"删除令牌前请确保已将令牌移动至其他设备" +
+                $"{Environment.NewLine}" +
+                $"令牌删除后不可恢复" +
+                $"{Environment.NewLine}" +
+                $"你确认要删除帐号 {account} 的令牌吗？", "删除令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            Appsetting.Instance.Manifest.RemoveGuard(account, out var _);
+        }
+
         private void exportGuardBtn_Click(object sender, EventArgs e)
         {
             if (Appsetting.Instance.Manifest.Encrypted)
