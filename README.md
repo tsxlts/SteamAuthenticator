@@ -9,6 +9,6 @@ Steam身份验证器 Steam桌面令牌<br>
 ![main](images/main.png)<br>
 ![login](images/login.png)<br>
 ![setting](images/setting.png)<br>
+![guard](images/guard.png)<br>
 ![confirmation](images/confirmation.png)<br>
 ![offer](images/offer.png)<br>
-![guard](images/guard.png)<br>
