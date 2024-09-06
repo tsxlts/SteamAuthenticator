@@ -38,6 +38,7 @@
             copyRefreshTokenMenuItem = new ToolStripMenuItem();
             copyAccessTokenToolItem = new ToolStripMenuItem();
             checkVersionMenuItem = new ToolStripMenuItem();
+            quitMenuItem = new ToolStripMenuItem();
             authenticatorMenu = new ToolStripMenuItem();
             guardMenuItem = new ToolStripMenuItem();
             confirmMenuItem = new ToolStripMenuItem();
@@ -57,8 +58,13 @@
             OfferCountLabel = new Label();
             label2 = new Label();
             label1 = new Label();
-            UsersPanel = new Panel();
-            quitMenuItem = new ToolStripMenuItem();
+            usersPanel = new Panel();
+            label3 = new Label();
+            label4 = new Label();
+            label5 = new Label();
+            versionLabel = new LinkLabel();
+            label6 = new Label();
+            label7 = new Label();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -131,6 +137,13 @@
             checkVersionMenuItem.Size = new Size(180, 22);
             checkVersionMenuItem.Text = "检查更新";
             checkVersionMenuItem.Click += checkVersionMenuItem_Click;
+            // 
+            // quitMenuItem
+            // 
+            quitMenuItem.Name = "quitMenuItem";
+            quitMenuItem.Size = new Size(180, 22);
+            quitMenuItem.Text = "退出";
+            quitMenuItem.Click += quitMenuItem_Click;
             // 
             // authenticatorMenu
             // 
@@ -279,6 +292,7 @@
             // ConfirmationCountLable
             // 
             ConfirmationCountLable.AutoSize = true;
+            ConfirmationCountLable.ForeColor = Color.FromArgb(0, 128, 255);
             ConfirmationCountLable.Location = new Point(44, 33);
             ConfirmationCountLable.Name = "ConfirmationCountLable";
             ConfirmationCountLable.Size = new Size(15, 17);
@@ -289,6 +303,7 @@
             // OfferCountLabel
             // 
             OfferCountLabel.AutoSize = true;
+            OfferCountLabel.ForeColor = Color.FromArgb(255, 128, 0);
             OfferCountLabel.Location = new Point(44, 5);
             OfferCountLabel.Name = "OfferCountLabel";
             OfferCountLabel.Size = new Size(15, 17);
@@ -299,6 +314,7 @@
             // label2
             // 
             label2.AutoSize = true;
+            label2.ForeColor = Color.FromArgb(0, 128, 255);
             label2.Location = new Point(3, 33);
             label2.Name = "label2";
             label2.Size = new Size(35, 17);
@@ -309,6 +325,7 @@
             // label1
             // 
             label1.AutoSize = true;
+            label1.ForeColor = Color.FromArgb(255, 128, 0);
             label1.Location = new Point(3, 5);
             label1.Name = "label1";
             label1.Size = new Size(35, 17);
@@ -316,30 +333,96 @@
             label1.Text = "报价:";
             label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // UsersPanel
+            // usersPanel
             // 
-            UsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            UsersPanel.AutoScroll = true;
-            UsersPanel.BorderStyle = BorderStyle.FixedSingle;
-            UsersPanel.Location = new Point(12, 156);
-            UsersPanel.Name = "UsersPanel";
-            UsersPanel.Size = new Size(660, 293);
-            UsersPanel.TabIndex = 7;
-            UsersPanel.SizeChanged += UsersPanel_SizeChanged;
+            usersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            usersPanel.AutoScroll = true;
+            usersPanel.BorderStyle = BorderStyle.FixedSingle;
+            usersPanel.Location = new Point(12, 156);
+            usersPanel.Name = "usersPanel";
+            usersPanel.Size = new Size(660, 297);
+            usersPanel.TabIndex = 7;
+            usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
-            // quitMenuItem
+            // label3
             // 
-            quitMenuItem.Name = "quitMenuItem";
-            quitMenuItem.Size = new Size(180, 22);
-            quitMenuItem.Text = "退出";
-            quitMenuItem.Click += quitMenuItem_Click;
+            label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label3.AutoSize = true;
+            label3.ForeColor = Color.Green;
+            label3.Location = new Point(12, 456);
+            label3.Name = "label3";
+            label3.Size = new Size(56, 17);
+            label3.TabIndex = 8;
+            label3.Text = "登录成功";
+            // 
+            // label4
+            // 
+            label4.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label4.AutoSize = true;
+            label4.ForeColor = Color.Red;
+            label4.Location = new Point(74, 456);
+            label4.Name = "label4";
+            label4.Size = new Size(56, 17);
+            label4.TabIndex = 9;
+            label4.Text = "登录失败";
+            // 
+            // label5
+            // 
+            label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label5.AutoSize = true;
+            label5.ForeColor = Color.Gray;
+            label5.Location = new Point(136, 456);
+            label5.Name = "label5";
+            label5.Size = new Size(56, 17);
+            label5.TabIndex = 10;
+            label5.Text = "正在登录";
+            // 
+            // versionLabel
+            // 
+            versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            versionLabel.Location = new Point(572, 456);
+            versionLabel.Name = "versionLabel";
+            versionLabel.Size = new Size(100, 23);
+            versionLabel.TabIndex = 12;
+            versionLabel.TabStop = true;
+            versionLabel.Text = "v1.0.0";
+            versionLabel.TextAlign = ContentAlignment.TopRight;
+            versionLabel.LinkClicked += versionLabel_LinkClicked;
+            // 
+            // label6
+            // 
+            label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label6.AutoSize = true;
+            label6.ForeColor = Color.FromArgb(255, 128, 0);
+            label6.Location = new Point(198, 456);
+            label6.Name = "label6";
+            label6.Size = new Size(44, 17);
+            label6.TabIndex = 13;
+            label6.Text = "报价数";
+            // 
+            // label7
+            // 
+            label7.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label7.AutoSize = true;
+            label7.ForeColor = Color.FromArgb(0, 128, 255);
+            label7.Location = new Point(248, 456);
+            label7.Name = "label7";
+            label7.Size = new Size(44, 17);
+            label7.TabIndex = 14;
+            label7.Text = "确认数";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 461);
-            Controls.Add(UsersPanel);
+            ClientSize = new Size(684, 479);
+            Controls.Add(label7);
+            Controls.Add(label6);
+            Controls.Add(versionLabel);
+            Controls.Add(label5);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(usersPanel);
             Controls.Add(panel1);
             Controls.Add(Balance);
             Controls.Add(UserName);
@@ -391,8 +474,14 @@
         private Label acceptOfferBtn;
         private Label declineOfferBtn;
         private Label confirmationBtn;
-        private Panel UsersPanel;
+        private Panel usersPanel;
         private ToolStripMenuItem checkVersionMenuItem;
         private ToolStripMenuItem quitMenuItem;
+        private Label label3;
+        private Label label4;
+        private Label label5;
+        private LinkLabel versionLabel;
+        private Label label6;
+        private Label label7;
     }
 }

@@ -86,7 +86,7 @@ namespace Steam_Authenticator.Forms
                             }
                             else
                             {
-                                input = new Input("提示", "请输入邮箱令牌");
+                                input = new Input("提示", "请输入手机令牌");
                                 if (input.ShowDialog() != DialogResult.OK)
                                 {
                                     return;

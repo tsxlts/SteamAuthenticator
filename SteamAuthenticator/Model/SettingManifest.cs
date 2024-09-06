@@ -61,10 +61,23 @@ namespace Steam_Authenticator.Model
             public bool PeriodicCheckingConfirmation { get; set; }
 
             /// <summary>
+            /// 检测频率
+            /// 单位：秒
+            /// </summary>
+            [JsonProperty("auto_refresh_internal")]
+            public int AutoRefreshInternal { get; set; } = 5;
+
+            /// <summary>
             /// 是否检测所有账号确认信息
             /// </summary>
             [JsonProperty("check_all_confirmation")]
             public bool CheckAllConfirmation { get; set; }
+
+            /// <summary>
+            /// 自动弹出确认
+            /// </summary>
+            [JsonProperty("confirmation_auto_popup")]
+            public bool ConfirmationAutoPopup { get; set; }
 
             /// <summary>
             /// 是否自动确认报价

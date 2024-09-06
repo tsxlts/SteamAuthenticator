@@ -34,24 +34,28 @@
             autoConfirmMarket = new CheckBox();
             saveBtn = new Button();
             autoAcceptOffer = new CheckBox();
+            confirmationAutoPopup = new CheckBox();
+            autoRefreshInternal = new NumericUpDown();
+            label1 = new Label();
+            ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).BeginInit();
             SuspendLayout();
             // 
             // periodicChecking
             // 
             periodicChecking.AutoSize = true;
-            periodicChecking.Font = new Font("Microsoft YaHei UI", 8F);
+            periodicChecking.Font = new Font("Microsoft YaHei UI", 9F);
             periodicChecking.Location = new Point(12, 12);
             periodicChecking.Name = "periodicChecking";
-            periodicChecking.Size = new Size(257, 36);
+            periodicChecking.Size = new Size(147, 21);
             periodicChecking.TabIndex = 0;
-            periodicChecking.Text = "自动刷新报价确认信息\r\n有新的确认信息时自动提示我或者自动帮我确认";
+            periodicChecking.Text = "自动刷新报价确认信息";
             periodicChecking.UseVisualStyleBackColor = true;
             periodicChecking.CheckedChanged += periodicChecking_CheckedChanged;
             // 
             // checkAll
             // 
             checkAll.AutoSize = true;
-            checkAll.Location = new Point(12, 54);
+            checkAll.Location = new Point(12, 68);
             checkAll.Name = "checkAll";
             checkAll.Size = new Size(159, 21);
             checkAll.TabIndex = 1;
@@ -61,7 +65,7 @@
             // autoConfirmTrade
             // 
             autoConfirmTrade.AutoSize = true;
-            autoConfirmTrade.Location = new Point(12, 81);
+            autoConfirmTrade.Location = new Point(12, 122);
             autoConfirmTrade.Name = "autoConfirmTrade";
             autoConfirmTrade.Size = new Size(99, 21);
             autoConfirmTrade.TabIndex = 2;
@@ -72,7 +76,7 @@
             // autoConfirmMarket
             // 
             autoConfirmMarket.AutoSize = true;
-            autoConfirmMarket.Location = new Point(12, 109);
+            autoConfirmMarket.Location = new Point(12, 149);
             autoConfirmMarket.Name = "autoConfirmMarket";
             autoConfirmMarket.Size = new Size(123, 21);
             autoConfirmMarket.TabIndex = 3;
@@ -83,7 +87,7 @@
             // saveBtn
             // 
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(12, 171);
+            saveBtn.Location = new Point(12, 218);
             saveBtn.Name = "saveBtn";
             saveBtn.Size = new Size(258, 33);
             saveBtn.TabIndex = 4;
@@ -94,18 +98,50 @@
             // autoAcceptOffer
             // 
             autoAcceptOffer.AutoSize = true;
-            autoAcceptOffer.Location = new Point(12, 136);
+            autoAcceptOffer.Location = new Point(12, 176);
             autoAcceptOffer.Name = "autoAcceptOffer";
             autoAcceptOffer.Size = new Size(99, 21);
             autoAcceptOffer.TabIndex = 5;
             autoAcceptOffer.Text = "自动接收报价";
             autoAcceptOffer.UseVisualStyleBackColor = true;
             // 
+            // confirmationAutoPopup
+            // 
+            confirmationAutoPopup.AutoSize = true;
+            confirmationAutoPopup.Location = new Point(12, 95);
+            confirmationAutoPopup.Name = "confirmationAutoPopup";
+            confirmationAutoPopup.Size = new Size(183, 21);
+            confirmationAutoPopup.TabIndex = 6;
+            confirmationAutoPopup.Text = "有新的确认信息时自动提示我";
+            confirmationAutoPopup.UseVisualStyleBackColor = true;
+            // 
+            // autoRefreshInternal
+            // 
+            autoRefreshInternal.Location = new Point(12, 39);
+            autoRefreshInternal.Maximum = new decimal(new int[] { 3600, 0, 0, 0 });
+            autoRefreshInternal.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            autoRefreshInternal.Name = "autoRefreshInternal";
+            autoRefreshInternal.Size = new Size(56, 23);
+            autoRefreshInternal.TabIndex = 7;
+            autoRefreshInternal.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(74, 42);
+            label1.Name = "label1";
+            label1.Size = new Size(68, 17);
+            label1.TabIndex = 8;
+            label1.Text = "秒刷新一次";
+            // 
             // Setting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(282, 215);
+            ClientSize = new Size(282, 263);
+            Controls.Add(label1);
+            Controls.Add(autoRefreshInternal);
+            Controls.Add(confirmationAutoPopup);
             Controls.Add(autoAcceptOffer);
             Controls.Add(saveBtn);
             Controls.Add(autoConfirmMarket);
@@ -119,6 +155,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "用户设置";
             Load += Setting_Load;
+            ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -131,5 +168,8 @@
         private CheckBox autoConfirmMarket;
         private Button saveBtn;
         private CheckBox autoAcceptOffer;
+        private CheckBox confirmationAutoPopup;
+        private NumericUpDown autoRefreshInternal;
+        private Label label1;
     }
 }

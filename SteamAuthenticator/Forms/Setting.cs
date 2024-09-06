@@ -14,7 +14,9 @@ namespace Steam_Authenticator.Forms
         private void Setting_Load(object sender, EventArgs e)
         {
             periodicChecking.Checked = Appsetting.Instance.AppSetting.Entry.PeriodicCheckingConfirmation;
+            autoRefreshInternal.Value = Appsetting.Instance.AppSetting.Entry.AutoRefreshInternal;
             checkAll.Checked = Appsetting.Instance.AppSetting.Entry.CheckAllConfirmation;
+            confirmationAutoPopup.Checked = Appsetting.Instance.AppSetting.Entry.ConfirmationAutoPopup;
             autoConfirmTrade.Checked = Appsetting.Instance.AppSetting.Entry.AutoConfirmTrade;
             autoConfirmMarket.Checked = Appsetting.Instance.AppSetting.Entry.AutoConfirmMarket;
             autoAcceptOffer.Checked = Appsetting.Instance.AppSetting.Entry.AutoAcceptOffer;
@@ -48,7 +50,9 @@ namespace Steam_Authenticator.Forms
         private void saveBtn_Click(object sender, EventArgs e)
         {
             Appsetting.Instance.AppSetting.Entry.PeriodicCheckingConfirmation = periodicChecking.Checked;
+            Appsetting.Instance.AppSetting.Entry.AutoRefreshInternal = (int)autoRefreshInternal.Value;
             Appsetting.Instance.AppSetting.Entry.CheckAllConfirmation = checkAll.Checked;
+            Appsetting.Instance.AppSetting.Entry.ConfirmationAutoPopup = confirmationAutoPopup.Checked;
             Appsetting.Instance.AppSetting.Entry.AutoConfirmTrade = autoConfirmTrade.Checked;
             Appsetting.Instance.AppSetting.Entry.AutoConfirmMarket = autoConfirmMarket.Checked;
             Appsetting.Instance.AppSetting.Entry.AutoAcceptOffer = autoAcceptOffer.Checked;
@@ -60,7 +64,7 @@ namespace Steam_Authenticator.Forms
 
         private void SetControlsEnabledState(bool enabled)
         {
-            checkAll.Enabled = autoConfirmMarket.Enabled = autoConfirmTrade.Enabled = autoAcceptOffer.Enabled = enabled;
+            checkAll.Enabled = confirmationAutoPopup.Enabled = autoConfirmMarket.Enabled = autoConfirmTrade.Enabled = autoAcceptOffer.Enabled = enabled;
         }
 
         private void ShowWarning(CheckBox affectedBox)

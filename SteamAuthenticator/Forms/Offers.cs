@@ -156,15 +156,16 @@ namespace Steam_Authenticator.Forms
 
             Browser browser = new Browser()
             {
-                Width = 1000,
-                Height = 800
+                Width = 400,
+                Height = 600
             };
 
             browser.Text = "交易报价";
             browser.Show();
 
-            await browser.SetCookie($"{setting.Domain.SteamCommunity}", webClient.WebCookie.ToArray());
-            await browser.LoadUrl($"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
+            string offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
+            await browser.SetCookie(offerUrl, webClient.WebCookie.ToArray());
+            await browser.LoadUrl(offerUrl);
         }
 
         private async Task RefreshOffers(CancellationToken cancellationToken)
@@ -247,7 +248,7 @@ namespace Steam_Authenticator.Forms
                     }
 
                     stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine($"你收到来自{player?.SteamName ?? offer.AccountIdOther.ToString()}的报价");
+                    stringBuilder.AppendLine($"你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价");
 
                     if (giveDescription?.Any() ?? false)
                     {
@@ -271,6 +272,22 @@ namespace Steam_Authenticator.Forms
                             stringBuilder.AppendLine($"您将收到 {giveDescription.First().MarketName} ");
                         }
                     }
+
+                    switch (offer.ConfirmationMethod)
+                    {
+                        case TradeOfferConfirmationMethod.Email:
+                            stringBuilder.AppendLine("等待邮箱令牌确认");
+                            break;
+                        case TradeOfferConfirmationMethod.MobileApp:
+                            stringBuilder.AppendLine("等待手机令牌确认");
+                            break;
+
+                        case TradeOfferConfirmationMethod.Invalid:
+                        default:
+                            stringBuilder.AppendLine("等待你接受报价");
+                            break;
+                    }
+
                     Label nameLabel = new Label()
                     {
                         Text = $"{stringBuilder}",
@@ -284,7 +301,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton acceptButton = new OfferButton()
                     {
                         Text = "接受",
-                        Location = new Point(90, 60),
+                        Location = new Point(90, 90),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(30, 144, 255),
@@ -299,7 +316,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton cancelButton = new OfferButton()
                     {
                         Text = "拒绝",
-                        Location = new Point(180, 60),
+                        Location = new Point(180, 90),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(30, 144, 255),
@@ -314,7 +331,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton detailButton = new OfferButton()
                     {
                         Text = "查看",
-                        Location = new Point(270, 60),
+                        Location = new Point(270, 90),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(30, 144, 255),
@@ -332,7 +349,7 @@ namespace Steam_Authenticator.Forms
                         $"\n{offer.Message}",
                         AutoSize = true,
                         ForeColor = Color.Snow,
-                        Location = new Point(90, 100),
+                        Location = new Point(90, 130),
                         BackColor = Color.Transparent
                     };
                     panel.Controls.Add(summaryLabel);
