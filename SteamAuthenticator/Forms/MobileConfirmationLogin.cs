@@ -23,7 +23,7 @@ namespace Steam_Authenticator.Forms
         private async void acceptBtn_Click(object sender, EventArgs e)
         {
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-            if (guard == null)
+            if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
             {
                 MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -44,7 +44,7 @@ namespace Steam_Authenticator.Forms
         private async void declineBtn_Click(object sender, EventArgs e)
         {
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-            if (guard == null)
+            if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
             {
                 MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;

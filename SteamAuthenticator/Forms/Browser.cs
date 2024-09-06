@@ -5,21 +5,22 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Browser : Form
     {
-        private ChromiumWebBrowser browser;
+        private readonly ChromiumWebBrowser browser;
 
         public Browser()
         {
             InitializeComponent();
-        }
 
-        private void Browser_Load(object sender, EventArgs e)
-        {
             browser = new ChromiumWebBrowser()
             {
                 Dock = DockStyle.Fill
             };
             WebPanel.Controls.Clear();
             WebPanel.Controls.Add(browser);
+        }
+
+        private void Browser_Load(object sender, EventArgs e)
+        {
         }
 
         public void LoadHtlm(string html)

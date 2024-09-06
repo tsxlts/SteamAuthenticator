@@ -1,5 +1,6 @@
 using Steam_Authenticator.Forms;
 using System.Diagnostics;
+using System.Net;
 using System.Runtime.InteropServices;
 using static SteamKit.SteamBulider;
 
@@ -35,11 +36,24 @@ namespace Steam_Authenticator
 
                 WithProxy((s, m) =>
                 {
+                    var setting = Appsetting.Instance.AppSetting.Entry;
                     var proxy = Proxy.Instance
-                    .WithSteamCommunity(Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity)
-                    .WithSteamApi(Appsetting.Instance.AppSetting.Entry.Domain.SteamApi)
-                    .WithSteamStore(Appsetting.Instance.AppSetting.Entry.Domain.SteamPowered)
-                    .WithSteamLogin(Appsetting.Instance.AppSetting.Entry.Domain.SteamLogin);
+                    .WithSteamCommunity(setting.Domain.SteamCommunity)
+                    .WithSteamApi(setting.Domain.SteamApi)
+                    .WithSteamStore(setting.Domain.SteamPowered)
+                    .WithSteamLogin(setting.Domain.SteamLogin);
+
+                    if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address) || !string.IsNullOrWhiteSpace(setting.Proxy?.Host))
+                    {
+                        if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address))
+                        {
+                            proxy.WithProxy(new WebProxy(new Uri(setting.Proxy.Address)));
+                        }
+                        else
+                        {
+                            proxy.WithProxy(new WebProxy(setting.Proxy.Host, setting.Proxy.Port));
+                        }
+                    }
 
                     return proxy;
                 });

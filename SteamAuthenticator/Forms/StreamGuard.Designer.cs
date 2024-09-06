@@ -36,10 +36,16 @@
             GuardText = new Label();
             label5 = new Label();
             label6 = new Label();
-            panel1 = new Panel();
             deleteGuardBtn = new Button();
             exportGuardBtn = new Button();
-            panel1.SuspendLayout();
+            splitContainer1 = new SplitContainer();
+            label1 = new Label();
+            RevocationCode = new Label();
+            label7 = new Label();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
             // Users
@@ -57,7 +63,7 @@
             ExpireText.ForeColor = Color.Green;
             ExpireText.Location = new Point(61, 86);
             ExpireText.Name = "ExpireText";
-            ExpireText.Size = new Size(61, 23);
+            ExpireText.Size = new Size(40, 23);
             ExpireText.TabIndex = 1;
             ExpireText.Text = "30秒";
             ExpireText.TextAlign = ContentAlignment.MiddleLeft;
@@ -77,18 +83,18 @@
             label3.AutoSize = true;
             label3.Location = new Point(12, 53);
             label3.Name = "label3";
-            label3.Size = new Size(44, 17);
+            label3.Size = new Size(32, 17);
             label3.TabIndex = 3;
-            label3.Text = "令牌码";
+            label3.Text = "令牌";
             label3.TextAlign = ContentAlignment.MiddleRight;
             // 
             // GuardText
             // 
             GuardText.Cursor = Cursors.Hand;
             GuardText.ForeColor = Color.Red;
-            GuardText.Location = new Point(61, 50);
+            GuardText.Location = new Point(61, 53);
             GuardText.Name = "GuardText";
-            GuardText.Size = new Size(61, 23);
+            GuardText.Size = new Size(55, 17);
             GuardText.TabIndex = 4;
             GuardText.Text = "*****";
             GuardText.TextAlign = ContentAlignment.MiddleLeft;
@@ -96,6 +102,7 @@
             // 
             // label5
             // 
+            label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label5.ForeColor = Color.FromArgb(128, 128, 128);
             label5.Location = new Point(128, 53);
             label5.Name = "label5";
@@ -106,6 +113,7 @@
             // 
             // label6
             // 
+            label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.ForeColor = Color.FromArgb(128, 128, 128);
             label6.Location = new Point(104, 89);
             label6.Name = "label6";
@@ -113,20 +121,12 @@
             label6.TabIndex = 6;
             label6.Text = "到期自动刷新";
             // 
-            // panel1
-            // 
-            panel1.Controls.Add(deleteGuardBtn);
-            panel1.Controls.Add(exportGuardBtn);
-            panel1.Location = new Point(0, 123);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(195, 33);
-            panel1.TabIndex = 7;
-            // 
             // deleteGuardBtn
             // 
+            deleteGuardBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             deleteGuardBtn.Location = new Point(0, 0);
             deleteGuardBtn.Name = "deleteGuardBtn";
-            deleteGuardBtn.Size = new Size(92, 33);
+            deleteGuardBtn.Size = new Size(97, 30);
             deleteGuardBtn.TabIndex = 1;
             deleteGuardBtn.Text = "删除令牌";
             deleteGuardBtn.UseVisualStyleBackColor = true;
@@ -134,20 +134,77 @@
             // 
             // exportGuardBtn
             // 
-            exportGuardBtn.Location = new Point(103, 0);
+            exportGuardBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            exportGuardBtn.Location = new Point(0, 0);
             exportGuardBtn.Name = "exportGuardBtn";
-            exportGuardBtn.Size = new Size(92, 33);
+            exportGuardBtn.Size = new Size(93, 30);
             exportGuardBtn.TabIndex = 0;
             exportGuardBtn.Text = "导出令牌";
             exportGuardBtn.UseVisualStyleBackColor = true;
             exportGuardBtn.Click += exportGuardBtn_Click;
             // 
+            // splitContainer1
+            // 
+            splitContainer1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer1.IsSplitterFixed = true;
+            splitContainer1.Location = new Point(1, 162);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(deleteGuardBtn);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(exportGuardBtn);
+            splitContainer1.Size = new Size(194, 30);
+            splitContainer1.SplitterDistance = 97;
+            splitContainer1.TabIndex = 8;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label1.Cursor = Cursors.Hand;
+            label1.ForeColor = Color.FromArgb(128, 128, 128);
+            label1.Location = new Point(128, 124);
+            label1.Name = "label1";
+            label1.Size = new Size(56, 17);
+            label1.TabIndex = 11;
+            label1.Text = "点此复制";
+            label1.TextAlign = ContentAlignment.MiddleLeft;
+            label1.Click += label1_Click;
+            // 
+            // RevocationCode
+            // 
+            RevocationCode.Cursor = Cursors.Hand;
+            RevocationCode.ForeColor = Color.Red;
+            RevocationCode.Location = new Point(61, 124);
+            RevocationCode.Name = "RevocationCode";
+            RevocationCode.Size = new Size(55, 17);
+            RevocationCode.TabIndex = 10;
+            RevocationCode.Text = "******";
+            RevocationCode.TextAlign = ContentAlignment.MiddleLeft;
+            RevocationCode.Click += RevocationCode_Click;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(12, 124);
+            label7.Name = "label7";
+            label7.Size = new Size(44, 17);
+            label7.TabIndex = 9;
+            label7.Text = "恢复码";
+            label7.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // StreamGuard
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(195, 158);
-            Controls.Add(panel1);
+            ClientSize = new Size(196, 193);
+            Controls.Add(label1);
+            Controls.Add(RevocationCode);
+            Controls.Add(label7);
+            Controls.Add(splitContainer1);
             Controls.Add(label6);
             Controls.Add(label5);
             Controls.Add(GuardText);
@@ -163,7 +220,10 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Steam令牌";
             Load += StreamGuard_Load;
-            panel1.ResumeLayout(false);
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -177,8 +237,11 @@
         private Label GuardText;
         private Label label5;
         private Label label6;
-        private Panel panel1;
         private Button exportGuardBtn;
         private Button deleteGuardBtn;
+        private SplitContainer splitContainer1;
+        private Label label1;
+        private Label RevocationCode;
+        private Label label7;
     }
 }

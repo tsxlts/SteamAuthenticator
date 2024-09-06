@@ -43,12 +43,14 @@ namespace Steam_Authenticator.Forms
             string account = Users.SelectedItem?.ToString();
             if (string.IsNullOrWhiteSpace(account))
             {
+                GuardText.Text = "*****";
                 return;
             }
 
             var guard = Appsetting.Instance.Manifest.GetGuard(account);
             if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
             {
+                GuardText.Text = "*****";
                 return;
             }
 
@@ -61,12 +63,42 @@ namespace Steam_Authenticator.Forms
 
         private void Users_SelectedValueChanged(object sender, EventArgs e)
         {
+            RevocationCode.Text = "******";
             timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
         }
 
         private void GuardText_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(GuardText.Text);
+        }
+
+        private void RevocationCode_Click(object sender, EventArgs e)
+        {
+            string account = Users.SelectedItem?.ToString();
+            if (string.IsNullOrWhiteSpace(account))
+            {
+                return;
+            }
+
+            var guard = Appsetting.Instance.Manifest.GetGuard(account);
+            if (string.IsNullOrWhiteSpace(guard?.RevocationCode))
+            {
+                return;
+            }
+
+            if (RevocationCode.Text == "******")
+            {
+                RevocationCode.Text = guard.RevocationCode;
+            }
+            else
+            {
+                RevocationCode.Text = "******";
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(RevocationCode.Text);
         }
 
         private void deleteGuardBtn_Click(object sender, EventArgs e)

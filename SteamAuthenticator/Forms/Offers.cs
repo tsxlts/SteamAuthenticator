@@ -3,6 +3,7 @@ using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Text;
 using static Steam_Authenticator.Internal.Utils;
@@ -27,6 +28,8 @@ namespace Steam_Authenticator.Forms
             {
                 return;
             }
+
+            Text = $"交易报价 [{webClient.Account}]";
 
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
@@ -149,23 +152,33 @@ namespace Steam_Authenticator.Forms
 
         private async void btnDetail_Click(object sender, EventArgs e)
         {
-            var setting = Appsetting.Instance.AppSetting.Entry;
-
-            var button = (OfferButton)sender;
-            var offer = button.Offer;
-
-            Browser browser = new Browser()
+            string offerUrl = null;
+            try
             {
-                Width = 400,
-                Height = 600
-            };
+                var setting = Appsetting.Instance.AppSetting.Entry;
 
-            browser.Text = "交易报价";
-            browser.Show();
+                var button = (OfferButton)sender;
+                var offer = button.Offer;
 
-            string offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
-            await browser.SetCookie(offerUrl, webClient.WebCookie.ToArray());
-            await browser.LoadUrl(offerUrl);
+                Browser browser = new Browser()
+                {
+                    Width = 400,
+                    Height = 600
+                };
+
+                browser.Text = "交易报价";
+                browser.Show();
+
+                offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
+                await browser.SetCookie(offerUrl, webClient.WebCookie.ToArray());
+                await browser.LoadUrl(offerUrl);
+            }
+            catch (Exception ex)
+            {
+                Process.Start("explorer.exe", offerUrl);
+
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private async Task RefreshOffers(CancellationToken cancellationToken)

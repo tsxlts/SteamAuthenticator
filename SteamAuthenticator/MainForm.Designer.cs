@@ -44,8 +44,10 @@
             confirmMenuItem = new ToolStripMenuItem();
             addAuthenticatorMenuItem = new ToolStripMenuItem();
             moveAuthenticatorMenuItem = new ToolStripMenuItem();
-            removeAuthenticatorMenuItem = new ToolStripMenuItem();
             importAuthenticatorMenuItem = new ToolStripMenuItem();
+            importFileAuthenticatorMenuItem = new ToolStripMenuItem();
+            importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
+            removeAuthenticatorMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
             UserName = new Label();
             Balance = new Label();
@@ -147,7 +149,7 @@
             // 
             // authenticatorMenu
             // 
-            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, confirmMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, removeAuthenticatorMenuItem, importAuthenticatorMenuItem });
+            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, confirmMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
             authenticatorMenu.Name = "authenticatorMenu";
             authenticatorMenu.Size = new Size(80, 21);
             authenticatorMenu.Text = "令牌验证器";
@@ -155,44 +157,58 @@
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(124, 22);
+            guardMenuItem.Size = new Size(180, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // confirmMenuItem
             // 
             confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(124, 22);
+            confirmMenuItem.Size = new Size(180, 22);
             confirmMenuItem.Text = "确认";
             confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(124, 22);
+            addAuthenticatorMenuItem.Size = new Size(180, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(124, 22);
+            moveAuthenticatorMenuItem.Size = new Size(180, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
+            // 
+            // importAuthenticatorMenuItem
+            // 
+            importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
+            importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
+            importAuthenticatorMenuItem.Size = new Size(180, 22);
+            importAuthenticatorMenuItem.Text = "导入令牌";
+            // 
+            // importFileAuthenticatorMenuItem
+            // 
+            importFileAuthenticatorMenuItem.Name = "importFileAuthenticatorMenuItem";
+            importFileAuthenticatorMenuItem.Size = new Size(124, 22);
+            importFileAuthenticatorMenuItem.Text = "文件导入";
+            importFileAuthenticatorMenuItem.Click += importFileAuthenticatorMenuItem_Click;
+            // 
+            // importSecretAuthenticatorMenuItem
+            // 
+            importSecretAuthenticatorMenuItem.Name = "importSecretAuthenticatorMenuItem";
+            importSecretAuthenticatorMenuItem.Size = new Size(124, 22);
+            importSecretAuthenticatorMenuItem.Text = "秘钥导入";
+            importSecretAuthenticatorMenuItem.Click += importSecretAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(124, 22);
-            removeAuthenticatorMenuItem.Text = "删除令牌";
+            removeAuthenticatorMenuItem.Size = new Size(180, 22);
+            removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
-            // 
-            // importAuthenticatorMenuItem
-            // 
-            importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(124, 22);
-            importAuthenticatorMenuItem.Text = "导入令牌";
-            importAuthenticatorMenuItem.Click += importAuthenticatorMenuItem_Click;
             // 
             // UserImg
             // 
@@ -483,5 +499,7 @@
         private LinkLabel versionLabel;
         private Label label6;
         private Label label7;
+        private ToolStripMenuItem importFileAuthenticatorMenuItem;
+        private ToolStripMenuItem importSecretAuthenticatorMenuItem;
     }
 }

@@ -25,6 +25,8 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
+            Text = $"令牌确认 [{webClient.Account}]";
+
             await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
             autoRefreshTimer.Interval = 5000;
@@ -64,9 +66,9 @@ namespace Steam_Authenticator.Forms
                 button.Enabled = false;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                if (guard == null)
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -101,9 +103,9 @@ namespace Steam_Authenticator.Forms
                 button.Enabled = false;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                if (guard == null)
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -131,25 +133,32 @@ namespace Steam_Authenticator.Forms
 
         private async void btnDetail_Click(object sender, EventArgs e)
         {
-            var button = (ConfirmationButton)sender;
-            var confirmation = button.Confirmation;
-
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-            if (guard == null)
+            try
             {
-                MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                var button = (ConfirmationButton)sender;
+                var confirmation = button.Confirmation;
+
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
+                {
+                    MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                Browser browser = new Browser()
+                {
+                    Width = 400,
+                    Height = 600
+                };
+                var detail = await webClient.Confirmation.ConfirmationDetailAsync(confirmation.Id, guard.DeviceId, guard.IdentitySecret);
+                browser.Text = confirmation.ConfTypeName;
+                browser.Show();
+                browser.LoadHtlm(detail);
             }
-
-            Browser browser = new Browser()
+            catch (Exception ex)
             {
-                Width = 400,
-                Height = 500
-            };
-            var detail = await webClient.Confirmation.ConfirmationDetailAsync(confirmation.Id, guard.DeviceId, guard.IdentitySecret);
-            browser.Text = confirmation.ConfTypeName;
-            browser.Show();
-            browser.LoadHtlm(detail);
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private async Task RefreshConfirmations(bool showError, CancellationToken cancellationToken)
@@ -167,7 +176,7 @@ namespace Steam_Authenticator.Forms
                 refreshBtn.Enabled = false;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                if (guard == null)
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
                     if (showError)
                     {

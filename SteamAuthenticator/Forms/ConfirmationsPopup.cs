@@ -48,7 +48,7 @@ namespace Steam_Authenticator.Forms
                 button.Enabled = false;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                if (guard == null)
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
                     MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;

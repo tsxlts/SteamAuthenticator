@@ -40,6 +40,13 @@ namespace Steam_Authenticator.Model
                     SteamPowered = "https://store.steampowered.com",
                     SteamLogin = "https://login.steampowered.com"
                 };
+
+                Proxy = new HostProxy
+                {
+                    Host = "",
+                    Address = "",
+                    Port = 8080
+                };
             }
 
             /// <summary>
@@ -53,6 +60,12 @@ namespace Steam_Authenticator.Model
             /// </summary>
             [JsonProperty("domain")]
             public Domain Domain { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            [JsonProperty("proxy")]
+            public HostProxy Proxy { get; set; }
 
             /// <summary>
             /// 是否自动检测确认信息

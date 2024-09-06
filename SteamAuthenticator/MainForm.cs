@@ -380,7 +380,7 @@ namespace Steam_Authenticator
 
         private async void moveAuthenticatorMenuItem_Click(object sender, EventArgs e)
         {
-            var webClient = currentClient.Client;
+            var webClient = currentClient?.Client;
             if (webClient == null || !webClient.LoggedIn)
             {
                 MessageBox.Show("请先登录Steam帐号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -607,7 +607,7 @@ namespace Steam_Authenticator
 
         private async void removeAuthenticatorMenuItem_Click(object sender, EventArgs e)
         {
-            var webClient = currentClient.Client;
+            var webClient = currentClient?.Client;
             if (webClient == null || !webClient.LoggedIn)
             {
                 MessageBox.Show("请先登录Steam帐号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -657,7 +657,7 @@ namespace Steam_Authenticator
                 code = guard?.RevocationCode;
                 if (string.IsNullOrWhiteSpace(code))
                 {
-                    Input input = new Input("输入撤销码", "请输入撤销码");
+                    Input input = new Input("删除令牌", "请输入恢复码");
                     if (input.ShowDialog() != DialogResult.OK)
                     {
                         return;
@@ -726,7 +726,7 @@ namespace Steam_Authenticator
 
         private void confirmMenuItem_Click(object sender, EventArgs e)
         {
-            var webClient = currentClient.Client;
+            var webClient = currentClient?.Client;
             if (webClient == null || !webClient.LoggedIn)
             {
                 MessageBox.Show("请先登录Steam帐号");
@@ -734,17 +734,17 @@ namespace Steam_Authenticator
             }
 
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-            if (guard == null)
+            if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
                 MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Forms.Confirmations confirmation = new Forms.Confirmations(webClient);
+            Confirmations confirmation = new Confirmations(webClient);
             confirmation.Show();
         }
 
-        private void importAuthenticatorMenuItem_Click(object sender, EventArgs e)
+        private void importFileAuthenticatorMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -829,11 +829,85 @@ namespace Steam_Authenticator
             }
         }
 
+        private async void importSecretAuthenticatorMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var webClient = currentClient?.Client;
+                if (webClient == null || !webClient.LoggedIn)
+                {
+                    MessageBox.Show("请先登录你需要导入令牌的Steam帐号");
+                    return;
+                }
+
+                var guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                if (guard != null)
+                {
+                    MessageBox.Show($"帐号 {webClient.Account} 已在当前设备绑定令牌" +
+                        $"{Environment.NewLine}" +
+                        $"如果当前设备的令牌信息已失效，请先前往 [令牌验证器 -> 令牌] 删除令牌",
+                        "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                var authenticatorStatusResponse = authenticatorStatus.Body;
+                if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
+                {
+                    MessageBox.Show($"帐号 {webClient.Account} 未绑定手机令牌" +
+                        $"{Environment.NewLine}" +
+                        $"你可以选择添加令牌为帐号 {webClient.Account} 添加令牌",
+                        "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                ImportAuthenticator importAuthenticator = new ImportAuthenticator(webClient);
+                if (importAuthenticator.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                guard = new Guard
+                {
+                    AccountName = webClient.Account,
+                    DeviceId = authenticatorStatusResponse.DeviceId,
+                    TokenGID = authenticatorStatusResponse.TokenGID,
+                    GuardScheme = authenticatorStatusResponse.GuardScheme,
+
+                    SerialNumber = null,
+                    URI = null,
+                    Secret1 = null,
+
+                    RevocationCode = importAuthenticator.RevocationCode,
+                    IdentitySecret = importAuthenticator.IdentitySecret,
+                    SharedSecret = importAuthenticator.SharedSecret,
+                };
+
+                if (!string.IsNullOrWhiteSpace(guard.IdentitySecret))
+                {
+                    var queryConfirmations = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret);
+                    if (!queryConfirmations.Success)
+                    {
+                        MessageBox.Show($"你提供的身份秘钥似乎有误，请确认身份秘钥是否可用", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                }
+
+                Appsetting.Instance.Manifest.AddGuard(webClient.Account, guard);
+
+                MessageBox.Show($"令牌导入成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void offersBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                var webClient = currentClient.Client;
+                var webClient = currentClient?.Client;
                 if (webClient == null || !webClient.LoggedIn)
                 {
                     MessageBox.Show("请先登录Steam帐号");
@@ -853,7 +927,7 @@ namespace Steam_Authenticator
         {
             try
             {
-                var webClient = currentClient.Client;
+                var webClient = currentClient?.Client;
                 if (webClient == null || !webClient.LoggedIn)
                 {
                     MessageBox.Show("请先登录Steam帐号");
@@ -883,7 +957,7 @@ namespace Steam_Authenticator
         {
             try
             {
-                var webClient = currentClient.Client;
+                var webClient = currentClient?.Client;
                 if (webClient == null || !webClient.LoggedIn)
                 {
                     MessageBox.Show("请先登录Steam帐号");
@@ -977,6 +1051,34 @@ namespace Steam_Authenticator
             }
         }
 
+        private void offersNumberBtn_Click(object sender, EventArgs e)
+        {
+            Control control = sender as Control;
+            UserPanel panel = control.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            Offers offersForm = new Offers(userClient.Client);
+            offersForm.ShowDialog();
+        }
+
+        private void confirmationNumberBtn_Click(object sender, EventArgs e)
+        {
+            Control control = sender as Control;
+            UserPanel panel = control.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+            var webClient = userClient.Client;
+
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
+            {
+                MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Confirmations confirmations = new Confirmations(webClient);
+            confirmations.ShowDialog();
+        }
+
         private void RefreshClientMsg(object _)
         {
             var setting = Appsetting.Instance.AppSetting.Entry;
@@ -1020,7 +1122,7 @@ namespace Steam_Authenticator
                 var webClient = currentClient.Client;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                if (guard == null)
+                if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
                 {
                     return;
                 }
@@ -1156,7 +1258,7 @@ namespace Steam_Authenticator
                         var webClient = client.Client;
 
                         Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-                        if (guard == null)
+                        if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                         {
                             return;
                         }
@@ -1359,15 +1461,22 @@ namespace Steam_Authenticator
 
         private async Task SwitchUser(UserClient userClient)
         {
-            if (!userClient.Client.LoggedIn)
+            try
             {
-                if (!await userClient.LoginAsync())
+                if (!userClient.Client.LoggedIn)
                 {
-                    userClient = await Login(true, userClient.User.Account);
+                    if (!await userClient.LoginAsync())
+                    {
+                        userClient = await Login(true, userClient.User.Account);
+                    }
                 }
-            }
 
-            SetCurrentClient(userClient);
+                SetCurrentClient(userClient);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"切换用户失败{Environment.NewLine}{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void SetCurrentClient(UserClient userClient, bool reload = false)
@@ -1465,8 +1574,16 @@ namespace Steam_Authenticator
                         UserClient = UserClient.None
                     };
 
-                    PictureBox pictureBox = new PictureBox() { Width = 80, Height = 80, Location = new Point(0, 0), SizeMode = PictureBoxSizeMode.Zoom };
+                    PictureBox pictureBox = new PictureBox()
+                    {
+                        Width = 80,
+                        Height = 80,
+                        Location = new Point(0, 0),
+                        Cursor = Cursors.Hand,
+                        SizeMode = PictureBoxSizeMode.Zoom
+                    };
                     pictureBox.Image = Properties.Resources.add;
+                    pictureBox.Click += addUserBtn_Click;
                     panel.Controls.Add(pictureBox);
 
                     Label nameLabel = new Label()
@@ -1474,18 +1591,14 @@ namespace Steam_Authenticator
                         Text = $"添加帐号",
                         AutoSize = false,
                         AutoEllipsis = true,
+                        Cursor = Cursors.Hand,
                         Size = new Size(80, 18),
                         TextAlign = ContentAlignment.TopCenter,
                         ForeColor = Color.FromArgb(244, 164, 96),
                         Location = new Point(0, 80)
                     };
-                    panel.Controls.Add(nameLabel);
-
-                    pictureBox.Cursor = Cursors.Hand;
-                    nameLabel.Cursor = Cursors.Hand;
-                    pictureBox.Click += addUserBtn_Click;
                     nameLabel.Click += addUserBtn_Click;
-
+                    panel.Controls.Add(nameLabel);
                     usersPanel.Controls.Add(panel);
                 }
 
@@ -1599,6 +1712,7 @@ namespace Steam_Authenticator
                 Width = 80,
                 Height = 80,
                 Location = new Point(0, 0),
+                Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
             };
             string avatar = userClient.User.Avatar;
@@ -1607,6 +1721,8 @@ namespace Steam_Authenticator
             {
                 pictureBox.LoadAsync(avatar);
             }
+            pictureBox.MouseClick += btnUser_Click;
+            pictureBox.ContextMenuStrip = contextMenuStrip;
             panel.Controls.Add(pictureBox);
 
             Label nameLabel = new Label()
@@ -1615,11 +1731,14 @@ namespace Steam_Authenticator
                 Text = $"{userClient.User.Account} [{userClient.User.NickName}]",
                 AutoSize = false,
                 AutoEllipsis = true,
+                Cursor = Cursors.Hand,
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
                 Location = new Point(0, 80)
             };
+            nameLabel.MouseClick += btnUser_Click;
+            nameLabel.ContextMenuStrip = contextMenuStrip;
             panel.Controls.Add(nameLabel);
 
             Label offerLabel = new Label()
@@ -1628,11 +1747,13 @@ namespace Steam_Authenticator
                 Text = $"---",
                 AutoSize = false,
                 AutoEllipsis = true,
+                Cursor = Cursors.Hand,
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopRight,
                 ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(255, 128, 0),
                 Location = new Point(0, 98)
             };
+            offerLabel.Click += offersNumberBtn_Click;
             panel.Controls.Add(offerLabel);
 
             Label confirmationLabel = new Label()
@@ -1641,20 +1762,14 @@ namespace Steam_Authenticator
                 Text = $"---",
                 AutoSize = false,
                 AutoEllipsis = true,
+                Cursor = Cursors.Hand,
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopLeft,
                 ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(0, 128, 255),
                 Location = new Point(42, 98)
             };
+            confirmationLabel.Click += confirmationNumberBtn_Click;
             panel.Controls.Add(confirmationLabel);
-
-            pictureBox.Cursor = Cursors.Hand;
-            nameLabel.Cursor = Cursors.Hand;
-            pictureBox.MouseClick += btnUser_Click;
-            nameLabel.MouseClick += btnUser_Click;
-
-            pictureBox.ContextMenuStrip = contextMenuStrip;
-            nameLabel.ContextMenuStrip = contextMenuStrip;
 
             panel.UserClient
                 .WithStartLogin(() => nameLabel.ForeColor = Color.FromArgb(128, 128, 128))

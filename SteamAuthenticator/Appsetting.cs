@@ -33,10 +33,13 @@ namespace Steam_Authenticator
         public string SteamLogin { get; set; }
     }
 
-    public class ProxyAuth
+    public class HostProxy
     {
-        public string AuthName { get; set; }
-        public string EncryptKey { get; set; }
+        public string Address { get; set; }
+
+        public string Host { get; set; }
+
+        public int Port { get; set; }
     }
 
     public class UserClient

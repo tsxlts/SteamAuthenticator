@@ -80,7 +80,7 @@ namespace Steam_Authenticator.Forms
                         if (login.AllowedConfirmations!.Any(c => c.ConfirmationType == AuthConfirmationType.DeviceCode))
                         {
                             string code = null;
-                            if (guard != null)
+                            if (!string.IsNullOrWhiteSpace(guard?.SharedSecret))
                             {
                                 code = GuardCodeGenerator.GenerateSteamGuardCode(Extension.GetSteamTimestampAsync().Result, guard.SharedSecret);
                             }
