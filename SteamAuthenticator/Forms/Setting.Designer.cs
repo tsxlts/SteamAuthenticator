@@ -33,10 +33,11 @@
             autoConfirmTrade = new CheckBox();
             autoConfirmMarket = new CheckBox();
             saveBtn = new Button();
-            autoAcceptOffer = new CheckBox();
+            autoAcceptReceiveOffer = new CheckBox();
             confirmationAutoPopup = new CheckBox();
             autoRefreshInternal = new NumericUpDown();
             label1 = new Label();
+            autoAcceptGiveOffer = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).BeginInit();
             SuspendLayout();
             // 
@@ -87,7 +88,7 @@
             // saveBtn
             // 
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(12, 218);
+            saveBtn.Location = new Point(12, 244);
             saveBtn.Name = "saveBtn";
             saveBtn.Size = new Size(258, 33);
             saveBtn.TabIndex = 4;
@@ -95,15 +96,15 @@
             saveBtn.UseVisualStyleBackColor = true;
             saveBtn.Click += saveBtn_Click;
             // 
-            // autoAcceptOffer
+            // autoAcceptReceiveOffer
             // 
-            autoAcceptOffer.AutoSize = true;
-            autoAcceptOffer.Location = new Point(12, 176);
-            autoAcceptOffer.Name = "autoAcceptOffer";
-            autoAcceptOffer.Size = new Size(99, 21);
-            autoAcceptOffer.TabIndex = 5;
-            autoAcceptOffer.Text = "自动接收报价";
-            autoAcceptOffer.UseVisualStyleBackColor = true;
+            autoAcceptReceiveOffer.AutoSize = true;
+            autoAcceptReceiveOffer.Location = new Point(12, 176);
+            autoAcceptReceiveOffer.Name = "autoAcceptReceiveOffer";
+            autoAcceptReceiveOffer.Size = new Size(195, 21);
+            autoAcceptReceiveOffer.TabIndex = 5;
+            autoAcceptReceiveOffer.Text = "自动接收赠送报价（收货报价）";
+            autoAcceptReceiveOffer.UseVisualStyleBackColor = true;
             // 
             // confirmationAutoPopup
             // 
@@ -134,15 +135,26 @@
             label1.TabIndex = 8;
             label1.Text = "秒刷新一次";
             // 
+            // autoAcceptGiveOffer
+            // 
+            autoAcceptGiveOffer.AutoSize = true;
+            autoAcceptGiveOffer.Location = new Point(12, 203);
+            autoAcceptGiveOffer.Name = "autoAcceptGiveOffer";
+            autoAcceptGiveOffer.Size = new Size(195, 21);
+            autoAcceptGiveOffer.TabIndex = 9;
+            autoAcceptGiveOffer.Text = "自动接收索取报价（发货报价）";
+            autoAcceptGiveOffer.UseVisualStyleBackColor = true;
+            // 
             // Setting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(282, 263);
+            ClientSize = new Size(282, 289);
+            Controls.Add(autoAcceptGiveOffer);
             Controls.Add(label1);
             Controls.Add(autoRefreshInternal);
             Controls.Add(confirmationAutoPopup);
-            Controls.Add(autoAcceptOffer);
+            Controls.Add(autoAcceptReceiveOffer);
             Controls.Add(saveBtn);
             Controls.Add(autoConfirmMarket);
             Controls.Add(autoConfirmTrade);
@@ -167,9 +179,10 @@
         private CheckBox autoConfirmTrade;
         private CheckBox autoConfirmMarket;
         private Button saveBtn;
-        private CheckBox autoAcceptOffer;
+        private CheckBox autoAcceptReceiveOffer;
         private CheckBox confirmationAutoPopup;
         private NumericUpDown autoRefreshInternal;
         private Label label1;
+        private CheckBox autoAcceptGiveOffer;
     }
 }

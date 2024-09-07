@@ -157,28 +157,28 @@
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(180, 22);
+            guardMenuItem.Size = new Size(124, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // confirmMenuItem
             // 
             confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(180, 22);
+            confirmMenuItem.Size = new Size(124, 22);
             confirmMenuItem.Text = "确认";
             confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(180, 22);
+            addAuthenticatorMenuItem.Size = new Size(124, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(180, 22);
+            moveAuthenticatorMenuItem.Size = new Size(124, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -186,7 +186,7 @@
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(180, 22);
+            importAuthenticatorMenuItem.Size = new Size(124, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
@@ -206,13 +206,14 @@
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(180, 22);
+            removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
             // UserImg
             // 
             UserImg.Image = Properties.Resources.userimg;
+            UserImg.InitialImage = Properties.Resources.loading;
             UserImg.Location = new Point(12, 38);
             UserImg.Name = "UserImg";
             UserImg.Size = new Size(100, 100);

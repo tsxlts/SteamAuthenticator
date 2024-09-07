@@ -170,8 +170,7 @@ namespace Steam_Authenticator.Forms
                 browser.Show();
 
                 offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
-                await browser.SetCookie(offerUrl, webClient.WebCookie.ToArray());
-                await browser.LoadUrl(offerUrl);
+                await browser.LoadUrl(offerUrl, webClient.WebCookie.ToArray());
             }
             catch (Exception ex)
             {
@@ -276,13 +275,13 @@ namespace Steam_Authenticator.Forms
                     }
                     if (receiveDescription?.Any() ?? false)
                     {
-                        if (giveDescription.Count() > 1)
+                        if (receiveDescription.Count() > 1)
                         {
-                            stringBuilder.AppendLine($"您将收到 {giveDescription.First().MarketName} 等多件物品");
+                            stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} 等多件物品");
                         }
                         else
                         {
-                            stringBuilder.AppendLine($"您将收到 {giveDescription.First().MarketName} ");
+                            stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} ");
                         }
                     }
 

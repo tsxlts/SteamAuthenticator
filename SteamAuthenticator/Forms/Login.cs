@@ -18,7 +18,7 @@ namespace Steam_Authenticator.Forms
         {
             try
             {
-                loginBtn.Enabled = false;
+                loginBtn.Enabled = cancelBtn.Enabled = false;
 
                 string user = User.Text;
                 string password = Password.Text;
@@ -131,17 +131,54 @@ namespace Steam_Authenticator.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                loginBtn.Enabled = true;
+                loginBtn.Enabled = cancelBtn.Enabled = true;
             }
         }
 
         private void cancelBtn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
+        }
+
+        private async void qrAuth_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                loginBtn.Enabled = cancelBtn.Enabled = false;
+
+                QrAuth qrAuth = new QrAuth();
+                qrAuth.ShowDialog();
+                if (string.IsNullOrWhiteSpace(qrAuth.RefreshToken))
+                {
+                    return;
+                }
+
+                var steamWebClient = new SteamCommunityClient();
+                using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                {
+                    bool success = await steamWebClient.LoginAsync(qrAuth.RefreshToken, cts.Token);
+                    if (!success)
+                    {
+                        MessageBox.Show("登录失败", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+
+                Client = steamWebClient;
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                loginBtn.Enabled = cancelBtn.Enabled = true;
+            }
         }
 
         public SteamCommunityClient Client { get; private set; }

@@ -1209,9 +1209,16 @@ namespace Steam_Authenticator
                                 }
                             }
 
-                            if (offers.Any() && setting.AutoAcceptOffer)
+                            var receiveOffers = offers.Where(c => !(c.ItemsToGive?.Any() ?? false)).ToList();
+                            var giveOffers = offers.Where(c => c.ItemsToGive?.Any() ?? false).ToList();
+
+                            if (receiveOffers.Any() && setting.AutoAcceptReceiveOffer)
                             {
-                                HandleOffer(webClient, offers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                            }
+                            if (giveOffers.Any() && setting.AutoAcceptGiveOffer)
+                            {
+                                HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
                         }
                         catch
@@ -1714,6 +1721,7 @@ namespace Steam_Authenticator
                 Location = new Point(0, 0),
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
+                InitialImage = Properties.Resources.loading,
             };
             string avatar = userClient.User.Avatar;
             pictureBox.Image = Properties.Resources.userimg;

@@ -49,5 +49,23 @@ namespace Steam_Authenticator.Forms
             var result = await browser.LoadUrlAsync(url);
             return result;
         }
+
+        public async Task<LoadUrlAsyncResponse> LoadUrl(string url, params SteamKit.Cookie[] cookies)
+        {
+            await browser.LoadUrlAsync(url);
+            if (cookies?.Any() ?? false)
+            {
+                foreach (var cookie in cookies)
+                {
+                    await browser.GetCookieManager().SetCookieAsync(url, new Cookie
+                    {
+                        Name = cookie.Name,
+                        Value = cookie.Value
+                    });
+                }
+            }
+
+            return await browser.LoadUrlAsync(url);
+        }
     }
 }

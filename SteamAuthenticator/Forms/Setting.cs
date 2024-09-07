@@ -19,7 +19,8 @@ namespace Steam_Authenticator.Forms
             confirmationAutoPopup.Checked = Appsetting.Instance.AppSetting.Entry.ConfirmationAutoPopup;
             autoConfirmTrade.Checked = Appsetting.Instance.AppSetting.Entry.AutoConfirmTrade;
             autoConfirmMarket.Checked = Appsetting.Instance.AppSetting.Entry.AutoConfirmMarket;
-            autoAcceptOffer.Checked = Appsetting.Instance.AppSetting.Entry.AutoAcceptOffer;
+            autoAcceptReceiveOffer.Checked = Appsetting.Instance.AppSetting.Entry.AutoAcceptReceiveOffer;
+            autoAcceptGiveOffer.Checked = Appsetting.Instance.AppSetting.Entry.AutoAcceptGiveOffer;
 
             SetControlsEnabledState(periodicChecking.Checked);
 
@@ -55,7 +56,8 @@ namespace Steam_Authenticator.Forms
             Appsetting.Instance.AppSetting.Entry.ConfirmationAutoPopup = confirmationAutoPopup.Checked;
             Appsetting.Instance.AppSetting.Entry.AutoConfirmTrade = autoConfirmTrade.Checked;
             Appsetting.Instance.AppSetting.Entry.AutoConfirmMarket = autoConfirmMarket.Checked;
-            Appsetting.Instance.AppSetting.Entry.AutoAcceptOffer = autoAcceptOffer.Checked;
+            Appsetting.Instance.AppSetting.Entry.AutoAcceptReceiveOffer = autoAcceptReceiveOffer.Checked;
+            Appsetting.Instance.AppSetting.Entry.AutoAcceptGiveOffer = autoAcceptGiveOffer.Checked;
 
             Appsetting.Instance.AppSetting.Save();
 
@@ -64,7 +66,7 @@ namespace Steam_Authenticator.Forms
 
         private void SetControlsEnabledState(bool enabled)
         {
-            checkAll.Enabled = confirmationAutoPopup.Enabled = autoConfirmMarket.Enabled = autoConfirmTrade.Enabled = autoAcceptOffer.Enabled = enabled;
+            checkAll.Enabled = confirmationAutoPopup.Enabled = autoConfirmMarket.Enabled = autoConfirmTrade.Enabled = autoAcceptReceiveOffer.Enabled = autoAcceptGiveOffer.Enabled = enabled;
         }
 
         private void ShowWarning(CheckBox affectedBox)

@@ -105,10 +105,18 @@ namespace Steam_Authenticator.Model
             public bool AutoConfirmMarket { get; set; }
 
             /// <summary>
-            /// 是否自动接收报价
+            /// 是否自动接收赠送报价
+            /// 别人送给我的
             /// </summary>
-            [JsonProperty("auto_accept_offer")]
-            public bool AutoAcceptOffer { get; set; }
+            [JsonProperty("auto_accept_receive_offer")]
+            public bool AutoAcceptReceiveOffer { get; set; }
+
+            /// <summary>
+            /// 是否自动接收索取报价
+            /// 别人索取我的
+            /// </summary>
+            [JsonProperty("auto_accept_give_offer")]
+            public bool AutoAcceptGiveOffer { get; set; }
         }
     }
 }

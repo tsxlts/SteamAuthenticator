@@ -35,6 +35,7 @@
             Password = new TextBox();
             loginBtn = new Button();
             cancelBtn = new Button();
+            qrAuth = new LinkLabel();
             SuspendLayout();
             // 
             // User
@@ -72,7 +73,7 @@
             // 
             // loginBtn
             // 
-            loginBtn.Location = new Point(127, 110);
+            loginBtn.Location = new Point(127, 125);
             loginBtn.Name = "loginBtn";
             loginBtn.Size = new Size(70, 28);
             loginBtn.TabIndex = 4;
@@ -82,7 +83,7 @@
             // 
             // cancelBtn
             // 
-            cancelBtn.Location = new Point(47, 110);
+            cancelBtn.Location = new Point(51, 125);
             cancelBtn.Name = "cancelBtn";
             cancelBtn.Size = new Size(70, 28);
             cancelBtn.TabIndex = 5;
@@ -90,12 +91,28 @@
             cancelBtn.UseVisualStyleBackColor = true;
             cancelBtn.Click += cancelBtn_Click;
             // 
+            // linkLabel1
+            // 
+            qrAuth.ActiveLinkColor = Color.Gray;
+            qrAuth.AutoSize = true;
+            qrAuth.Cursor = Cursors.Hand;
+            qrAuth.LinkColor = Color.Gray;
+            qrAuth.Location = new Point(141, 91);
+            qrAuth.Name = "linkLabel1";
+            qrAuth.Size = new Size(56, 17);
+            qrAuth.TabIndex = 6;
+            qrAuth.TabStop = true;
+            qrAuth.Text = "扫码登录";
+            qrAuth.VisitedLinkColor = Color.Gray;
+            qrAuth.LinkClicked += qrAuth_LinkClicked;
+            // 
             // Login
             // 
             AcceptButton = loginBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(209, 150);
+            ClientSize = new Size(209, 163);
+            Controls.Add(qrAuth);
             Controls.Add(cancelBtn);
             Controls.Add(loginBtn);
             Controls.Add(label2);
@@ -121,5 +138,6 @@
         private TextBox Password;
         private Button loginBtn;
         private Button cancelBtn;
+        private LinkLabel qrAuth;
     }
 }
