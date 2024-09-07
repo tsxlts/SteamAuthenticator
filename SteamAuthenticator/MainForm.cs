@@ -142,7 +142,9 @@ namespace Steam_Authenticator
                 }
             }
 
-            Input input = new Input("设置密码", "请输入新的访问密码", true);
+            Input input = new Input("设置密码", $"请输入新的访问密码" +
+                $"{Environment.NewLine}" +
+                $"如果你想移除密码，则不需要输入任何文本，直接点击确定即可", true);
             if (input.ShowDialog() != DialogResult.OK)
             {
                 return;

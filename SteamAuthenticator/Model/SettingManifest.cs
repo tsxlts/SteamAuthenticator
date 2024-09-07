@@ -52,6 +52,12 @@ namespace Steam_Authenticator.Model
             /// <summary>
             /// 
             /// </summary>
+            [JsonProperty("first_used")]
+            public bool FirstUsed { get; set; } = true;
+
+            /// <summary>
+            /// 
+            /// </summary>
             [JsonProperty("current_user")]
             public string CurrentUser { get; set; }
 
