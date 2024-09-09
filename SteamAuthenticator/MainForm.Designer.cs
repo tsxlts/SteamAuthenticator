@@ -312,9 +312,9 @@
             ConfirmationCountLable.ForeColor = Color.FromArgb(0, 128, 255);
             ConfirmationCountLable.Location = new Point(44, 33);
             ConfirmationCountLable.Name = "ConfirmationCountLable";
-            ConfirmationCountLable.Size = new Size(15, 17);
+            ConfirmationCountLable.Size = new Size(23, 17);
             ConfirmationCountLable.TabIndex = 3;
-            ConfirmationCountLable.Text = "0";
+            ConfirmationCountLable.Text = "---";
             ConfirmationCountLable.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // OfferCountLabel
@@ -323,9 +323,9 @@
             OfferCountLabel.ForeColor = Color.FromArgb(255, 128, 0);
             OfferCountLabel.Location = new Point(44, 5);
             OfferCountLabel.Name = "OfferCountLabel";
-            OfferCountLabel.Size = new Size(15, 17);
+            OfferCountLabel.Size = new Size(23, 17);
             OfferCountLabel.TabIndex = 2;
-            OfferCountLabel.Text = "0";
+            OfferCountLabel.Text = "---";
             OfferCountLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // label2

@@ -117,6 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label2.Text" xml:space="preserve">
+    <value>安全提示：
+       本程序在运行过程中所使用的Steam帐号信息、帐号登录信息、Steam令牌信息等用户数据均保存在你当前所使用的计算机上。
+       为了你的帐号安全，强烈建议你设置访问密码，同时请妥善保管你的帐号密码和Steam令牌，请勿随意将你的密码和令牌提供给他人。
+       在接受报价和令牌确认时请仔细核对对方身份信息，以免上当受骗造成损失。
+       在使用本程序的过程中造成的帐号和财产损失，本程序开发者不承担任何责任！！！</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

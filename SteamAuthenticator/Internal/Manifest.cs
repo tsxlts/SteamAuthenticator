@@ -1,4 +1,5 @@
 ﻿
+using ProtoBuf;
 using System.Text;
 
 namespace Steam_Authenticator.Internal
@@ -189,6 +190,16 @@ namespace Steam_Authenticator.Internal
 
                     stream.Write(new byte[] { 0x0A });
 
+                    using (var headerStream = new MemoryStream())
+                    {
+                        Serializer.Serialize(headerStream, Header);
+                        var headerBuffer = headerStream.ToArray();
+                        stream.WriteInt32(headerBuffer.Length);
+                        stream.Write(headerBuffer);
+                    }
+
+                    stream.Write(new byte[] { 0x0A });
+
                     byte[] pathBuffer;
                     byte[] nameBuffer;
                     byte[] dataBuffer;
@@ -240,6 +251,16 @@ namespace Steam_Authenticator.Internal
 
                 stream.ReadByte();
 
+                var headerBuffer = new byte[stream.ReadInt32()];
+                stream.Read(headerBuffer);
+                using (var headerStream = new MemoryStream(headerBuffer))
+                {
+                    Header = new ManifestHeader();
+                    Serializer.Deserialize(headerStream, Header);
+                }
+
+                stream.ReadByte();
+
                 byte[] pathBuffer;
                 byte[] nameBuffer;
                 byte[] dataBuffer;
@@ -277,6 +298,11 @@ namespace Steam_Authenticator.Internal
 
         public string FileName { get; set; }
 
+        public ManifestHeader Header { get; set; } = new ManifestHeader
+        {
+            Version = 1
+        };
+
         public List<ManifestEntry> Entries { get; private set; } = new List<ManifestEntry>();
 
         public class ManifestEntry
@@ -286,6 +312,16 @@ namespace Steam_Authenticator.Internal
             public string Name { get; set; }
 
             public byte[] Data { get; set; }
+        }
+
+        [ProtoContract()]
+        public class ManifestHeader : IExtensible
+        {
+            private IExtension __pbn__extensionData;
+            IExtension IExtensible.GetExtensionObject(bool createIfMissing) => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+            [ProtoMember(1)]
+            public uint Version { get; set; }
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Steam_Authenticator.Forms
 
                 Appsetting.Instance.AppSetting.Save();
 
-                this.Close();
+                MessageBox.Show("已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (HttpRequestException ex)
             {

@@ -42,6 +42,7 @@
             // 
             OffersView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             OffersView.FixedPanel = FixedPanel.Panel1;
+            OffersView.IsSplitterFixed = true;
             OffersView.Location = new Point(1, 1);
             OffersView.Name = "OffersView";
             OffersView.Orientation = Orientation.Horizontal;

@@ -61,7 +61,7 @@ namespace Steam_Authenticator.Forms
 
             Appsetting.Instance.AppSetting.Save();
 
-            Close();
+            MessageBox.Show("已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void SetControlsEnabledState(bool enabled)

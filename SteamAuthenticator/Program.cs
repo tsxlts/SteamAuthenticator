@@ -37,11 +37,23 @@ namespace Steam_Authenticator
                 WithProxy((s, m) =>
                 {
                     var setting = Appsetting.Instance.AppSetting.Entry;
-                    var proxy = Proxy.Instance
-                    .WithSteamCommunity(setting.Domain.SteamCommunity)
-                    .WithSteamApi(setting.Domain.SteamApi)
-                    .WithSteamStore(setting.Domain.SteamPowered)
-                    .WithSteamLogin(setting.Domain.SteamLogin);
+                    var proxy = Proxy.Instance;
+                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamCommunity))
+                    {
+                        proxy.WithSteamCommunity(setting.Domain.SteamCommunity);
+                    }
+                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamApi))
+                    {
+                        proxy.WithSteamApi(setting.Domain.SteamApi);
+                    }
+                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamPowered))
+                    {
+                        proxy.WithSteamStore(setting.Domain.SteamPowered);
+                    }
+                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamLogin))
+                    {
+                        proxy.WithSteamLogin(setting.Domain.SteamLogin);
+                    }
 
                     if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address) || !string.IsNullOrWhiteSpace(setting.Proxy?.Host))
                     {
@@ -58,13 +70,69 @@ namespace Steam_Authenticator
                     return proxy;
                 });
 
+                if (Appsetting.Instance.AppSetting.Entry.FirstUsed)
+                {
+                    Welcome welcome = new Welcome();
+                    if (welcome.ShowDialog() != DialogResult.Continue)
+                    {
+                        return;
+                    }
+
+                    Appsetting.Instance.AppSetting.Entry.FirstUsed = false;
+                    Appsetting.Instance.AppSetting.Save();
+
+                    var dialogResult = MessageBox.Show($"为了你的帐号安全，建议你设置访问密码" +
+                         $"{Environment.NewLine}" +
+                         $"是否立即设置访问密码？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (dialogResult != DialogResult.Yes)
+                    {
+                        goto Run;
+                    }
+
+                    Input input = new Input("设置密码", $"请输入访问密码" +
+                        $"{Environment.NewLine}" +
+                        $"如果你不需要设置密码，则不需要输入任何文本，直接点击确定即可", password: true);
+                    if (input.ShowDialog() != DialogResult.OK)
+                    {
+                        goto Run;
+                    }
+
+                    string password = input.InputValue;
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        goto Run;
+                    }
+
+                    while (true)
+                    {
+                        input = new Input("设置密码", "请再次确认访问密码", password: true, required: true, errorMsg: "请输入密码");
+                        if (input.ShowDialog() != DialogResult.OK)
+                        {
+                            goto Run;
+                        }
+
+                        if (password != input.InputValue)
+                        {
+                            MessageBox.Show("两次密码不一致", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            continue;
+                        }
+
+                        Appsetting.Instance.Manifest.ChangePassword("", password);
+                        Appsetting.Instance.AppSetting.Password = password;
+                        MessageBox.Show("密码设置成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        break;
+                    }
+
+                    goto Run;
+                }
+
                 if (Appsetting.Instance.Manifest.Encrypted)
                 {
                     string tips = "请输入访问密码";
                     Input input;
                     while (true)
                     {
-                        input = new Input("访问密码", tips, true);
+                        input = new Input("访问密码", tips, password: true, required: true, errorMsg: "请输入密码");
                         if (input.ShowDialog() != DialogResult.OK)
                         {
                             return;
@@ -79,66 +147,6 @@ namespace Steam_Authenticator
 
                         Appsetting.Instance.AppSetting.Password = password;
                         break;
-                    }
-                }
-                else
-                {
-                    if (Appsetting.Instance.AppSetting.Entry.FirstUsed)
-                    {
-                        try
-                        {
-                            Appsetting.Instance.AppSetting.Entry.FirstUsed = false;
-                            Appsetting.Instance.AppSetting.Save();
-
-                            var dialogResult = MessageBox.Show($"为了你的帐号安全，建议你设置访问密码" +
-                                 $"{Environment.NewLine}" +
-                                 $"是否立即设置访问密码？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                            if (dialogResult != DialogResult.Yes)
-                            {
-                                goto Run;
-                            }
-
-                            Input input = new Input("设置密码", $"请输入访问密码" +
-                                $"{Environment.NewLine}" +
-                                $"如果你不需要设置密码，则不需要输入任何文本，直接点击确定即可", true);
-                            if (input.ShowDialog() != DialogResult.OK)
-                            {
-                                goto Run;
-                            }
-
-                            string password = input.InputValue;
-                            if (string.IsNullOrWhiteSpace(password))
-                            {
-                                goto Run;
-                            }
-
-                            while (true)
-                            {
-                                input = new Input("设置密码", "请再次确认访问密码", true);
-                                if (input.ShowDialog() != DialogResult.OK)
-                                {
-                                    goto Run;
-                                }
-
-                                if (password != input.InputValue)
-                                {
-                                    MessageBox.Show("两次密码不一致", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    continue;
-                                }
-
-                                Appsetting.Instance.Manifest.ChangePassword("", password);
-                                Appsetting.Instance.AppSetting.Password = password;
-                                break;
-                            }
-                        }
-                        finally
-                        {
-                            MessageBox.Show($"安全提示" +
-                                $"{Environment.NewLine}" +
-                                $"为了你的帐号安全，请妥善保管你的帐号密码和Steam令牌" +
-                                 $"{Environment.NewLine}" +
-                                $"请勿随意将你的密码和令牌提供给他人", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
                     }
                 }
 

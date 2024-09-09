@@ -248,7 +248,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ProxySetting";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "代理设置";
             Load += ProxySetting_Load;
             splitContainer1.Panel1.ResumeLayout(false);

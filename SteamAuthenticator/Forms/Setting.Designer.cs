@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Setting));
             periodicChecking = new CheckBox();
             checkAll = new CheckBox();
             autoConfirmTrade = new CheckBox();
@@ -161,10 +162,11 @@
             Controls.Add(checkAll);
             Controls.Add(periodicChecking);
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Setting";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "用户设置";
             Load += Setting_Load;
             ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).EndInit();

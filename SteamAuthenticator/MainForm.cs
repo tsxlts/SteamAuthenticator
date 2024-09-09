@@ -25,6 +25,7 @@ namespace Steam_Authenticator
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
         private readonly ContextMenuStrip contextMenuStrip;
 
+        private string initialDirectory = null;
         private UserClient currentClient = null;
 
         public MainForm()
@@ -125,7 +126,7 @@ namespace Steam_Authenticator
                 Input passwordInput;
                 while (true)
                 {
-                    passwordInput = new Input("设置密码", passwordTips, true);
+                    passwordInput = new Input("设置密码", passwordTips, password: true, required: true, errorMsg: "请输入密码");
                     if (passwordInput.ShowDialog() != DialogResult.OK)
                     {
                         return;
@@ -144,7 +145,7 @@ namespace Steam_Authenticator
 
             Input input = new Input("设置密码", $"请输入新的访问密码" +
                 $"{Environment.NewLine}" +
-                $"如果你想移除密码，则不需要输入任何文本，直接点击确定即可", true);
+                $"如果你想移除密码，则不需要输入任何文本，直接点击确定即可", password: true);
             if (input.ShowDialog() != DialogResult.OK)
             {
                 return;
@@ -155,7 +156,7 @@ namespace Steam_Authenticator
             {
                 while (true)
                 {
-                    input = new Input("设置密码", "请再次确认新的访问密码", true);
+                    input = new Input("设置密码", "请再次确认新的访问密码", password: true, required: true, errorMsg: "请输入密码");
                     if (input.ShowDialog() != DialogResult.OK)
                     {
                         return;
@@ -319,7 +320,7 @@ namespace Steam_Authenticator
                                     tips = "请输入邮箱验证码";
                                     break;
                             }
-                            Input input = new Input("输入验证码", tips);
+                            Input input = new Input("绑定令牌", tips, required: true, errorMsg: "请输入验证码");
                             if (input.ShowDialog() != DialogResult.OK)
                             {
                                 return;
@@ -406,6 +407,18 @@ namespace Steam_Authenticator
                 return;
             }
 
+            var dialogResult = MessageBox.Show($"你正在移动你的Steam令牌到当前设备" +
+                     $"{Environment.NewLine}" +
+                     $"Steam将发送一条验证短信到你绑定的安全手机号" +
+                    $"{Environment.NewLine}" +
+                     $"移动令牌后你在48小时内产生的交易报价将被Steam暂挂，但是你可以正常进行交易" +
+                     $"{Environment.NewLine}" +
+                     $"你是否要继续移动你的Steam令牌？", "移动令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialogResult != DialogResult.Yes)
+            {
+                return;
+            }
+
             string deviceId = authenticatorStatusResponse.DeviceId;
 
             MoveAuthenticatorResult moveAuthenticatorResult = MoveAuthenticatorResult.Begin;
@@ -485,7 +498,7 @@ namespace Steam_Authenticator
                         {
                             Input input = new Input("添加手机号", $"你正在绑定手机号, 验证短信已发送至你的手机," +
                                 $"{Environment.NewLine}" +
-                                $"请输入你收到的手机验证码");
+                                $"请输入你收到的手机验证码", required: true, errorMsg: "请输入验证码");
                             if (input.ShowDialog() != DialogResult.OK)
                             {
                                 if (MessageBox.Show("是否要退出绑定令牌？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -542,7 +555,7 @@ namespace Steam_Authenticator
                         {
                             Input input = new Input("移动令牌验证器", $"你正在移动令牌验证器, 验证短信已发送至你的手机" +
                                 $"{Environment.NewLine}" +
-                                $"请输入你收到的手机验证码");
+                                $"请输入你收到的手机验证码", required: true, errorMsg: "请输入验证码");
                             if (input.ShowDialog() != DialogResult.OK)
                             {
                                 if (MessageBox.Show("是否要退出绑定令牌？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -659,7 +672,7 @@ namespace Steam_Authenticator
                 code = guard?.RevocationCode;
                 if (string.IsNullOrWhiteSpace(code))
                 {
-                    Input input = new Input("删除令牌", "请输入恢复码");
+                    Input input = new Input("删除令牌", "请输入恢复码", required: true, errorMsg: "请输入恢复码");
                     if (input.ShowDialog() != DialogResult.OK)
                     {
                         return;
@@ -738,7 +751,7 @@ namespace Steam_Authenticator
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
-                MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -753,7 +766,7 @@ namespace Steam_Authenticator
                 Title = "导入令牌",
                 Filter = "令牌文件 (*.entry)|*.entry",
                 DefaultExt = ".entry",
-                InitialDirectory = AppContext.BaseDirectory,
+                InitialDirectory = initialDirectory ?? AppContext.BaseDirectory,
                 Multiselect = true
             };
 
@@ -771,6 +784,7 @@ namespace Steam_Authenticator
                 foreach (var item in openFileDialog.FileNames)
                 {
                     FileInfo fileInfo = new FileInfo(item);
+                    initialDirectory = fileInfo.DirectoryName;
                     try
                     {
                         using (FileStream stream = fileInfo.OpenRead())
@@ -778,40 +792,43 @@ namespace Steam_Authenticator
                             bool encrypt = stream.ReadBoolean();
                             byte[] dataBuffer = new byte[0];
 
+                            string password = null;
+                            byte[] iv = [];
+                            byte[] salt = [];
                             if (encrypt)
                             {
                                 tips = $"请输入解密密码" +
                                     $"{Environment.NewLine}" +
                                     $"{fileInfo.Name}";
 
-                                input = new Input($"导出令牌[{fileInfo.Name}]", tips, true);
+                                input = new Input($"导出令牌[{fileInfo.Name}]", tips, password: true, required: true, errorMsg: "请输入密码");
                                 input.ShowDialog();
-                                string password = input.InputValue;
+                                password = input.InputValue;
 
-                                byte[] iv = new byte[stream.ReadInt32()];
+                                iv = new byte[stream.ReadInt32()];
                                 stream.Read(iv);
 
-                                byte[] salt = new byte[stream.ReadInt32()];
+                                salt = new byte[stream.ReadInt32()];
                                 stream.Read(salt);
-
-                                dataBuffer = new byte[stream.ReadInt32()];
-                                stream.Read(dataBuffer);
-
-                                dataBuffer = FileEncryptor.DecryptData(password, salt, iv, dataBuffer);
                             }
-                            else
+
+                            while (stream.Position != stream.Length)
                             {
                                 dataBuffer = new byte[stream.ReadInt32()];
                                 stream.Read(dataBuffer);
+                                if (encrypt)
+                                {
+                                    dataBuffer = FileEncryptor.DecryptData(password, salt, iv, dataBuffer);
+                                }
+
+                                Guard guard = new Guard();
+                                guard.Deserialize(new MemoryStream(dataBuffer));
+                                guard = guard.Value;
+
+                                Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
+
+                                success.Add($"{fileInfo.Name}[{guard.AccountName}]");
                             }
-
-                            Guard guard = new Guard();
-                            guard.Deserialize(new MemoryStream(dataBuffer));
-                            guard = guard.Value;
-
-                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
-
-                            success.Add(fileInfo.Name);
                         }
                     }
                     catch (Exception ex)
@@ -1073,7 +1090,7 @@ namespace Steam_Authenticator
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
-                MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -1218,7 +1235,7 @@ namespace Steam_Authenticator
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
-                            if (giveOffers.Any() && setting.AutoAcceptGiveOffer)
+                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && setting.AutoAcceptGiveOffer)
                             {
                                 HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -1510,12 +1527,12 @@ namespace Steam_Authenticator
             UserName.Text = "---";
             Balance.Text = "￥0.00";
 
-            OfferCountLabel.Text = "0";
-            ConfirmationCountLable.Text = "0";
+            OfferCountLabel.Text = "---";
+            ConfirmationCountLable.Text = "---";
 
             if (userClient?.Client?.LoggedIn ?? false)
             {
-                Text = $"Steam验证器[{userClient.Client.Account}]";
+                Text = $"Steam验证器 {userClient.User.Account}[{userClient.User.NickName}]";
 
                 copyCookieMenuItem.Enabled = true;
                 copyRefreshTokenMenuItem.Enabled = true;

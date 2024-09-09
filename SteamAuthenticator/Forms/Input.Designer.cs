@@ -97,7 +97,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Input";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "请输入...";
             Load += Input_Load;
             panel1.ResumeLayout(false);

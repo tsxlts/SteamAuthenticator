@@ -91,14 +91,14 @@
             cancelBtn.UseVisualStyleBackColor = true;
             cancelBtn.Click += cancelBtn_Click;
             // 
-            // linkLabel1
+            // qrAuth
             // 
             qrAuth.ActiveLinkColor = Color.Gray;
             qrAuth.AutoSize = true;
             qrAuth.Cursor = Cursors.Hand;
             qrAuth.LinkColor = Color.Gray;
             qrAuth.Location = new Point(141, 91);
-            qrAuth.Name = "linkLabel1";
+            qrAuth.Name = "qrAuth";
             qrAuth.Size = new Size(56, 17);
             qrAuth.TabIndex = 6;
             qrAuth.TabStop = true;
@@ -124,7 +124,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Login";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "登录";
             ResumeLayout(false);
             PerformLayout();
