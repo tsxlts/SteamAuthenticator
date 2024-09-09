@@ -39,34 +39,44 @@
             cancelBtm = new Button();
             acceptBtn = new Button();
             label4 = new Label();
+            AccountNameBox = new TextBox();
+            label5 = new Label();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
+            // AccountNameBox
+            // 
+            AccountNameBox.Font = new Font("Microsoft YaHei UI", 12F);
+            AccountNameBox.Location = new Point(118, 63);
+            AccountNameBox.Name = "AccountNameBox";
+            AccountNameBox.Size = new Size(212, 28);
+            AccountNameBox.TabIndex = 0;
+            // 
             // label1
             // 
             label1.Font = new Font("Microsoft YaHei UI", 8F);
-            label1.Location = new Point(12, 59);
+            label1.Location = new Point(12, 114);
             label1.Name = "label1";
             label1.Size = new Size(100, 38);
-            label1.TabIndex = 0;
+            label1.TabIndex = 1;
             label1.Text = "恢         复         码\r\nrevocation_code";
             label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // RevocationCodeBox
             // 
             RevocationCodeBox.Font = new Font("Microsoft YaHei UI", 12F);
-            RevocationCodeBox.Location = new Point(118, 64);
+            RevocationCodeBox.Location = new Point(118, 119);
             RevocationCodeBox.Name = "RevocationCodeBox";
             RevocationCodeBox.Size = new Size(212, 28);
-            RevocationCodeBox.TabIndex = 1;
+            RevocationCodeBox.TabIndex = 2;
             // 
             // SharedSecretBox
             // 
             SharedSecretBox.Font = new Font("Microsoft YaHei UI", 12F);
-            SharedSecretBox.Location = new Point(118, 119);
+            SharedSecretBox.Location = new Point(118, 174);
             SharedSecretBox.Name = "SharedSecretBox";
             SharedSecretBox.Size = new Size(212, 28);
             SharedSecretBox.TabIndex = 3;
@@ -74,7 +84,7 @@
             // label2
             // 
             label2.Font = new Font("Microsoft YaHei UI", 8F);
-            label2.Location = new Point(12, 114);
+            label2.Location = new Point(12, 169);
             label2.Name = "label2";
             label2.Size = new Size(100, 38);
             label2.TabIndex = 2;
@@ -84,7 +94,7 @@
             // IdentitySecretBox
             // 
             IdentitySecretBox.Font = new Font("Microsoft YaHei UI", 12F);
-            IdentitySecretBox.Location = new Point(118, 176);
+            IdentitySecretBox.Location = new Point(118, 231);
             IdentitySecretBox.Name = "IdentitySecretBox";
             IdentitySecretBox.Size = new Size(212, 28);
             IdentitySecretBox.TabIndex = 5;
@@ -92,7 +102,7 @@
             // label3
             // 
             label3.Font = new Font("Microsoft YaHei UI", 8F);
-            label3.Location = new Point(12, 171);
+            label3.Location = new Point(12, 226);
             label3.Name = "label3";
             label3.Size = new Size(100, 38);
             label3.TabIndex = 4;
@@ -102,7 +112,7 @@
             // splitContainer1
             // 
             splitContainer1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            splitContainer1.Location = new Point(0, 230);
+            splitContainer1.Location = new Point(0, 281);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -147,13 +157,25 @@
             label4.TabIndex = 7;
             label4.Text = "如果你想要使用令牌功能，必须填写登录秘钥\r\n如果你想要使用令牌确认功能，必须填写身份秘钥";
             // 
+            // label5
+            // 
+            label5.Font = new Font("Microsoft YaHei UI", 8F);
+            label5.Location = new Point(12, 58);
+            label5.Name = "label5";
+            label5.Size = new Size(100, 38);
+            label5.TabIndex = 8;
+            label5.Text = "帐                     号\r\naccount_name";
+            label5.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // ImportAuthenticator
             // 
             AcceptButton = acceptBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = cancelBtm;
-            ClientSize = new Size(342, 269);
+            ClientSize = new Size(342, 320);
+            Controls.Add(AccountNameBox);
+            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(splitContainer1);
             Controls.Add(IdentitySecretBox);
@@ -189,5 +211,7 @@
         private Button cancelBtm;
         private Button acceptBtn;
         private Label label4;
+        private TextBox AccountNameBox;
+        private Label label5;
     }
 }

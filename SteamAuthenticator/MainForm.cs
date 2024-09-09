@@ -902,6 +902,17 @@ namespace Steam_Authenticator
                     SharedSecret = importAuthenticator.SharedSecret,
                 };
 
+                if (!string.IsNullOrWhiteSpace(guard.SharedSecret))
+                {
+                    string code = GuardCodeGenerator.GenerateSteamGuardCode(await Extension.GetSteamTimestampAsync(), guard.SharedSecret);
+                    var validateToken = await SteamAuthenticator.ValidateTokenAsync(webClient.WebApiToken, code);
+                    if (!validateToken.Body.Valid)
+                    {
+                        MessageBox.Show($"你提供的登录秘钥似乎有误，请确认登录秘钥是否可用", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(guard.IdentitySecret))
                 {
                     var queryConfirmations = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret);
@@ -915,6 +926,10 @@ namespace Steam_Authenticator
                 Appsetting.Instance.Manifest.AddGuard(webClient.Account, guard);
 
                 MessageBox.Show($"令牌导入成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch(FormatException)
+            {
+                MessageBox.Show($"你填写的秘钥格式有误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {

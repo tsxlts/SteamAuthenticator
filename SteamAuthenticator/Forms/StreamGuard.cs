@@ -107,150 +107,176 @@ namespace Steam_Authenticator.Forms
 
         private void deleteGuardBtn_Click(object sender, EventArgs e)
         {
-            string account = Users.SelectedItem?.ToString();
-            if (string.IsNullOrWhiteSpace(account))
+            try
             {
-                MessageBox.Show("请选择要删除的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+                deleteGuardBtn.Enabled = false;
 
-            if (Appsetting.Instance.Manifest.Encrypted)
-            {
-                string tips = "请输入访问密码";
-                Input input;
-                while (true)
+                string account = Users.SelectedItem?.ToString();
+                if (string.IsNullOrWhiteSpace(account))
                 {
-                    input = new Input("删除令牌", tips, password: true, required: true, errorMsg: "请输入密码");
-                    if (input.ShowDialog() != DialogResult.OK)
-                    {
-                        return;
-                    }
+                    MessageBox.Show("请选择要删除的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-                    string password = input.InputValue;
-                    if (!Appsetting.Instance.Manifest.CheckPassword(password))
+                if (Appsetting.Instance.Manifest.Encrypted)
+                {
+                    string tips = "请输入访问密码";
+                    Input input;
+                    while (true)
                     {
-                        tips = "访问密码错误，请重新输入";
-                        continue;
+                        input = new Input("删除令牌", tips, password: true, required: true, errorMsg: "请输入密码");
+                        if (input.ShowDialog() != DialogResult.OK)
+                        {
+                            return;
+                        }
+
+                        string password = input.InputValue;
+                        if (!Appsetting.Instance.Manifest.CheckPassword(password))
+                        {
+                            tips = "访问密码错误，请重新输入";
+                            continue;
+                        }
+                        break;
                     }
-                    break;
+                }
+
+                if (MessageBox.Show($"删除令牌前请确保已将令牌移动至其他设备" +
+                    $"{Environment.NewLine}" +
+                    $"令牌删除后不可恢复" +
+                    $"{Environment.NewLine}" +
+                    $"你确认要删除帐号 {account} 的令牌吗？", "删除令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                Appsetting.Instance.Manifest.RemoveGuard(account, out var _);
+                Users.Items.Remove(account);
+
+                if (Users.Items.Count > 0)
+                {
+                    Users.SelectedIndex = 0;
                 }
             }
-
-            if (MessageBox.Show($"删除令牌前请确保已将令牌移动至其他设备" +
-                $"{Environment.NewLine}" +
-                $"令牌删除后不可恢复" +
-                $"{Environment.NewLine}" +
-                $"你确认要删除帐号 {account} 的令牌吗？", "删除令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            catch (Exception ex)
             {
-                return;
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            Appsetting.Instance.Manifest.RemoveGuard(account, out var _);
-            Users.Items.Remove(account);
-
-            if (Users.Items.Count > 0)
+            finally
             {
-                Users.SelectedIndex = 0;
+                deleteGuardBtn.Enabled = true;
             }
         }
 
         private void exportGuardBtn_Click(object sender, EventArgs e)
         {
-            if (!Appsetting.Instance.Manifest.GetGuards().Any())
+            try
             {
-                MessageBox.Show("没有可以导出的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+                exportGuardBtn.Enabled = false;
 
-            if (Appsetting.Instance.Manifest.Encrypted)
-            {
-                string tips = "请输入访问密码";
-                Input input;
-                while (true)
+                if (!Appsetting.Instance.Manifest.GetGuards().Any())
                 {
-                    input = new Input("导出令牌", tips, password: true, required: true, errorMsg: "请输入密码");
-                    if (input.ShowDialog() != DialogResult.OK)
-                    {
-                        return;
-                    }
-
-                    string password = input.InputValue;
-                    if (!Appsetting.Instance.Manifest.CheckPassword(password))
-                    {
-                        tips = "访问密码错误，请重新输入";
-                        continue;
-                    }
-                    break;
-                }
-            }
-
-            string account = Users.SelectedItem?.ToString();
-            ExportGuardOptions exportGuardOptions = new ExportGuardOptions(account);
-            if (exportGuardOptions.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
-
-            List<Guard> guards = exportGuardOptions.SelectGuards;
-            if (guards.Count == 0)
-            {
-                MessageBox.Show("请选择要导出的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            string encryptPassword = exportGuardOptions.EncryptPassword;
-            bool encrypt = !string.IsNullOrWhiteSpace(encryptPassword);
-
-            using (var stream = new MemoryStream())
-            {
-                stream.WriteBoolean(encrypt);
-
-                var iv = new byte[0];
-                var salt = new byte[0];
-                if (encrypt)
-                {
-                    iv = FileEncryptor.GetInitializationVector();
-                    salt = FileEncryptor.GetRandomSalt();
-
-                    stream.WriteInt32(iv.Length);
-                    stream.Write(iv);
-
-                    stream.WriteInt32(salt.Length);
-                    stream.Write(salt);
+                    MessageBox.Show("没有可以导出的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
 
-                foreach (var guard in guards)
+                if (Appsetting.Instance.Manifest.Encrypted)
                 {
-                    using (var guardStream = guard.Serialize())
+                    string tips = "请输入访问密码";
+                    Input input;
+                    while (true)
                     {
-                        byte[] dataBuffer = new byte[guardStream.Length];
-                        guardStream.Read(dataBuffer);
-                        if (encrypt)
+                        input = new Input("导出令牌", tips, password: true, required: true, errorMsg: "请输入密码");
+                        if (input.ShowDialog() != DialogResult.OK)
                         {
-                            dataBuffer = FileEncryptor.EncryptData(encryptPassword, salt, iv, dataBuffer);
+                            return;
                         }
 
-                        stream.WriteInt32(dataBuffer.Length);
-                        stream.Write(dataBuffer);
+                        string password = input.InputValue;
+                        if (!Appsetting.Instance.Manifest.CheckPassword(password))
+                        {
+                            tips = "访问密码错误，请重新输入";
+                            continue;
+                        }
+                        break;
                     }
                 }
 
-                SaveFileDialog saveFileDialog = new SaveFileDialog
+                string account = Users.SelectedItem?.ToString();
+                ExportGuardOptions exportGuardOptions = new ExportGuardOptions(account);
+                if (exportGuardOptions.ShowDialog() != DialogResult.OK)
                 {
-                    Title = "导出令牌",
-                    Filter = "令牌文件 (*.entry)|*.entry",
-                    DefaultExt = ".entry",
-                    FileName = $"{DateTime.Now:yyyyMMddHHmmss}.guard.entry",
-                    InitialDirectory = initialDirectory ?? AppContext.BaseDirectory,
-                };
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string filePath = saveFileDialog.FileName;
-                    File.WriteAllBytes(filePath, stream.ToArray());
-
-                    initialDirectory = new FileInfo(filePath).DirectoryName;
+                    return;
                 }
+
+                List<Guard> guards = exportGuardOptions.SelectGuards;
+                if (guards.Count == 0)
+                {
+                    MessageBox.Show("请选择要导出的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                string encryptPassword = exportGuardOptions.EncryptPassword;
+                bool encrypt = !string.IsNullOrWhiteSpace(encryptPassword);
+
+                using (var stream = new MemoryStream())
+                {
+                    stream.WriteBoolean(encrypt);
+
+                    var iv = new byte[0];
+                    var salt = new byte[0];
+                    if (encrypt)
+                    {
+                        iv = FileEncryptor.GetInitializationVector();
+                        salt = FileEncryptor.GetRandomSalt();
+
+                        stream.WriteInt32(iv.Length);
+                        stream.Write(iv);
+
+                        stream.WriteInt32(salt.Length);
+                        stream.Write(salt);
+                    }
+
+                    foreach (var guard in guards)
+                    {
+                        using (var guardStream = guard.Serialize())
+                        {
+                            byte[] dataBuffer = new byte[guardStream.Length];
+                            guardStream.Read(dataBuffer);
+                            if (encrypt)
+                            {
+                                dataBuffer = FileEncryptor.EncryptData(encryptPassword, salt, iv, dataBuffer);
+                            }
+
+                            stream.WriteInt32(dataBuffer.Length);
+                            stream.Write(dataBuffer);
+                        }
+                    }
+
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        Title = "导出令牌",
+                        Filter = "令牌文件 (*.entry)|*.entry",
+                        DefaultExt = ".entry",
+                        FileName = $"{DateTime.Now:yyyyMMddHHmmss}.guard.entry",
+                        InitialDirectory = initialDirectory ?? AppContext.BaseDirectory,
+                    };
+
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = saveFileDialog.FileName;
+                        File.WriteAllBytes(filePath, stream.ToArray());
+
+                        initialDirectory = new FileInfo(filePath).DirectoryName;
+                    }
+                }
+            }
+            catch(Exception ex) 
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                exportGuardBtn.Enabled = true;
             }
         }
     }

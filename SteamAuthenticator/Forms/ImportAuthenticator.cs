@@ -10,6 +10,9 @@ namespace Steam_Authenticator.Forms
         public ImportAuthenticator(SteamCommunityClient webClient)
         {
             InitializeComponent();
+
+            AccountNameBox.Enabled = false;
+            AccountNameBox.Text = webClient.Account;
         }
 
         private void acceptBtn_Click(object sender, EventArgs e)
@@ -29,6 +32,7 @@ namespace Steam_Authenticator.Forms
             Close();
         }
 
+        public string AccountName => AccountNameBox.Text;
         public string RevocationCode => RevocationCodeBox.Text;
         public string SharedSecret => SharedSecretBox.Text;
         public string IdentitySecret => IdentitySecretBox.Text;
