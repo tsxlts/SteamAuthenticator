@@ -270,7 +270,7 @@ namespace Steam_Authenticator.Forms
                     }
                 }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

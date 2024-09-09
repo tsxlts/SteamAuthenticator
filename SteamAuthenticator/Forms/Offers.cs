@@ -57,6 +57,8 @@ namespace Steam_Authenticator.Forms
 
             try
             {
+                acceptAllBtn.Enabled = false;
+
                 if (!webClient.LoggedIn)
                 {
                     MessageBox.Show("请先登录Steam帐号");
@@ -75,6 +77,10 @@ namespace Steam_Authenticator.Forms
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                acceptAllBtn.Enabled = true;
+            }
         }
 
         private async void declineAllBtn_Click(object sender, EventArgs e)
@@ -86,6 +92,8 @@ namespace Steam_Authenticator.Forms
 
             try
             {
+                declineAllBtn.Enabled = false;
+
                 if (!webClient.LoggedIn)
                 {
                     MessageBox.Show("请先登录Steam帐号");
@@ -103,6 +111,10 @@ namespace Steam_Authenticator.Forms
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                declineAllBtn.Enabled = true;
             }
         }
 

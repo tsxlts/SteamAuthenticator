@@ -927,7 +927,7 @@ namespace Steam_Authenticator
 
                 MessageBox.Show($"令牌导入成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch(FormatException)
+            catch (FormatException)
             {
                 MessageBox.Show($"你填写的秘钥格式有误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -961,6 +961,8 @@ namespace Steam_Authenticator
         {
             try
             {
+                acceptOfferBtn.Enabled = false;
+
                 var webClient = currentClient?.Client;
                 if (webClient == null || !webClient.LoggedIn)
                 {
@@ -985,12 +987,18 @@ namespace Steam_Authenticator
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                acceptOfferBtn.Enabled = true;
+            }
         }
 
         private async void declineOfferBtn_Click(object sender, EventArgs e)
         {
             try
             {
+                declineOfferBtn.Enabled = false;
+
                 var webClient = currentClient?.Client;
                 if (webClient == null || !webClient.LoggedIn)
                 {
@@ -1014,6 +1022,10 @@ namespace Steam_Authenticator
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                declineOfferBtn.Enabled = true;
             }
         }
 
@@ -1384,14 +1396,16 @@ namespace Steam_Authenticator
             {
                 var webClient = currentClient.Client;
 
-                var walletDetails = await webClient.User.QueryWalletDetailsAsync();
+                var walletDetails = await webClient.User.QueryWalletDetailsAsync(cancellationToken);
 
                 if (walletDetails?.HasWallet ?? false)
                 {
                     Balance.Text = $"{walletDetails.FormattedBalance}";
+
+                    DelayedBalance.Text = "￥0.00";
                     if (!string.IsNullOrWhiteSpace(walletDetails.FormattedDelayedBalance))
                     {
-                        Balance.Text = $"{Balance.Text} ({walletDetails.FormattedDelayedBalance})";
+                        DelayedBalance.Text = $"{walletDetails.FormattedDelayedBalance}";
                     }
                 }
             }
@@ -1541,6 +1555,7 @@ namespace Steam_Authenticator
             UserName.ForeColor = Color.Black;
             UserName.Text = "---";
             Balance.Text = "￥0.00";
+            DelayedBalance.Text = "￥0.00";
 
             OfferCountLabel.Text = "---";
             ConfirmationCountLable.Text = "---";
@@ -1561,6 +1576,7 @@ namespace Steam_Authenticator
                 UserName.ForeColor = Color.Green;
                 UserName.Text = $"{userClient.User.Account} [{userClient.User.NickName}]";
                 Balance.Text = "￥0.00";
+                DelayedBalance.Text = "￥0.00";
 
                 ResetTimer(TimeSpan.Zero, timerMinPeriod);
             }

@@ -67,6 +67,7 @@
             versionLabel = new LinkLabel();
             label6 = new Label();
             label7 = new Label();
+            DelayedBalance = new Label();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -237,7 +238,7 @@
             Balance.ForeColor = Color.Green;
             Balance.Location = new Point(118, 68);
             Balance.Name = "Balance";
-            Balance.Size = new Size(200, 23);
+            Balance.Size = new Size(200, 18);
             Balance.TabIndex = 4;
             Balance.Text = "￥0.00";
             Balance.TextAlign = ContentAlignment.MiddleLeft;
@@ -428,11 +429,23 @@
             label7.TabIndex = 14;
             label7.Text = "确认数";
             // 
+            // DelayedBalance
+            // 
+            DelayedBalance.AutoEllipsis = true;
+            DelayedBalance.ForeColor = Color.Gray;
+            DelayedBalance.Location = new Point(118, 90);
+            DelayedBalance.Name = "DelayedBalance";
+            DelayedBalance.Size = new Size(200, 18);
+            DelayedBalance.TabIndex = 15;
+            DelayedBalance.Text = "￥0.00";
+            DelayedBalance.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 479);
+            Controls.Add(DelayedBalance);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(versionLabel);
@@ -502,5 +515,6 @@
         private Label label7;
         private ToolStripMenuItem importFileAuthenticatorMenuItem;
         private ToolStripMenuItem importSecretAuthenticatorMenuItem;
+        private Label DelayedBalance;
     }
 }
