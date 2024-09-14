@@ -239,7 +239,7 @@ namespace Steam_Authenticator.Forms
                             Panel panel = new Panel() { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding { Bottom = 10 } };
                             panel.Paint += (s, e) =>
                             {
-                                using (LinearGradientBrush brush = new LinearGradientBrush(panel.ClientRectangle, Color.FromArgb(30, 144, 255), Color.FromArgb(0, 191, 255), 90F))
+                                using (LinearGradientBrush brush = new LinearGradientBrush(panel.ClientRectangle, Color.FromArgb(255, 228, 181), Color.FromArgb(255, 255, 224), 90F))
                                 {
                                     e.Graphics.FillRectangle(brush, panel.ClientRectangle);
                                 }
@@ -256,19 +256,30 @@ namespace Steam_Authenticator.Forms
                             {
                                 Text = $"{confirmation.Headline}\n{confirmation.CreatorId}",
                                 AutoSize = true,
-                                ForeColor = Color.Snow,
+                                ForeColor = Color.Green,
                                 Location = new Point(90, 20),
                                 BackColor = Color.Transparent
                             };
                             panel.Controls.Add(nameLabel);
+                            
+                            Label summaryLabel = new Label()
+                            {
+                                Text = $"[{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(confirmation.CreationTime).ToLocalTime():yyyy/MM/dd HH:mm:ss}]" +
+                                $"\n{string.Join("\n", confirmation.Summary)}",
+                                AutoSize = true,
+                                ForeColor = Color.Green,
+                                Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
+                                BackColor = Color.Transparent
+                            };
+                            panel.Controls.Add(summaryLabel);
 
                             ConfirmationButton acceptButton = new ConfirmationButton()
                             {
                                 Text = confirmation.Accept,
-                                Location = new Point(90, 60),
+                                Location = new Point(90, summaryLabel.Height + summaryLabel.Location.Y + 10),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },
-                                BackColor = Color.FromArgb(30, 144, 255),
+                                BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
                                 AutoSize = true,
                                 AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -280,10 +291,10 @@ namespace Steam_Authenticator.Forms
                             ConfirmationButton cancelButton = new ConfirmationButton()
                             {
                                 Text = confirmation.Cancel,
-                                Location = new Point(180, 60),
+                                Location = new Point(180, summaryLabel.Height + summaryLabel.Location.Y + 10),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },
-                                BackColor = Color.FromArgb(30, 144, 255),
+                                BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
                                 AutoSize = true,
                                 AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -295,10 +306,10 @@ namespace Steam_Authenticator.Forms
                             ConfirmationButton detailButton = new ConfirmationButton()
                             {
                                 Text = "查看",
-                                Location = new Point(270, 60),
+                                Location = new Point(270, summaryLabel.Height + summaryLabel.Location.Y + 10),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },
-                                BackColor = Color.FromArgb(30, 144, 255),
+                                BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
                                 AutoSize = true,
                                 AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -306,17 +317,6 @@ namespace Steam_Authenticator.Forms
                             };
                             detailButton.Click += btnDetail_Click;
                             panel.Controls.Add(detailButton);
-
-                            Label summaryLabel = new Label()
-                            {
-                                Text = $"[{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(confirmation.CreationTime).ToLocalTime():yyyy/MM/dd HH:mm:ss}]" +
-                                $"\n{string.Join("\n", confirmation.Summary)}",
-                                AutoSize = true,
-                                ForeColor = Color.Snow,
-                                Location = new Point(90, 100),
-                                BackColor = Color.Transparent
-                            };
-                            panel.Controls.Add(summaryLabel);
 
                             ConfirmationsView.Panel2.Controls.Add(panel);
                         }

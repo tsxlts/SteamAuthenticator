@@ -258,7 +258,7 @@ namespace Steam_Authenticator.Forms
                     Panel panel = new Panel() { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding { Bottom = 10 } };
                     panel.Paint += (s, e) =>
                     {
-                        using (LinearGradientBrush brush = new LinearGradientBrush(panel.ClientRectangle, Color.FromArgb(30, 144, 255), Color.FromArgb(0, 191, 255), 90F))
+                        using (LinearGradientBrush brush = new LinearGradientBrush(panel.ClientRectangle, Color.FromArgb(255, 228, 181), Color.FromArgb(255, 255, 224), 90F))
                         {
                             e.Graphics.FillRectangle(brush, panel.ClientRectangle);
                         }
@@ -272,7 +272,8 @@ namespace Steam_Authenticator.Forms
                     }
 
                     stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine($"你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价");
+                    stringBuilder.AppendLine($"{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(offer.TimeCreated).ToLocalTime():yyyy/MM/dd HH:mm:ss}" +
+                        $"\n你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价");
 
                     if (giveDescription?.Any() ?? false)
                     {
@@ -316,19 +317,29 @@ namespace Steam_Authenticator.Forms
                     {
                         Text = $"{stringBuilder}",
                         AutoSize = true,
-                        ForeColor = Color.Snow,
+                        ForeColor = Color.Green,
                         Location = new Point(90, 20),
                         BackColor = Color.Transparent
                     };
                     panel.Controls.Add(nameLabel);
 
+                    Label summaryLabel = new Label()
+                    {
+                        Text = $"{offer.Message}",
+                        AutoSize = true,
+                        ForeColor = Color.Green,
+                        Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
+                        BackColor = Color.Transparent
+                    };
+                    panel.Controls.Add(summaryLabel);
+
                     OfferButton acceptButton = new OfferButton()
                     {
                         Text = "接受",
-                        Location = new Point(90, 90),
+                        Location = new Point(90, summaryLabel.Height + summaryLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
-                        BackColor = Color.FromArgb(30, 144, 255),
+                        BackColor = Color.FromArgb(102, 153, 255),
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -340,10 +351,10 @@ namespace Steam_Authenticator.Forms
                     OfferButton cancelButton = new OfferButton()
                     {
                         Text = "拒绝",
-                        Location = new Point(180, 90),
+                        Location = new Point(180, summaryLabel.Height + summaryLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
-                        BackColor = Color.FromArgb(30, 144, 255),
+                        BackColor = Color.FromArgb(102, 153, 255),
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -355,10 +366,10 @@ namespace Steam_Authenticator.Forms
                     OfferButton detailButton = new OfferButton()
                     {
                         Text = "查看",
-                        Location = new Point(270, 90),
+                        Location = new Point(270, summaryLabel.Height + summaryLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
-                        BackColor = Color.FromArgb(30, 144, 255),
+                        BackColor = Color.FromArgb(102, 153, 255),
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -366,17 +377,6 @@ namespace Steam_Authenticator.Forms
                     };
                     detailButton.Click += btnDetail_Click;
                     panel.Controls.Add(detailButton);
-
-                    Label summaryLabel = new Label()
-                    {
-                        Text = $"[{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(offer.TimeCreated).ToLocalTime():yyyy/MM/dd HH:mm:ss}]" +
-                        $"\n{offer.Message}",
-                        AutoSize = true,
-                        ForeColor = Color.Snow,
-                        Location = new Point(90, 130),
-                        BackColor = Color.Transparent
-                    };
-                    panel.Controls.Add(summaryLabel);
 
                     OffersView.Panel2.Controls.Add(panel);
                 }

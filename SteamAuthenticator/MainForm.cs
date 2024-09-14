@@ -44,7 +44,7 @@ namespace Steam_Authenticator
             contextMenuStrip = new ContextMenuStrip();
             contextMenuStrip.Items.Add("ÇÐ»»").Click += setCurrentClientMenuItem_Click;
             contextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += loginMenuItem_Click;
-            contextMenuStrip.Items.Add("×¢ÏúµÇÂ¼").Click += removeUserMenuItem_Click;
+            contextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += removeUserMenuItem_Click;
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
@@ -63,6 +63,7 @@ namespace Steam_Authenticator
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            refreshUserTimer.Dispose();
             timer.Dispose();
             foreach (var client in Appsetting.Instance.Clients)
             {
@@ -1072,6 +1073,11 @@ namespace Steam_Authenticator
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
 
+            if (await userClient.LoginAsync())
+            {
+                return;
+            }
+
             await Login(false, userClient.User.Account);
         }
 
@@ -1544,7 +1550,6 @@ namespace Steam_Authenticator
                 }
             }
 
-            ResetTimer(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
             Text = $"SteamÑéÖ¤Æ÷";
 
             copyCookieMenuItem.Enabled = false;
@@ -1577,8 +1582,6 @@ namespace Steam_Authenticator
                 UserName.Text = $"{userClient.User.Account} [{userClient.User.NickName}]";
                 Balance.Text = "£¤0.00";
                 DelayedBalance.Text = "£¤0.00";
-
-                ResetTimer(TimeSpan.Zero, timerMinPeriod);
             }
 
             currentClient = userClient;
@@ -1668,7 +1671,8 @@ namespace Steam_Authenticator
             }
             finally
             {
-                ResetRefreshUserTimer(TimeSpan.FromMinutes(0), TimeSpan.FromMinutes(10));
+                ResetTimer(TimeSpan.Zero, timerMinPeriod);
+                ResetRefreshUserTimer(TimeSpan.Zero, TimeSpan.FromMinutes(10));
             }
         }
 
