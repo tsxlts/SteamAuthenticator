@@ -86,7 +86,7 @@ namespace Steam_Authenticator.Forms
                             }
                             else
                             {
-                                input = new Input("确认登录", 
+                                input = new Input("确认登录",
                                     $"请进行手机令牌确认登录" +
                                     $"{Environment.NewLine}" +
                                     $"或者输入手机令牌", required: true, errorMsg: "请输入手机令牌");

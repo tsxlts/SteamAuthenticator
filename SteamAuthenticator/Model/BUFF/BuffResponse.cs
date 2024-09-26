@@ -8,7 +8,8 @@ namespace Steam_Authenticator.Model.BUFF
         public string msg { get; set; }
 
         public string error { get; set; }
-
         public T data { get; set; }
+
+        public bool IsSuccess => "OK".Equals(code, StringComparison.OrdinalIgnoreCase);
     }
 }

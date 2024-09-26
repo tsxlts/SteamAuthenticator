@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
-using SteamKit;
+using Steam_Authenticator.Model.BUFF;
+using SteamKit.Model;
 using SteamKit.WebClient;
 
 namespace Steam_Authenticator
@@ -45,7 +47,7 @@ namespace Steam_Authenticator
 
     public class UserClient
     {
-        public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
+        public static UserClient None = new UserClient(new User(), new SteamCommunityClient(), null);
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
@@ -53,17 +55,37 @@ namespace Steam_Authenticator
         private Action startLogin = null;
         private Action<bool> endLogin = null;
 
-        public UserClient(User user, SteamCommunityClient client)
+        public UserClient(User user, SteamCommunityClient client, BuffClient buffClient)
         {
             User = user;
             Client = client;
+            BuffClient = buffClient;
         }
 
         public SteamCommunityClient Client { get; set; }
 
         public User User { get; set; }
 
-        public CookieCollection BuffCookies { get; set; }
+        public BuffClient BuffClient { get; private set; }
+
+        public UserClient SetBuffClient(BuffClient buffClient)
+        {
+            BuffClient = buffClient;
+            if (User != null)
+            {
+                User.BuffUser = buffClient?.User;
+            }
+            return this;
+        }
+
+        public UserClient SaveSetting(BuffUserSetting setting)
+        {
+            if (User?.BuffUser != null)
+            {
+                User.BuffUser.Setting = setting;
+            }
+            return this;
+        }
 
         public UserClient WithStartLogin(Action action)
         {
@@ -100,4 +122,63 @@ namespace Steam_Authenticator
         }
     }
 
+    public class BuffClient
+    {
+        public static BuffClient None = new BuffClient(new BuffUser());
+
+        private Action startLogin = null;
+        private Action<bool> endLogin = null;
+
+        public BuffClient(BuffUser user)
+        {
+            User = user;
+        }
+
+        public BuffUser User { get; private set; }
+
+        public bool LoggedIn { get; set; }
+
+        public BuffClient WithStartLogin(Action action)
+        {
+            startLogin = action;
+            return this;
+        }
+
+        public BuffClient WithEndLogin(Action<bool> action)
+        {
+            endLogin = action;
+            return this;
+        }
+
+        public async Task<bool> LoginAsync()
+        {
+            bool result = false;
+            try
+            {
+                startLogin?.Invoke();
+
+                if (!(User.Cookies?.Any() ?? false))
+                {
+                    result = false;
+                    return result;
+                }
+
+                var userInfo = await BuffApi.QueryUserInfo(cookies: User.Cookies);
+                result = !string.IsNullOrWhiteSpace(userInfo.Body?.data?.id);
+
+                LoggedIn = result;
+
+                return result;
+            }
+            finally
+            {
+                endLogin?.Invoke(result);
+            }
+        }
+
+        public async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade()
+        {
+            return await BuffApi.QuerySteamTrade(cookies: User.Cookies);
+        }
+    }
 }

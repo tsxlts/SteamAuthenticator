@@ -89,9 +89,9 @@
             // saveBtn
             // 
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(12, 244);
+            saveBtn.Location = new Point(1, 256);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(258, 33);
+            saveBtn.Size = new Size(281, 33);
             saveBtn.TabIndex = 4;
             saveBtn.Text = "保存设置";
             saveBtn.UseVisualStyleBackColor = true;

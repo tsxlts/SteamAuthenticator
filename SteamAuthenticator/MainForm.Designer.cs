@@ -68,19 +68,26 @@
             label6 = new Label();
             label7 = new Label();
             DelayedBalance = new Label();
-            第三方帐号管理ToolStripMenuItem = new ToolStripMenuItem();
-            buffAuthMenuItem = new ToolStripMenuItem();
+            tabControl = new TabControl();
+            steamPage = new TabPage();
+            buffPage = new TabPage();
+            buffUsersPanel = new Panel();
+            statusPanel = new Panel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
+            tabControl.SuspendLayout();
+            steamPage.SuspendLayout();
+            buffPage.SuspendLayout();
+            statusPanel.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu, 第三方帐号管理ToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(684, 25);
+            menuStrip1.Size = new Size(690, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -160,28 +167,28 @@
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(180, 22);
+            guardMenuItem.Size = new Size(124, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // confirmMenuItem
             // 
             confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(180, 22);
+            confirmMenuItem.Size = new Size(124, 22);
             confirmMenuItem.Text = "确认";
             confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(180, 22);
+            addAuthenticatorMenuItem.Size = new Size(124, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(180, 22);
+            moveAuthenticatorMenuItem.Size = new Size(124, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -189,7 +196,7 @@
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(180, 22);
+            importAuthenticatorMenuItem.Size = new Size(124, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
@@ -209,7 +216,7 @@
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(180, 22);
+            removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
@@ -256,7 +263,7 @@
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(464, 38);
+            panel1.Location = new Point(470, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
@@ -357,10 +364,9 @@
             // 
             usersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             usersPanel.AutoScroll = true;
-            usersPanel.BorderStyle = BorderStyle.FixedSingle;
-            usersPanel.Location = new Point(12, 156);
+            usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
-            usersPanel.Size = new Size(660, 297);
+            usersPanel.Size = new Size(656, 274);
             usersPanel.TabIndex = 7;
             usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
@@ -369,7 +375,7 @@
             label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label3.AutoSize = true;
             label3.ForeColor = Color.Green;
-            label3.Location = new Point(12, 456);
+            label3.Location = new Point(3, 7);
             label3.Name = "label3";
             label3.Size = new Size(56, 17);
             label3.TabIndex = 8;
@@ -380,7 +386,7 @@
             label4.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label4.AutoSize = true;
             label4.ForeColor = Color.Red;
-            label4.Location = new Point(74, 456);
+            label4.Location = new Point(65, 7);
             label4.Name = "label4";
             label4.Size = new Size(56, 17);
             label4.TabIndex = 9;
@@ -391,7 +397,7 @@
             label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label5.AutoSize = true;
             label5.ForeColor = Color.Gray;
-            label5.Location = new Point(136, 456);
+            label5.Location = new Point(127, 7);
             label5.Name = "label5";
             label5.Size = new Size(56, 17);
             label5.TabIndex = 10;
@@ -400,7 +406,7 @@
             // versionLabel
             // 
             versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            versionLabel.Location = new Point(572, 456);
+            versionLabel.Location = new Point(578, 464);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(100, 23);
             versionLabel.TabIndex = 12;
@@ -414,7 +420,7 @@
             label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label6.AutoSize = true;
             label6.ForeColor = Color.FromArgb(255, 128, 0);
-            label6.Location = new Point(198, 456);
+            label6.Location = new Point(189, 7);
             label6.Name = "label6";
             label6.Size = new Size(44, 17);
             label6.TabIndex = 13;
@@ -425,7 +431,7 @@
             label7.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label7.AutoSize = true;
             label7.ForeColor = Color.FromArgb(0, 128, 255);
-            label7.Location = new Point(248, 456);
+            label7.Location = new Point(239, 7);
             label7.Name = "label7";
             label7.Size = new Size(44, 17);
             label7.TabIndex = 14;
@@ -442,33 +448,71 @@
             DelayedBalance.Text = "￥0.00";
             DelayedBalance.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // 第三方帐号管理ToolStripMenuItem
+            // tabControl
             // 
-            第三方帐号管理ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { buffAuthMenuItem });
-            第三方帐号管理ToolStripMenuItem.Name = "第三方帐号管理ToolStripMenuItem";
-            第三方帐号管理ToolStripMenuItem.Size = new Size(104, 21);
-            第三方帐号管理ToolStripMenuItem.Text = "第三方帐号管理";
+            tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabControl.Controls.Add(steamPage);
+            tabControl.Controls.Add(buffPage);
+            tabControl.Location = new Point(12, 144);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(670, 310);
+            tabControl.TabIndex = 16;
             // 
-            // buffAuthMenuItem
+            // steamPage
             // 
-            buffAuthMenuItem.Name = "buffAuthMenuItem";
-            buffAuthMenuItem.Size = new Size(180, 22);
-            buffAuthMenuItem.Text = "登录 BUFF 帐号";
-            buffAuthMenuItem.Click += buffAuthMenuItem_Click_1;
+            steamPage.Controls.Add(usersPanel);
+            steamPage.Location = new Point(4, 26);
+            steamPage.Name = "steamPage";
+            steamPage.Padding = new Padding(3);
+            steamPage.Size = new Size(662, 280);
+            steamPage.TabIndex = 0;
+            steamPage.Text = "Steam 帐号";
+            steamPage.UseVisualStyleBackColor = true;
+            // 
+            // buffPage
+            // 
+            buffPage.Controls.Add(buffUsersPanel);
+            buffPage.Location = new Point(4, 26);
+            buffPage.Name = "buffPage";
+            buffPage.Padding = new Padding(3);
+            buffPage.Size = new Size(662, 280);
+            buffPage.TabIndex = 1;
+            buffPage.Text = "BUFF 帐号";
+            buffPage.UseVisualStyleBackColor = true;
+            // 
+            // buffUserPanel
+            // 
+            buffUsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            buffUsersPanel.AutoScroll = true;
+            buffUsersPanel.Location = new Point(3, 3);
+            buffUsersPanel.Name = "buffUserPanel";
+            buffUsersPanel.Size = new Size(656, 274);
+            buffUsersPanel.TabIndex = 8;
+            buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
+            // 
+            // statusPanel
+            // 
+            statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            statusPanel.Controls.Add(label3);
+            statusPanel.Controls.Add(label4);
+            statusPanel.Controls.Add(label6);
+            statusPanel.Controls.Add(label7);
+            statusPanel.Controls.Add(label5);
+            statusPanel.Location = new Point(12, 453);
+            statusPanel.Name = "statusPanel";
+            statusPanel.Size = new Size(608, 30);
+            statusPanel.TabIndex = 17;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 479);
+            ClientSize = new Size(690, 487);
+            Controls.Add(statusPanel);
+            Controls.Add(tabControl);
             Controls.Add(DelayedBalance);
-            Controls.Add(label7);
-            Controls.Add(label6);
             Controls.Add(versionLabel);
-            Controls.Add(label5);
-            Controls.Add(label4);
-            Controls.Add(label3);
-            Controls.Add(usersPanel);
             Controls.Add(panel1);
             Controls.Add(Balance);
             Controls.Add(UserName);
@@ -487,6 +531,11 @@
             ((System.ComponentModel.ISupportInitialize)UserImg).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            tabControl.ResumeLayout(false);
+            steamPage.ResumeLayout(false);
+            buffPage.ResumeLayout(false);
+            statusPanel.ResumeLayout(false);
+            statusPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -532,7 +581,10 @@
         private ToolStripMenuItem importFileAuthenticatorMenuItem;
         private ToolStripMenuItem importSecretAuthenticatorMenuItem;
         private Label DelayedBalance;
-        private ToolStripMenuItem 第三方帐号管理ToolStripMenuItem;
-        private ToolStripMenuItem buffAuthMenuItem;
+        private TabControl tabControl;
+        private TabPage steamPage;
+        private TabPage buffPage;
+        private Panel statusPanel;
+        private Panel buffUsersPanel;
     }
 }

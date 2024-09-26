@@ -261,7 +261,7 @@ namespace Steam_Authenticator.Forms
                                 BackColor = Color.Transparent
                             };
                             panel.Controls.Add(nameLabel);
-                            
+
                             Label summaryLabel = new Label()
                             {
                                 Text = $"[{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(confirmation.CreationTime).ToLocalTime():yyyy/MM/dd HH:mm:ss}]" +
