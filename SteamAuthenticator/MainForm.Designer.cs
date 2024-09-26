@@ -68,6 +68,8 @@
             label6 = new Label();
             label7 = new Label();
             DelayedBalance = new Label();
+            第三方帐号管理ToolStripMenuItem = new ToolStripMenuItem();
+            buffAuthMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -75,7 +77,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu, 第三方帐号管理ToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(684, 25);
@@ -158,28 +160,28 @@
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(124, 22);
+            guardMenuItem.Size = new Size(180, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // confirmMenuItem
             // 
             confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(124, 22);
+            confirmMenuItem.Size = new Size(180, 22);
             confirmMenuItem.Text = "确认";
             confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(124, 22);
+            addAuthenticatorMenuItem.Size = new Size(180, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(124, 22);
+            moveAuthenticatorMenuItem.Size = new Size(180, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -187,7 +189,7 @@
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(124, 22);
+            importAuthenticatorMenuItem.Size = new Size(180, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
@@ -207,7 +209,7 @@
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(124, 22);
+            removeAuthenticatorMenuItem.Size = new Size(180, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
@@ -440,6 +442,20 @@
             DelayedBalance.Text = "￥0.00";
             DelayedBalance.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // 第三方帐号管理ToolStripMenuItem
+            // 
+            第三方帐号管理ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { buffAuthMenuItem });
+            第三方帐号管理ToolStripMenuItem.Name = "第三方帐号管理ToolStripMenuItem";
+            第三方帐号管理ToolStripMenuItem.Size = new Size(104, 21);
+            第三方帐号管理ToolStripMenuItem.Text = "第三方帐号管理";
+            // 
+            // buffAuthMenuItem
+            // 
+            buffAuthMenuItem.Name = "buffAuthMenuItem";
+            buffAuthMenuItem.Size = new Size(180, 22);
+            buffAuthMenuItem.Text = "登录 BUFF 帐号";
+            buffAuthMenuItem.Click += buffAuthMenuItem_Click_1;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -516,5 +532,7 @@
         private ToolStripMenuItem importFileAuthenticatorMenuItem;
         private ToolStripMenuItem importSecretAuthenticatorMenuItem;
         private Label DelayedBalance;
+        private ToolStripMenuItem 第三方帐号管理ToolStripMenuItem;
+        private ToolStripMenuItem buffAuthMenuItem;
     }
 }

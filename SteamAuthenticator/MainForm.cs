@@ -8,6 +8,7 @@ using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -1100,6 +1101,26 @@ namespace Steam_Authenticator
             if (userClient.User.SteamId == currentClient?.User?.SteamId)
             {
                 SetCurrentClient(Appsetting.Instance.Clients.FirstOrDefault() ?? userClient, true);
+            }
+        }
+
+        private void buffAuthMenuItem_Click_1(object sender, EventArgs e)
+        {
+            var buffAuth = new BuffAuth("请扫码登录 BUFF 帐号");
+            if (buffAuth.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == buffAuth.Result.Body.data.steamid);
+            if (!clients.Any())
+            {
+                MessageBox.Show($"未在当前设备已登录的Steam帐号中找到你的BUFF帐号绑定的Steam账号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            foreach (var item in clients)
+            {
+                item.BuffCookies = buffAuth.Result.Cookies;
             }
         }
 

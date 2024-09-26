@@ -85,11 +85,11 @@ namespace Steam_Authenticator.Forms
             cancellationTokenSource.Cancel();
         }
 
-        private void LoadQrCode(string quCode)
+        private void LoadQrCode(string plainText)
         {
             using (var qrGenerator = new QRCodeGenerator())
             {
-                using (var qrCodeData = qrGenerator.CreateQrCode(quCode, QRCodeGenerator.ECCLevel.L))
+                using (var qrCodeData = qrGenerator.CreateQrCode(plainText, QRCodeGenerator.ECCLevel.L))
                 {
                     using (var qrCode = new PngByteQRCode(qrCodeData))
                     {

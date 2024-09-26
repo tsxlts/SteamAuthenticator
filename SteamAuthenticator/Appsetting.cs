@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Steam_Authenticator.Model;
+using SteamKit;
 using SteamKit.WebClient;
 
 namespace Steam_Authenticator
@@ -61,6 +62,8 @@ namespace Steam_Authenticator
         public SteamCommunityClient Client { get; set; }
 
         public User User { get; set; }
+
+        public CookieCollection BuffCookies { get; set; }
 
         public UserClient WithStartLogin(Action action)
         {
