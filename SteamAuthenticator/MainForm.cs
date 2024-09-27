@@ -17,6 +17,7 @@ namespace Steam_Authenticator
         private readonly Version currentVersion;
         private readonly System.Threading.Timer timer;
         private readonly System.Threading.Timer refreshUserTimer;
+        private readonly System.Threading.Timer refreshBuffUserTimer;
         private readonly TimeSpan timerMinPeriod = TimeSpan.FromSeconds(20);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
         private readonly ContextMenuStrip userContextMenuStrip;
@@ -37,6 +38,7 @@ namespace Steam_Authenticator
 
             timer = new System.Threading.Timer(RefreshClientMsg, null, -1, -1);
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
+            refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
 
             userContextMenuStrip = new ContextMenuStrip();
             userContextMenuStrip.Items.Add("ÇÐ»»").Click += setCurrentClientMenuItem_Click;
@@ -470,6 +472,11 @@ namespace Steam_Authenticator
         private void ResetRefreshUserTimer(TimeSpan dueTime, TimeSpan period)
         {
             refreshUserTimer.Change(dueTime, period);
+        }
+
+        private void ResetRefreshBuffUserTimer(TimeSpan dueTime, TimeSpan period)
+        {
+            refreshBuffUserTimer.Change(dueTime, period);
         }
 
         private async Task<bool> CheckVersion()

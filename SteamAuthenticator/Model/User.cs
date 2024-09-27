@@ -20,9 +20,6 @@ namespace Steam_Authenticator.Model
 
     public class BuffUser
     {
-        [JsonIgnore]
-        public CookieCollection Cookies => Extension.GetCookies(BuffCookies ?? "");
-
         public string BuffCookies { get; set; }
 
         public string UserId { get; set; }

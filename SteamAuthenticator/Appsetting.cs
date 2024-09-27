@@ -2,6 +2,7 @@
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
+using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
 
@@ -136,6 +137,8 @@ namespace Steam_Authenticator
 
         public BuffUser User { get; private set; }
 
+        public CookieCollection Cookies => Extension.GetCookies(User?.BuffCookies ?? "");
+
         public bool LoggedIn { get; set; }
 
         public BuffClient WithStartLogin(Action action)
@@ -157,13 +160,13 @@ namespace Steam_Authenticator
             {
                 startLogin?.Invoke();
 
-                if (!(User.Cookies?.Any() ?? false))
+                if (!(Cookies?.Any() ?? false))
                 {
                     result = false;
                     return result;
                 }
 
-                var userInfo = await BuffApi.QueryUserInfo(cookies: User.Cookies);
+                var userInfo = await BuffApi.QueryUserInfo(cookies: Cookies);
                 result = !string.IsNullOrWhiteSpace(userInfo.Body?.data?.id);
 
                 LoggedIn = result;
@@ -176,9 +179,16 @@ namespace Steam_Authenticator
             }
         }
 
+        public async Task<IWebResponse<BuffResponse<BuffUserInfoResponse>>> Refresh(CancellationToken cancellationToken = default)
+        {
+            var userInfo = await BuffApi.QueryUserInfo(cookies: Cookies, cancellationToken);
+            LoggedIn = !string.IsNullOrWhiteSpace(userInfo.Body?.data?.id);
+            return userInfo;
+        }
+
         public async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade()
         {
-            return await BuffApi.QuerySteamTrade(cookies: User.Cookies);
+            return await BuffApi.QuerySteamTrade(cookies: Cookies);
         }
     }
 }
