@@ -73,13 +73,19 @@
             buffPage = new TabPage();
             buffUsersPanel = new Panel();
             statusPanel = new Panel();
+            pictureBox1 = new PictureBox();
+            pictureBox2 = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
+            usersPanel.SuspendLayout();
             tabControl.SuspendLayout();
             steamPage.SuspendLayout();
             buffPage.SuspendLayout();
+            buffUsersPanel.SuspendLayout();
             statusPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -364,6 +370,8 @@
             // 
             usersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             usersPanel.AutoScroll = true;
+            usersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            usersPanel.Controls.Add(pictureBox1);
             usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
             usersPanel.Size = new Size(656, 274);
@@ -481,12 +489,14 @@
             buffPage.Text = "BUFF 帐号";
             buffPage.UseVisualStyleBackColor = true;
             // 
-            // buffUserPanel
+            // buffUsersPanel
             // 
             buffUsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             buffUsersPanel.AutoScroll = true;
+            buffUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            buffUsersPanel.Controls.Add(pictureBox2);
             buffUsersPanel.Location = new Point(3, 3);
-            buffUsersPanel.Name = "buffUserPanel";
+            buffUsersPanel.Name = "buffUsersPanel";
             buffUsersPanel.Size = new Size(656, 274);
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
@@ -503,6 +513,26 @@
             statusPanel.Name = "statusPanel";
             statusPanel.Size = new Size(608, 30);
             statusPanel.TabIndex = 17;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = Properties.Resources.loading;
+            pictureBox1.Location = new Point(278, 87);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(100, 100);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            pictureBox2.Image = Properties.Resources.loading;
+            pictureBox2.Location = new Point(278, 87);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(100, 100);
+            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox2.TabIndex = 1;
+            pictureBox2.TabStop = false;
             // 
             // MainForm
             // 
@@ -531,11 +561,15 @@
             ((System.ComponentModel.ISupportInitialize)UserImg).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            usersPanel.ResumeLayout(false);
             tabControl.ResumeLayout(false);
             steamPage.ResumeLayout(false);
             buffPage.ResumeLayout(false);
+            buffUsersPanel.ResumeLayout(false);
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -586,5 +620,7 @@
         private TabPage buffPage;
         private Panel statusPanel;
         private Panel buffUsersPanel;
+        private PictureBox pictureBox1;
+        private PictureBox pictureBox2;
     }
 }

@@ -159,6 +159,10 @@ namespace Steam_Authenticator
             {
 
             }
+            finally
+            {
+                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(10));
+            }
         }
 
         private BuffClient BuffLogin(string tips)
@@ -272,7 +276,7 @@ namespace Steam_Authenticator
                 Cursor = Cursors.Default,
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
-                ForeColor = buffClient.LoggedIn ? Color.Green : Color.FromArgb(255, 128, 0),
+                ForeColor = Color.FromArgb(255, 128, 0),
                 Location = new Point(0, 98)
             };
             offerLabel.Click += buffOffersNumberBtn_Click;
@@ -323,6 +327,66 @@ namespace Steam_Authenticator
             }
             return size;
         }
-    }
 
+        private void RefreshBuffUser(object _)
+        {
+            try
+            {
+                using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
+                {
+                    var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToArray();
+                    foreach (BuffUserPanel userPanel in controlCollection)
+                    {
+                        //var nameLabel = userPanel.Controls.Cast<Control>().FirstOrDefault(c => c.Name == "username") as Label;
+                        var nameLabel = userPanel.Controls.Find("username", false)?.FirstOrDefault() as Label;
+                        if (nameLabel == null)
+                        {
+                            continue;
+                        }
+
+                        var buffClient = userPanel.Client;
+                        var user = buffClient.User;
+
+                        var buffResponse = buffClient.Refresh(tokenSource.Token).GetAwaiter().GetResult();
+                        var buffUser = buffResponse.Body?.data;
+
+                        if (buffClient.LoggedIn)
+                        {
+                            nameLabel.ForeColor = Color.Green;
+                        }
+                        else
+                        {
+                            nameLabel.ForeColor = Color.Red;
+                        }
+
+                        var newCookies = buffClient.Cookies;
+                        newCookies.Add(buffResponse.Cookies);
+
+                        user.Nickname = buffUser.nickname;
+                        user.Avatar = buffUser.avatar;
+                        user.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
+
+                        var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == user.SteamId);
+                        foreach (var client in clients)
+                        {
+                            client.SetBuffClient(buffClient);
+                            Appsetting.Instance.Manifest.AddUser(client.User.SteamId, client.User);
+                        }
+
+                        nameLabel.Text = user.Nickname;
+                        PictureBox pictureBox = userPanel.Controls.Find("useravatar", false)?.FirstOrDefault() as PictureBox;
+                        pictureBox?.LoadAsync(user.Avatar);
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(10 * 60), TimeSpan.FromSeconds(10 * 60));
+            }
+        }
+    }
 }

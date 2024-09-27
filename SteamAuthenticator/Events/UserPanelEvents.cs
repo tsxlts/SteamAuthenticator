@@ -389,7 +389,7 @@ namespace Steam_Authenticator
                 Cursor = Cursors.Hand,
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopRight,
-                ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(255, 128, 0),
+                ForeColor = Color.FromArgb(255, 128, 0),
                 Location = new Point(0, 98)
             };
             offerLabel.Click += offersNumberBtn_Click;
@@ -404,7 +404,7 @@ namespace Steam_Authenticator
                 Cursor = Cursors.Hand,
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopLeft,
-                ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(0, 128, 255),
+                ForeColor = Color.FromArgb(0, 128, 255),
                 Location = new Point(42, 98)
             };
             confirmationLabel.Click += confirmationNumberBtn_Click;
