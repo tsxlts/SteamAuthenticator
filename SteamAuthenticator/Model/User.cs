@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using SteamKit;
-
-namespace Steam_Authenticator.Model
+﻿namespace Steam_Authenticator.Model
 {
     public class User : JsonStreamSerializer<User>
     {

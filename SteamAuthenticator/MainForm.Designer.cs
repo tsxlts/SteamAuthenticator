@@ -34,9 +34,6 @@
             settingMenuItem = new ToolStripMenuItem();
             proxySettingMenuItem = new ToolStripMenuItem();
             passwordMenuItem = new ToolStripMenuItem();
-            copyCookieMenuItem = new ToolStripMenuItem();
-            copyRefreshTokenMenuItem = new ToolStripMenuItem();
-            copyAccessTokenToolItem = new ToolStripMenuItem();
             checkVersionMenuItem = new ToolStripMenuItem();
             quitMenuItem = new ToolStripMenuItem();
             authenticatorMenu = new ToolStripMenuItem();
@@ -61,6 +58,7 @@
             label2 = new Label();
             label1 = new Label();
             usersPanel = new Panel();
+            pictureBox1 = new PictureBox();
             label3 = new Label();
             label4 = new Label();
             label5 = new Label();
@@ -72,20 +70,19 @@
             steamPage = new TabPage();
             buffPage = new TabPage();
             buffUsersPanel = new Panel();
-            statusPanel = new Panel();
-            pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
+            statusPanel = new Panel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
             usersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl.SuspendLayout();
             steamPage.SuspendLayout();
             buffPage.SuspendLayout();
             buffUsersPanel.SuspendLayout();
-            statusPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            statusPanel.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -99,7 +96,7 @@
             // 
             // UserToolStripMenuItem
             // 
-            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingMenuItem, proxySettingMenuItem, passwordMenuItem, copyCookieMenuItem, copyRefreshTokenMenuItem, copyAccessTokenToolItem, checkVersionMenuItem, quitMenuItem });
+            UserToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingMenuItem, proxySettingMenuItem, passwordMenuItem, checkVersionMenuItem, quitMenuItem });
             UserToolStripMenuItem.Name = "UserToolStripMenuItem";
             UserToolStripMenuItem.Size = new Size(44, 21);
             UserToolStripMenuItem.Text = "文件";
@@ -124,30 +121,6 @@
             passwordMenuItem.Size = new Size(180, 22);
             passwordMenuItem.Text = "访问密码";
             passwordMenuItem.Click += passwordMenuItem_Click;
-            // 
-            // copyCookieMenuItem
-            // 
-            copyCookieMenuItem.Enabled = false;
-            copyCookieMenuItem.Name = "copyCookieMenuItem";
-            copyCookieMenuItem.Size = new Size(180, 22);
-            copyCookieMenuItem.Text = "复制Cookie";
-            copyCookieMenuItem.Click += copyCookieMenuItem_Click;
-            // 
-            // copyRefreshTokenMenuItem
-            // 
-            copyRefreshTokenMenuItem.Enabled = false;
-            copyRefreshTokenMenuItem.Name = "copyRefreshTokenMenuItem";
-            copyRefreshTokenMenuItem.Size = new Size(180, 22);
-            copyRefreshTokenMenuItem.Text = "复制RefreshToken";
-            copyRefreshTokenMenuItem.Click += copyRefreshTokenMenuItem_Click;
-            // 
-            // copyAccessTokenToolItem
-            // 
-            copyAccessTokenToolItem.Enabled = false;
-            copyAccessTokenToolItem.Name = "copyAccessTokenToolItem";
-            copyAccessTokenToolItem.Size = new Size(180, 22);
-            copyAccessTokenToolItem.Text = "复制AccessToken";
-            copyAccessTokenToolItem.Click += copyAccessTokenMenuItem_Click;
             // 
             // checkVersionMenuItem
             // 
@@ -378,6 +351,16 @@
             usersPanel.TabIndex = 7;
             usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = Properties.Resources.loading;
+            pictureBox1.Location = new Point(278, 87);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(100, 100);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            // 
             // label3
             // 
             label3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
@@ -501,6 +484,16 @@
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
+            // pictureBox2
+            // 
+            pictureBox2.Image = Properties.Resources.loading;
+            pictureBox2.Location = new Point(278, 87);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(100, 100);
+            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox2.TabIndex = 1;
+            pictureBox2.TabStop = false;
+            // 
             // statusPanel
             // 
             statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -513,26 +506,6 @@
             statusPanel.Name = "statusPanel";
             statusPanel.Size = new Size(608, 30);
             statusPanel.TabIndex = 17;
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.Image = Properties.Resources.loading;
-            pictureBox1.Location = new Point(278, 87);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(100, 100);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            // 
-            // pictureBox2
-            // 
-            pictureBox2.Image = Properties.Resources.loading;
-            pictureBox2.Location = new Point(278, 87);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(100, 100);
-            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox2.TabIndex = 1;
-            pictureBox2.TabStop = false;
             // 
             // MainForm
             // 
@@ -562,14 +535,14 @@
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             usersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tabControl.ResumeLayout(false);
             steamPage.ResumeLayout(false);
             buffPage.ResumeLayout(false);
             buffUsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -580,15 +553,12 @@
         private ToolStripMenuItem UserToolStripMenuItem;
         private PictureBox UserImg;
         private Label UserName;
-        private ToolStripMenuItem copyCookieMenuItem;
-        private ToolStripMenuItem copyRefreshTokenMenuItem;
         private Label Balance;
         private Panel panel1;
         private Label ConfirmationCountLable;
         private Label OfferCountLabel;
         private Label label2;
         private Label label1;
-        private ToolStripMenuItem copyAccessTokenToolItem;
         private ToolStripMenuItem authenticatorMenu;
         private ToolStripMenuItem guardMenuItem;
         private ToolStripMenuItem addAuthenticatorMenuItem;

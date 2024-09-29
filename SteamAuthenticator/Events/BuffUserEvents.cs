@@ -28,7 +28,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            await buffClient.LoginAsync();
+            await buffClient.RefreshAsync(true);
         }
 
         private void addBuffUserBtn_Click(object sender, EventArgs e)
@@ -75,7 +75,7 @@ namespace Steam_Authenticator
             BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
             BuffClient client = panel.Client;
 
-            await client.LoginAsync();
+            await client.RefreshAsync(true);
         }
 
         private void removeBuffUserMenuItem_Click(object sender, EventArgs e)
@@ -152,7 +152,7 @@ namespace Steam_Authenticator
                     buffUsersPanel.Controls.Add(panel);
                 }
 
-                var tasks = clients.Select(c => c.BuffClient.LoginAsync());
+                var tasks = clients.Select(c => c.BuffClient.RefreshAsync(true));
                 await Task.WhenAll(tasks);
             }
             catch
@@ -283,8 +283,16 @@ namespace Steam_Authenticator
             panel.Controls.Add(offerLabel);
 
             panel.Client
-                .WithStartLogin(() => nameLabel.ForeColor = Color.FromArgb(128, 128, 128))
-                .WithEndLogin(loggined =>
+                .WithStartLogin((relogin) =>
+                {
+                    if (!relogin)
+                    {
+                        return;
+                    }
+
+                    nameLabel.ForeColor = Color.FromArgb(128, 128, 128);
+                })
+                .WithEndLogin((relogin, loggined) =>
                 {
                     nameLabel.ForeColor = loggined ? Color.Green : Color.Red;
                 });
@@ -347,35 +355,7 @@ namespace Steam_Authenticator
                         var buffClient = userPanel.Client;
                         var user = buffClient.User;
 
-                        var buffResponse = buffClient.Refresh(tokenSource.Token).GetAwaiter().GetResult();
-                        var buffUser = buffResponse.Body?.data;
-
-                        if (buffClient.LoggedIn)
-                        {
-                            nameLabel.ForeColor = Color.Green;
-                        }
-                        else
-                        {
-                            nameLabel.ForeColor = Color.Red;
-                        }
-
-                        var newCookies = buffClient.Cookies;
-                        newCookies.Add(buffResponse.Cookies);
-
-                        user.Nickname = buffUser.nickname;
-                        user.Avatar = buffUser.avatar;
-                        user.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
-
-                        var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == user.SteamId);
-                        foreach (var client in clients)
-                        {
-                            client.SetBuffClient(buffClient);
-                            Appsetting.Instance.Manifest.AddUser(client.User.SteamId, client.User);
-                        }
-
-                        nameLabel.Text = user.Nickname;
-                        PictureBox pictureBox = userPanel.Controls.Find("useravatar", false)?.FirstOrDefault() as PictureBox;
-                        pictureBox?.LoadAsync(user.Avatar);
+                        buffClient.RefreshAsync(false, tokenSource.Token).GetAwaiter().GetResult();
                     }
                 }
             }
