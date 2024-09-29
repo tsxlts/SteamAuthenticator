@@ -47,14 +47,8 @@ namespace Steam_Authenticator.Forms
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
         }
 
-
         private async void acceptAllBtn_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("你确定要接受所有报价吗？", "接受报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
-                return;
-            }
-
             try
             {
                 acceptAllBtn.Enabled = false;
@@ -65,6 +59,11 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
                 if (thisOffers == null || !thisOffers.Any())
+                {
+                    return;
+                }
+
+                if (MessageBox.Show("你确定要接受所有报价吗？", "接受报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
@@ -80,16 +79,12 @@ namespace Steam_Authenticator.Forms
             finally
             {
                 acceptAllBtn.Enabled = true;
+                acceptAllBtn.Focus();
             }
         }
 
         private async void declineAllBtn_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("你确定要拒绝所有报价吗？", "拒绝报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
-                return;
-            }
-
             try
             {
                 declineAllBtn.Enabled = false;
@@ -100,6 +95,11 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
                 if (thisOffers == null || !thisOffers.Any())
+                {
+                    return;
+                }
+
+                if (MessageBox.Show("你确定要拒绝所有报价吗？", "拒绝报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
@@ -115,6 +115,7 @@ namespace Steam_Authenticator.Forms
             finally
             {
                 declineAllBtn.Enabled = true;
+                declineAllBtn.Focus();
             }
         }
 
@@ -391,6 +392,7 @@ namespace Steam_Authenticator.Forms
 
                 refreshBtn.Text = "刷新";
                 refreshBtn.Enabled = true;
+                refreshBtn.Focus();
             }
         }
 

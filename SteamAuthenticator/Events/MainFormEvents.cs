@@ -923,13 +923,13 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                if (MessageBox.Show("你确定要接受所有报价吗？", "接受报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
+                if (offers == null || !offers.Any())
                 {
                     return;
                 }
 
-                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
-                if (offers == null || !offers.Any())
+                if (MessageBox.Show("你确定要接受所有报价吗？", "接受报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
@@ -959,13 +959,13 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                if (MessageBox.Show("你确定要拒绝所有报价吗？", "拒绝报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
+                if (offers == null || !offers.Any())
                 {
                     return;
                 }
 
-                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
-                if (offers == null || !offers.Any())
+                if (MessageBox.Show("你确定要拒绝所有报价吗？", "拒绝报价", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     return;
                 }
