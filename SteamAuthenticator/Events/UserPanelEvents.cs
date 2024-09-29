@@ -3,6 +3,8 @@ using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
+using System.Text;
+using System.Web;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator
@@ -31,6 +33,44 @@ namespace Steam_Authenticator
             UserClient userClient = panel.UserClient;
 
             await SwitchUser(userClient);
+        }
+
+        private void copyCookieMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var item in userClient.Client.WebCookie)
+            {
+                stringBuilder.Append($"{item.Name}={HttpUtility.UrlEncode(item.Value)}; ");
+            }
+            Clipboard.SetText(stringBuilder.ToString());
+        }
+
+        private void copyAccessTokenMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            Clipboard.SetText(userClient.Client.AccessToken);
+        }
+
+        private void copyRefreshTokenMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            Clipboard.SetText(userClient.Client.RefreshToken);
         }
 
         private async void setCurrentClientMenuItem_Click(object sender, EventArgs e)
@@ -296,10 +336,6 @@ namespace Steam_Authenticator
 
             Text = $"Steam验证器";
 
-            copyCookieMenuItem.Enabled = false;
-            copyRefreshTokenMenuItem.Enabled = false;
-            copyAccessTokenToolItem.Enabled = false;
-
             UserImg.Image = Properties.Resources.userimg;
             UserName.ForeColor = Color.Black;
             UserName.Text = "---";
@@ -312,10 +348,6 @@ namespace Steam_Authenticator
             if (userClient?.Client?.LoggedIn ?? false)
             {
                 Text = $"Steam验证器 {userClient.User.Account}[{userClient.User.NickName}]";
-
-                copyCookieMenuItem.Enabled = true;
-                copyRefreshTokenMenuItem.Enabled = true;
-                copyAccessTokenToolItem.Enabled = true;
 
                 UserImg.Image = Properties.Resources.userimg;
                 if (!string.IsNullOrWhiteSpace(userClient.User.Avatar))

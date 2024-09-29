@@ -4,8 +4,6 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
-using System.Text;
-using System.Web;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
 
@@ -33,41 +31,6 @@ namespace Steam_Authenticator
         {
             ProxySetting proxySetting = new ProxySetting();
             proxySetting.ShowDialog();
-        }
-
-        private void copyCookieMenuItem_Click(object sender, EventArgs e)
-        {
-            if (currentClient == null || !currentClient.Client.LoggedIn)
-            {
-                return;
-            }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (var item in currentClient.Client.WebCookie)
-            {
-                stringBuilder.Append($"{item.Name}={HttpUtility.UrlEncode(item.Value)}; ");
-            }
-            Clipboard.SetText(stringBuilder.ToString());
-        }
-
-        private void copyRefreshTokenMenuItem_Click(object sender, EventArgs e)
-        {
-            if (currentClient == null || !currentClient.Client.LoggedIn)
-            {
-                return;
-            }
-
-            Clipboard.SetText(currentClient.Client.RefreshToken);
-        }
-
-        private void copyAccessTokenMenuItem_Click(object sender, EventArgs e)
-        {
-            if (currentClient == null || !currentClient.Client.LoggedIn)
-            {
-                return;
-            }
-
-            Clipboard.SetText(currentClient.Client.AccessToken);
         }
 
         private void passwordMenuItem_Click(object sender, EventArgs e)

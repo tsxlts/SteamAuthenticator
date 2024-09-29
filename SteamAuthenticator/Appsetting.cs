@@ -5,6 +5,7 @@ using Steam_Authenticator.Model.BUFF;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
+using System.Web;
 
 namespace Steam_Authenticator
 {
@@ -127,8 +128,8 @@ namespace Steam_Authenticator
     {
         public static BuffClient None = new BuffClient(new BuffUser());
 
-        private Action startLogin = null;
-        private Action<bool> endLogin = null;
+        private Action<bool> startLogin = null;
+        private Action<bool, bool> endLogin = null;
 
         public BuffClient(BuffUser user)
         {
@@ -141,49 +142,53 @@ namespace Steam_Authenticator
 
         public bool LoggedIn { get; set; }
 
-        public BuffClient WithStartLogin(Action action)
+        public BuffClient WithStartLogin(Action<bool> action)
         {
             startLogin = action;
             return this;
         }
 
-        public BuffClient WithEndLogin(Action<bool> action)
+        public BuffClient WithEndLogin(Action<bool, bool> action)
         {
             endLogin = action;
             return this;
         }
 
-        public async Task<bool> LoginAsync()
+        public async Task RefreshAsync(bool relogin, CancellationToken cancellationToken = default)
         {
-            bool result = false;
             try
             {
-                startLogin?.Invoke();
+                startLogin?.Invoke(relogin);
 
-                if (!(Cookies?.Any() ?? false))
+                var buffResponse = await BuffApi.QueryUserInfo(cookies: Cookies, cancellationToken);
+
+                if (string.IsNullOrWhiteSpace(buffResponse.Body?.data?.id))
                 {
-                    result = false;
-                    return result;
+                    LoggedIn = false;
+                    return;
                 }
 
-                var userInfo = await BuffApi.QueryUserInfo(cookies: Cookies);
-                result = !string.IsNullOrWhiteSpace(userInfo.Body?.data?.id);
+                LoggedIn = true;
 
-                LoggedIn = result;
+                var newCookies = this.Cookies;
+                newCookies.Add(buffResponse.Cookies);
 
-                return result;
+                var buffUser = buffResponse.Body.data;
+                User.Nickname = buffUser.nickname;
+                User.Avatar = buffUser.avatar;
+                User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
+
+                var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == User.SteamId);
+                foreach (var client in clients)
+                {
+                    client.SetBuffClient(this);
+                    Appsetting.Instance.Manifest.AddUser(client.User.SteamId, client.User);
+                }
             }
             finally
             {
-                endLogin?.Invoke(result);
+                endLogin?.Invoke(relogin, LoggedIn);
             }
-        }
-
-        public async Task<IWebResponse<BuffResponse<BuffUserInfoResponse>>> Refresh(CancellationToken cancellationToken = default)
-        {
-            var userInfo = await BuffApi.QueryUserInfo(cookies: Cookies, cancellationToken);
-            LoggedIn = !string.IsNullOrWhiteSpace(userInfo.Body?.data?.id);
-            return userInfo;
         }
 
         public async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade()

@@ -42,6 +42,9 @@ namespace Steam_Authenticator
 
             userContextMenuStrip = new ContextMenuStrip();
             userContextMenuStrip.Items.Add("ÇÐ»»").Click += setCurrentClientMenuItem_Click;
+            userContextMenuStrip.Items.Add("¸´ÖÆCookie").Click += copyCookieMenuItem_Click;
+            userContextMenuStrip.Items.Add("¸´ÖÆAccessToken").Click += copyAccessTokenMenuItem_Click;
+            userContextMenuStrip.Items.Add("¸´ÖÆRefreshToken").Click += copyRefreshTokenMenuItem_Click;
             userContextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += loginMenuItem_Click;
             userContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += removeUserMenuItem_Click;
 
