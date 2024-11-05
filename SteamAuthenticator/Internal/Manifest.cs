@@ -125,6 +125,12 @@ namespace Steam_Authenticator.Internal
 
         public bool ChangePassword(string oldPassword, string newPassword)
         {
+            if (IV.Length == 0 || Salt.Length == 0)
+            {
+                IV = FileEncryptor.GetInitializationVector();
+                Salt = FileEncryptor.GetRandomSalt();
+            }
+
             List<ManifestEntry> entries = new List<ManifestEntry>();
 
             ManifestEntry manifestEntry;
@@ -165,12 +171,6 @@ namespace Steam_Authenticator.Internal
 
         private bool Save()
         {
-            if (IV.Length == 0 || Salt.Length == 0)
-            {
-                IV = FileEncryptor.GetInitializationVector();
-                Salt = FileEncryptor.GetRandomSalt();
-            }
-
             using (var fileStream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 fileStream.SetLength(0);
