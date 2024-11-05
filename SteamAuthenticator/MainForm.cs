@@ -230,7 +230,7 @@ namespace Steam_Authenticator
                         }
                         finally
                         {
-                            UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId, false).FirstOrDefault() as UserPanel;
+                            UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
                             if (userPanel != null)
                             {
                                 Label offerLabel = userPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
