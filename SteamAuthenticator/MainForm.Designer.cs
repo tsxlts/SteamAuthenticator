@@ -105,14 +105,14 @@
             // 
             settingMenuItem.Name = "settingMenuItem";
             settingMenuItem.Size = new Size(180, 22);
-            settingMenuItem.Text = "设置";
+            settingMenuItem.Text = "全局设置";
             settingMenuItem.Click += settingMenuItem_Click;
             // 
             // proxySettingMenuItem
             // 
             proxySettingMenuItem.Name = "proxySettingMenuItem";
             proxySettingMenuItem.Size = new Size(180, 22);
-            proxySettingMenuItem.Text = "代理";
+            proxySettingMenuItem.Text = "代理设置";
             proxySettingMenuItem.Click += proxySettingMenuItem_Click;
             // 
             // passwordMenuItem

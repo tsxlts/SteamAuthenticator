@@ -36,6 +36,7 @@
             loginBtn = new Button();
             cancelBtn = new Button();
             qrAuth = new LinkLabel();
+            tokenAuth = new LinkLabel();
             SuspendLayout();
             // 
             // User
@@ -106,12 +107,28 @@
             qrAuth.VisitedLinkColor = Color.Gray;
             qrAuth.LinkClicked += qrAuth_LinkClicked;
             // 
+            // tokenAuth
+            // 
+            tokenAuth.ActiveLinkColor = Color.Gray;
+            tokenAuth.AutoSize = true;
+            tokenAuth.Cursor = Cursors.Hand;
+            tokenAuth.LinkColor = Color.Gray;
+            tokenAuth.Location = new Point(67, 91);
+            tokenAuth.Name = "tokenAuth";
+            tokenAuth.Size = new Size(68, 17);
+            tokenAuth.TabIndex = 7;
+            tokenAuth.TabStop = true;
+            tokenAuth.Text = "Token登录";
+            tokenAuth.VisitedLinkColor = Color.Gray;
+            tokenAuth.LinkClicked += tokenAuth_LinkClicked;
+            // 
             // Login
             // 
             AcceptButton = loginBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(209, 163);
+            Controls.Add(tokenAuth);
             Controls.Add(qrAuth);
             Controls.Add(cancelBtn);
             Controls.Add(loginBtn);
@@ -139,5 +156,6 @@
         private Button loginBtn;
         private Button cancelBtn;
         private LinkLabel qrAuth;
+        private LinkLabel tokenAuth;
     }
 }

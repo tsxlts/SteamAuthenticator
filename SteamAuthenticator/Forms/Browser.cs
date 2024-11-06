@@ -44,28 +44,32 @@ namespace Steam_Authenticator.Forms
             }
         }
 
-        public async Task<LoadUrlAsyncResponse> LoadUrl(string url)
+        public async Task<LoadUrlAsyncResponse> LoadUrl(Uri url)
         {
-            var result = await browser.LoadUrlAsync(url);
+            var result = await browser.LoadUrlAsync(url.ToString());
             return result;
         }
 
-        public async Task<LoadUrlAsyncResponse> LoadUrl(string url, params SteamKit.Cookie[] cookies)
+        public async Task<LoadUrlAsyncResponse> LoadUrl(Uri url, params SteamKit.Cookie[] cookies)
         {
-            await browser.LoadUrlAsync(url);
+            string loadingUrl = Path.Combine("file:///", AppContext.BaseDirectory, "html", "loading.html");
+            await browser.LoadUrlAsync(loadingUrl);
             if (cookies?.Any() ?? false)
             {
+                string main = $"{url.Scheme}://{url.Host}";
                 foreach (var cookie in cookies)
                 {
-                    await browser.GetCookieManager().SetCookieAsync(url, new Cookie
+                    await browser.GetCookieManager().SetCookieAsync(main, new Cookie
                     {
+                        Domain = cookie.Domain,
+                        Path = "/",
                         Name = cookie.Name,
                         Value = cookie.Value
                     });
                 }
             }
 
-            return await browser.LoadUrlAsync(url);
+            return await browser.LoadUrlAsync(url.ToString());
         }
     }
 }

@@ -2,9 +2,12 @@
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
 using SteamKit;
+using SteamKit.Model;
 using SteamKit.WebClient;
+using System.Net;
 using System.Text;
 using System.Web;
+using static Steam_Authenticator.Model.SettingManifest;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator
@@ -48,6 +51,11 @@ namespace Steam_Authenticator
             {
                 stringBuilder.Append($"{item.Name}={HttpUtility.UrlEncode(item.Value)}; ");
             }
+            if (stringBuilder.Length < 1)
+            {
+                return;
+            }
+
             Clipboard.SetText(stringBuilder.ToString());
         }
 
@@ -58,8 +66,13 @@ namespace Steam_Authenticator
 
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
+            string accessToken = userClient.Client.AccessToken;
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                return;
+            }
 
-            Clipboard.SetText(userClient.Client.AccessToken);
+            Clipboard.SetText(accessToken);
         }
 
         private void copyRefreshTokenMenuItem_Click(object sender, EventArgs e)
@@ -69,8 +82,13 @@ namespace Steam_Authenticator
 
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
+            string refreshToken = userClient.Client.RefreshToken;
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return;
+            }
 
-            Clipboard.SetText(userClient.Client.RefreshToken);
+            Clipboard.SetText(refreshToken);
         }
 
         private async void setCurrentClientMenuItem_Click(object sender, EventArgs e)

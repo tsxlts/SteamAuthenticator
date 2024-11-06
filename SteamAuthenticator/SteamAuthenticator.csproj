@@ -50,6 +50,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="html\loading.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="127.3.5" />
   </ItemGroup>
 

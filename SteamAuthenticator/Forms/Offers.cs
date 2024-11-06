@@ -165,7 +165,7 @@ namespace Steam_Authenticator.Forms
 
         private async void btnDetail_Click(object sender, EventArgs e)
         {
-            string offerUrl = null;
+            Uri offerUrl = null;
             try
             {
                 var setting = Appsetting.Instance.AppSetting.Entry;
@@ -182,12 +182,12 @@ namespace Steam_Authenticator.Forms
                 browser.Text = "交易报价";
                 browser.Show();
 
-                offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
+                offerUrl = new Uri($"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
                 await browser.LoadUrl(offerUrl, webClient.WebCookie.ToArray());
             }
             catch (Exception ex)
             {
-                Process.Start("explorer.exe", offerUrl);
+                Process.Start("explorer.exe", offerUrl.ToString());
 
                 MessageBox.Show(ex.Message);
             }
@@ -278,7 +278,7 @@ namespace Steam_Authenticator.Forms
 
                     if (giveDescription?.Any() ?? false)
                     {
-                        if (giveDescription.Count() > 1)
+                        if (offer.ItemsToGive.Count > 1)
                         {
                             stringBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName} 等多件物品");
                         }
@@ -289,7 +289,7 @@ namespace Steam_Authenticator.Forms
                     }
                     if (receiveDescription?.Any() ?? false)
                     {
-                        if (receiveDescription.Count() > 1)
+                        if (offer.ItemsToReceive.Count > 1)
                         {
                             stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} 等多件物品");
                         }
@@ -302,15 +302,15 @@ namespace Steam_Authenticator.Forms
                     switch (offer.ConfirmationMethod)
                     {
                         case TradeOfferConfirmationMethod.Email:
-                            stringBuilder.AppendLine("等待邮箱令牌确认");
+                            stringBuilder.AppendLine("*** 等待邮箱令牌确认 ***");
                             break;
                         case TradeOfferConfirmationMethod.MobileApp:
-                            stringBuilder.AppendLine("等待手机令牌确认");
+                            stringBuilder.AppendLine("*** 等待手机令牌确认 ***");
                             break;
 
                         case TradeOfferConfirmationMethod.Invalid:
                         default:
-                            stringBuilder.AppendLine("等待你接受报价");
+                            stringBuilder.AppendLine("*** 等待你接受报价 ***");
                             break;
                     }
 

@@ -1,5 +1,4 @@
-﻿
-using SteamKit;
+﻿using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
 
@@ -184,6 +183,47 @@ namespace Steam_Authenticator.Forms
             }
         }
 
+        private async void tokenAuth_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                loginBtn.Enabled = cancelBtn.Enabled = false;
+
+                RichTextInput richTextInput = new RichTextInput("登录", "请输入RefreshToken或者AccessToken", required: true, "请输入RefreshToken或者AccessToken");
+                richTextInput.ShowDialog();
+
+                string token = richTextInput.InputValue;
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return;
+                }
+                token = Uri.UnescapeDataString(token);
+
+                var steamWebClient = new SteamCommunityClient();
+                using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                {
+                    bool success = await steamWebClient.LoginAsync(token, cts.Token);
+                    if (!success)
+                    {
+                        MessageBox.Show("登录失败", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+
+                Client = steamWebClient;
+                DialogResult = DialogResult.OK;
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                loginBtn.Enabled = cancelBtn.Enabled = true;
+            }
+        }
+
         public SteamCommunityClient Client { get; private set; }
+
     }
 }

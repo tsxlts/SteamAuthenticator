@@ -167,7 +167,7 @@
             MinimizeBox = false;
             Name = "Setting";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "用户设置";
+            Text = "全局 报价/确认 设置";
             Load += Setting_Load;
             ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).EndInit();
             ResumeLayout(false);
