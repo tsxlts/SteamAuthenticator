@@ -99,6 +99,7 @@
             Name = "Offers";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "报价";
+            FormClosed += Offers_FormClosed;
             Load += Offers_Load;
             OffersView.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)OffersView).EndInit();

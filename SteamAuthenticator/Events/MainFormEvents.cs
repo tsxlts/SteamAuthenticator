@@ -671,7 +671,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Confirmations confirmation = new Confirmations(webClient);
+            Confirmations confirmation = new Confirmations(this, webClient);
             confirmation.Show();
         }
 
@@ -864,7 +864,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                Offers offersForm = new Offers(webClient);
+                Offers offersForm = new Offers(this, webClient);
                 offersForm.Show();
             }
             catch (Exception ex)

@@ -9,17 +9,25 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Confirmations : Form
     {
+        private readonly Form preForm;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
 
-        public Confirmations(SteamCommunityClient webClient)
+        public Confirmations(Form preForm, SteamCommunityClient webClient)
         {
             InitializeComponent();
+            this.preForm = preForm;
             this.webClient = webClient;
+
+            Width = this.preForm.Width;
+            Height = this.preForm.Height;
         }
 
         private async void Confirmations_Load(object sender, EventArgs e)
         {
+            Location = this.preForm.Location;
+            preForm.Hide();
+
             if (!webClient.LoggedIn)
             {
                 return;
@@ -33,6 +41,11 @@ namespace Steam_Authenticator.Forms
             autoRefreshTimer.Enabled = true;
 
             ConfirmationsView.Panel2.AutoScroll = true;
+        }
+       
+        private void Confirmations_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            preForm.Show();
         }
 
         private async void autoRefreshTimer_Tick(object sender, EventArgs e)
@@ -147,8 +160,8 @@ namespace Steam_Authenticator.Forms
 
                 Browser browser = new Browser()
                 {
-                    Width = 400,
-                    Height = 600
+                    Width = 600,
+                    Height = 400
                 };
                 var detail = await webClient.Confirmation.ConfirmationDetailAsync(confirmation.Id, guard.DeviceId, guard.IdentitySecret);
                 browser.Text = confirmation.ConfTypeName;

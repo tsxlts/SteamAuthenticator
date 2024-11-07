@@ -12,18 +12,26 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Offers : Form
     {
+        private readonly Form preForm;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
         private IEnumerable<Offer> thisOffers = new List<Offer>();
 
-        public Offers(SteamCommunityClient webClient)
+        public Offers(Form preForm, SteamCommunityClient webClient)
         {
             InitializeComponent();
+            this.preForm = preForm;
             this.webClient = webClient;
+
+            Width = this.preForm.Width;
+            Height = this.preForm.Height;
         }
 
         private async void Offers_Load(object sender, EventArgs e)
         {
+            Location = this.preForm.Location;
+            preForm.Hide();
+
             if (!webClient.LoggedIn)
             {
                 return;
@@ -34,6 +42,11 @@ namespace Steam_Authenticator.Forms
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
             OffersView.Panel2.AutoScroll = true;
+        }
+
+        private void Offers_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            preForm.Show();
         }
 
         private async void refreshBtn_Click(object sender, EventArgs e)
@@ -175,10 +188,9 @@ namespace Steam_Authenticator.Forms
 
                 Browser browser = new Browser()
                 {
-                    Width = 400,
-                    Height = 600
+                    Width = 600,
+                    Height = 400
                 };
-
                 browser.Text = "交易报价";
                 browser.Show();
 
@@ -395,6 +407,5 @@ namespace Steam_Authenticator.Forms
                 refreshBtn.Focus();
             }
         }
-
     }
 }

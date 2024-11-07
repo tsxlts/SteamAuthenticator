@@ -146,7 +146,7 @@ namespace Steam_Authenticator
             UserPanel panel = control.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
 
-            Offers offersForm = new Offers(userClient.Client);
+            Offers offersForm = new Offers(this, userClient.Client);
             offersForm.ShowDialog();
         }
 
@@ -164,7 +164,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Confirmations confirmations = new Confirmations(webClient);
+            Confirmations confirmations = new Confirmations(this, webClient);
             confirmations.ShowDialog();
         }
 

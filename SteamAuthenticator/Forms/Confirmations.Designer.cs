@@ -70,7 +70,7 @@
             autoRefreshTimer.Interval = 5000;
             autoRefreshTimer.Tick += autoRefreshTimer_Tick;
             // 
-            // Confirmation
+            // Confirmations
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -78,10 +78,10 @@
             Controls.Add(ConfirmationsView);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimizeBox = false;
-            Name = "Confirmation";
+            Name = "Confirmations";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "令牌确认";
+            FormClosed += Confirmations_FormClosed;
             Load += Confirmations_Load;
             ConfirmationsView.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)ConfirmationsView).EndInit();
