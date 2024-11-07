@@ -2,12 +2,9 @@
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
 using SteamKit;
-using SteamKit.Model;
 using SteamKit.WebClient;
-using System.Net;
 using System.Text;
 using System.Web;
-using static Steam_Authenticator.Model.SettingManifest;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator

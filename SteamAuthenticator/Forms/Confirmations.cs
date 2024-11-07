@@ -12,6 +12,7 @@ namespace Steam_Authenticator.Forms
         private readonly Form preForm;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
+        private IEnumerable<Confirmation> thisConfirmations = new List<Confirmation>();
 
         public Confirmations(Form preForm, SteamCommunityClient webClient)
         {
@@ -37,27 +38,12 @@ namespace Steam_Authenticator.Forms
 
             await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
-            autoRefreshTimer.Interval = 5000;
-            autoRefreshTimer.Enabled = true;
-
-            ConfirmationsView.Panel2.AutoScroll = true;
+            confirmationsPanel.AutoScroll = true;
         }
-       
+
         private void Confirmations_FormClosed(object sender, FormClosedEventArgs e)
         {
             preForm.Show();
-        }
-
-        private async void autoRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            return;
-
-            autoRefreshTimer.Enabled = false;
-
-            await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(3)).Token);
-
-            autoRefreshTimer.Interval = 5000;
-            autoRefreshTimer.Enabled = true;
         }
 
         private async void refreshBtn_Click(object sender, EventArgs e)
@@ -69,6 +55,108 @@ namespace Steam_Authenticator.Forms
             }
 
             await RefreshConfirmations(true, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+        }
+
+        private async void acceptAllBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                acceptAllBtn.Enabled = false;
+
+                if (!webClient.LoggedIn)
+                {
+                    MessageBox.Show("请先登录Steam帐号");
+                    return;
+                }
+
+                if (thisConfirmations == null || !thisConfirmations.Any())
+                {
+                    return;
+                }
+
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
+                {
+                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (MessageBox.Show("你确定要接受全部确认吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                {
+                    bool accept = await HandleConfirmation(webClient, guard, thisConfirmations, true, cts.Token);
+                    if (!accept)
+                    {
+                        MessageBox.Show("操作失败,请重新操作");
+                    }
+                }
+
+                await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                acceptAllBtn.Enabled = true;
+                acceptAllBtn.Focus();
+            }
+        }
+
+        private async void declineAllBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                declineAllBtn.Enabled = false;
+
+                if (!webClient.LoggedIn)
+                {
+                    MessageBox.Show("请先登录Steam帐号");
+                    return;
+                }
+
+                if (thisConfirmations == null || !thisConfirmations.Any())
+                {
+                    return;
+                }
+
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
+                {
+                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (MessageBox.Show("你确定要取消全部确认吗？", "取消确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                using (CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                {
+                    bool cancel = await HandleConfirmation(webClient, guard, thisConfirmations, false, cts.Token);
+                    if (!cancel)
+                    {
+                        MessageBox.Show("操作失败,请重新操作");
+                    }
+                }
+
+                await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                declineAllBtn.Enabled = true;
+                declineAllBtn.Focus();
+            }
         }
 
         private async void btnAccept_Click(object sender, EventArgs e)
@@ -231,19 +319,22 @@ namespace Steam_Authenticator.Forms
                             return;
                         }
 
-                        ConfirmationsView.Panel2.Controls.Clear();
+                        thisConfirmations = confirm.Confirmations;
+
+                        confirmationsPanel.Controls.Clear();
 
                         if (confirm.Confirmations.Count == 0)
                         {
                             Label errorLabel = new Label()
                             {
-                                Text = "当前没有任何确认信息",
+                                Text = "没有任何确认信息",
                                 AutoSize = false,
                                 ForeColor = Color.FromArgb(255, 140, 0),
                                 TextAlign = ContentAlignment.TopCenter,
-                                Dock = DockStyle.Fill
+                                Dock = DockStyle.Fill,
+                                Padding = new Padding(0, 20, 0, 0)
                             };
-                            ConfirmationsView.Panel2.Controls.Add(errorLabel);
+                            confirmationsPanel.Controls.Add(errorLabel);
                             return;
                         }
 
@@ -331,7 +422,7 @@ namespace Steam_Authenticator.Forms
                             detailButton.Click += btnDetail_Click;
                             panel.Controls.Add(detailButton);
 
-                            ConfirmationsView.Panel2.Controls.Add(panel);
+                            confirmationsPanel.Controls.Add(panel);
                         }
                     }
                 }

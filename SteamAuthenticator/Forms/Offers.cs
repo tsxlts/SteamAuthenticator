@@ -41,7 +41,7 @@ namespace Steam_Authenticator.Forms
 
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
-            OffersView.Panel2.AutoScroll = true;
+            offersPanel.AutoScroll = true;
         }
 
         private void Offers_FormClosed(object sender, FormClosedEventArgs e)
@@ -226,19 +226,20 @@ namespace Steam_Authenticator.Forms
                 var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
                 thisOffers = offers;
 
-                OffersView.Panel2.Controls.Clear();
+                offersPanel.Controls.Clear();
 
                 if (offers.Count == 0)
                 {
                     Label errorLabel = new Label()
                     {
-                        Text = "当前没有任何报价信息",
+                        Text = "没有任何报价信息",
                         AutoSize = false,
                         ForeColor = Color.FromArgb(255, 140, 0),
                         TextAlign = ContentAlignment.TopCenter,
-                        Dock = DockStyle.Fill
+                        Dock = DockStyle.Fill,
+                        Padding = new Padding(0, 20, 0, 0)
                     };
-                    OffersView.Panel2.Controls.Add(errorLabel);
+                    offersPanel.Controls.Add(errorLabel);
                     return;
                 }
 
@@ -391,7 +392,7 @@ namespace Steam_Authenticator.Forms
                     detailButton.Click += btnDetail_Click;
                     panel.Controls.Add(detailButton);
 
-                    OffersView.Panel2.Controls.Add(panel);
+                    offersPanel.Controls.Add(panel);
                 }
             }
             catch (Exception ex)
