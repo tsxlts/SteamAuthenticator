@@ -216,7 +216,7 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = true;
 
-                refreshBtn.Text = "正在刷新...";
+                refreshBtn.Text = "正在刷新";
                 refreshBtn.Enabled = false;
 
                 var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true,
@@ -402,7 +402,7 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = false;
 
-                refreshBtn.Text = "刷新";
+                refreshBtn.Text = "刷新报价";
                 refreshBtn.Enabled = true;
                 refreshBtn.Focus();
             }

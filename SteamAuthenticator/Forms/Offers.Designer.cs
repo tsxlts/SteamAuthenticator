@@ -30,12 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Offers));
             OffersView = new SplitContainer();
-            acceptAllBtn = new Button();
-            declineAllBtn = new Button();
-            refreshBtn = new Button();
+            panel1 = new Panel();
+            refreshBtn = new Label();
+            declineAllBtn = new Label();
+            acceptAllBtn = new Label();
             ((System.ComponentModel.ISupportInitialize)OffersView).BeginInit();
             OffersView.Panel1.SuspendLayout();
             OffersView.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // OffersView
@@ -49,50 +51,71 @@
             // 
             // OffersView.Panel1
             // 
-            OffersView.Panel1.Controls.Add(acceptAllBtn);
-            OffersView.Panel1.Controls.Add(declineAllBtn);
-            OffersView.Panel1.Controls.Add(refreshBtn);
-            OffersView.Size = new Size(402, 568);
-            OffersView.SplitterDistance = 45;
+            OffersView.Panel1.Controls.Add(panel1);
+            // 
+            // OffersView.Panel2
+            // 
+            OffersView.Panel2.BackColor = Color.White;
+            OffersView.Size = new Size(365, 276);
+            OffersView.SplitterDistance = 40;
             OffersView.TabIndex = 2;
             // 
-            // acceptAllBtn
+            // panel1
             // 
-            acceptAllBtn.Anchor = AnchorStyles.Top;
-            acceptAllBtn.Location = new Point(136, 3);
-            acceptAllBtn.Name = "acceptAllBtn";
-            acceptAllBtn.Size = new Size(130, 39);
-            acceptAllBtn.TabIndex = 1;
-            acceptAllBtn.Text = "全部接受";
-            acceptAllBtn.UseVisualStyleBackColor = true;
-            acceptAllBtn.Click += acceptAllBtn_Click;
-            // 
-            // declineAllBtn
-            // 
-            declineAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            declineAllBtn.Location = new Point(271, 3);
-            declineAllBtn.Name = "declineAllBtn";
-            declineAllBtn.Size = new Size(130, 39);
-            declineAllBtn.TabIndex = 2;
-            declineAllBtn.Text = "全部拒绝";
-            declineAllBtn.UseVisualStyleBackColor = true;
-            declineAllBtn.Click += declineAllBtn_Click;
+            panel1.BackColor = Color.FromArgb(255, 248, 220);
+            panel1.Controls.Add(refreshBtn);
+            panel1.Controls.Add(declineAllBtn);
+            panel1.Controls.Add(acceptAllBtn);
+            panel1.Dock = DockStyle.Fill;
+            panel1.Location = new Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(365, 40);
+            panel1.TabIndex = 0;
             // 
             // refreshBtn
             // 
-            refreshBtn.Location = new Point(2, 3);
+            refreshBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            refreshBtn.AutoSize = true;
+            refreshBtn.Cursor = Cursors.Hand;
+            refreshBtn.ForeColor = Color.Green;
+            refreshBtn.Location = new Point(178, 13);
             refreshBtn.Name = "refreshBtn";
-            refreshBtn.Size = new Size(130, 39);
-            refreshBtn.TabIndex = 0;
-            refreshBtn.Text = "刷新";
-            refreshBtn.UseVisualStyleBackColor = true;
+            refreshBtn.Size = new Size(56, 17);
+            refreshBtn.TabIndex = 9;
+            refreshBtn.Text = "刷新报价";
             refreshBtn.Click += refreshBtn_Click;
+            // 
+            // declineAllBtn
+            // 
+            declineAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            declineAllBtn.AutoSize = true;
+            declineAllBtn.Cursor = Cursors.Hand;
+            declineAllBtn.ForeColor = Color.Red;
+            declineAllBtn.Location = new Point(302, 13);
+            declineAllBtn.Name = "declineAllBtn";
+            declineAllBtn.Size = new Size(56, 17);
+            declineAllBtn.TabIndex = 8;
+            declineAllBtn.Text = "全部拒绝";
+            declineAllBtn.Click += declineAllBtn_Click;
+            // 
+            // acceptAllBtn
+            // 
+            acceptAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            acceptAllBtn.AutoSize = true;
+            acceptAllBtn.Cursor = Cursors.Hand;
+            acceptAllBtn.ForeColor = Color.Green;
+            acceptAllBtn.Location = new Point(240, 13);
+            acceptAllBtn.Name = "acceptAllBtn";
+            acceptAllBtn.Size = new Size(56, 17);
+            acceptAllBtn.TabIndex = 7;
+            acceptAllBtn.Text = "全部接受";
+            acceptAllBtn.Click += acceptAllBtn_Click;
             // 
             // Offers
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(404, 568);
+            ClientSize = new Size(367, 276);
             Controls.Add(OffersView);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -104,14 +127,17 @@
             OffersView.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)OffersView).EndInit();
             OffersView.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
 
         private SplitContainer OffersView;
-        private Button acceptAllBtn;
-        private Button declineAllBtn;
-        private Button refreshBtn;
+        private Panel panel1;
+        private Label declineAllBtn;
+        private Label acceptAllBtn;
+        private Label refreshBtn;
     }
 }

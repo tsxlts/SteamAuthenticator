@@ -185,7 +185,7 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = true;
 
-                refreshBtn.Text = "正在刷新...";
+                refreshBtn.Text = "正在刷新";
                 refreshBtn.Enabled = false;
 
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
@@ -347,7 +347,7 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = false;
 
-                refreshBtn.Text = "刷新";
+                refreshBtn.Text = "刷新确认";
                 refreshBtn.Enabled = true;
             }
         }
