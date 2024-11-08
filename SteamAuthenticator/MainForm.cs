@@ -178,6 +178,7 @@ namespace Steam_Authenticator
                     var task = Task.Run(() =>
                     {
                         var webClient = client.Client;
+                        var user = client.User;
                         var buffClinet = client.BuffClient;
                         int offerCount = 0;
                         int buffOfferCount = 0;
@@ -196,7 +197,7 @@ namespace Steam_Authenticator
                             var receiveOffers = offers.Where(c => !(c.ItemsToGive?.Any() ?? false)).ToList();
                             var giveOffers = offers.Where(c => c.ItemsToGive?.Any() ?? false).ToList();
 
-                            if (receiveOffers.Any() && setting.AutoAcceptReceiveOffer)
+                            if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -221,7 +222,7 @@ namespace Steam_Authenticator
                                 }
                             }
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && setting.AutoAcceptGiveOffer)
+                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && user.Setting.AutoAcceptGiveOffer)
                             {
                                 HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -334,6 +335,7 @@ namespace Steam_Authenticator
                     try
                     {
                         var webClient = client.Client;
+                        var user = client.User;
 
                         Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
                         if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
@@ -368,8 +370,8 @@ namespace Steam_Authenticator
 
                         foreach (var conf in confirmations)
                         {
-                            if ((conf.ConfType == ConfirmationType.MarketListing && setting.AutoConfirmMarket) ||
-                              (conf.ConfType == ConfirmationType.Trade && setting.AutoConfirmTrade))
+                            if ((conf.ConfType == ConfirmationType.MarketListing && user.Setting.AutoConfirmMarket) ||
+                              (conf.ConfType == ConfirmationType.Trade && user.Setting.AutoConfirmTrade))
                             {
                                 autoConfirm.Add(conf);
                                 continue;

@@ -30,15 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Setting));
             periodicChecking = new CheckBox();
-            checkAll = new CheckBox();
-            autoConfirmTrade = new CheckBox();
-            autoConfirmMarket = new CheckBox();
             saveBtn = new Button();
-            autoAcceptReceiveOffer = new CheckBox();
             confirmationAutoPopup = new CheckBox();
             autoRefreshInternal = new NumericUpDown();
             label1 = new Label();
-            autoAcceptGiveOffer = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)autoRefreshInternal).BeginInit();
             SuspendLayout();
             // 
@@ -54,64 +49,22 @@
             periodicChecking.UseVisualStyleBackColor = true;
             periodicChecking.CheckedChanged += periodicChecking_CheckedChanged;
             // 
-            // checkAll
-            // 
-            checkAll.AutoSize = true;
-            checkAll.Location = new Point(12, 68);
-            checkAll.Name = "checkAll";
-            checkAll.Size = new Size(159, 21);
-            checkAll.TabIndex = 1;
-            checkAll.Text = "检测所有账号报价和确认";
-            checkAll.UseVisualStyleBackColor = true;
-            // 
-            // autoConfirmTrade
-            // 
-            autoConfirmTrade.AutoSize = true;
-            autoConfirmTrade.Location = new Point(12, 122);
-            autoConfirmTrade.Name = "autoConfirmTrade";
-            autoConfirmTrade.Size = new Size(99, 21);
-            autoConfirmTrade.TabIndex = 2;
-            autoConfirmTrade.Text = "自动确认报价";
-            autoConfirmTrade.UseVisualStyleBackColor = true;
-            autoConfirmTrade.CheckedChanged += autoConfirmTrade_CheckedChanged;
-            // 
-            // autoConfirmMarket
-            // 
-            autoConfirmMarket.AutoSize = true;
-            autoConfirmMarket.Location = new Point(12, 149);
-            autoConfirmMarket.Name = "autoConfirmMarket";
-            autoConfirmMarket.Size = new Size(123, 21);
-            autoConfirmMarket.TabIndex = 3;
-            autoConfirmMarket.Text = "自动确认市场上架";
-            autoConfirmMarket.UseVisualStyleBackColor = true;
-            autoConfirmMarket.CheckedChanged += autoConfirmMarket_CheckedChanged;
-            // 
             // saveBtn
             // 
             saveBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(1, 256);
+            saveBtn.Location = new Point(1, 117);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(281, 33);
+            saveBtn.Size = new Size(196, 33);
             saveBtn.TabIndex = 4;
             saveBtn.Text = "保存设置";
             saveBtn.UseVisualStyleBackColor = true;
             saveBtn.Click += saveBtn_Click;
             // 
-            // autoAcceptReceiveOffer
-            // 
-            autoAcceptReceiveOffer.AutoSize = true;
-            autoAcceptReceiveOffer.Location = new Point(12, 176);
-            autoAcceptReceiveOffer.Name = "autoAcceptReceiveOffer";
-            autoAcceptReceiveOffer.Size = new Size(195, 21);
-            autoAcceptReceiveOffer.TabIndex = 5;
-            autoAcceptReceiveOffer.Text = "自动接收赠送报价（收货报价）";
-            autoAcceptReceiveOffer.UseVisualStyleBackColor = true;
-            // 
             // confirmationAutoPopup
             // 
             confirmationAutoPopup.AutoSize = true;
-            confirmationAutoPopup.Location = new Point(12, 95);
+            confirmationAutoPopup.Location = new Point(12, 68);
             confirmationAutoPopup.Name = "confirmationAutoPopup";
             confirmationAutoPopup.Size = new Size(183, 21);
             confirmationAutoPopup.TabIndex = 6;
@@ -137,30 +90,15 @@
             label1.TabIndex = 8;
             label1.Text = "秒刷新一次";
             // 
-            // autoAcceptGiveOffer
-            // 
-            autoAcceptGiveOffer.AutoSize = true;
-            autoAcceptGiveOffer.Location = new Point(12, 203);
-            autoAcceptGiveOffer.Name = "autoAcceptGiveOffer";
-            autoAcceptGiveOffer.Size = new Size(195, 21);
-            autoAcceptGiveOffer.TabIndex = 9;
-            autoAcceptGiveOffer.Text = "自动接收索取报价（发货报价）";
-            autoAcceptGiveOffer.UseVisualStyleBackColor = true;
-            // 
             // Setting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(282, 289);
-            Controls.Add(autoAcceptGiveOffer);
+            ClientSize = new Size(197, 150);
             Controls.Add(label1);
             Controls.Add(autoRefreshInternal);
             Controls.Add(confirmationAutoPopup);
-            Controls.Add(autoAcceptReceiveOffer);
             Controls.Add(saveBtn);
-            Controls.Add(autoConfirmMarket);
-            Controls.Add(autoConfirmTrade);
-            Controls.Add(checkAll);
             Controls.Add(periodicChecking);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -178,14 +116,9 @@
         #endregion
 
         private CheckBox periodicChecking;
-        private CheckBox checkAll;
-        private CheckBox autoConfirmTrade;
-        private CheckBox autoConfirmMarket;
         private Button saveBtn;
-        private CheckBox autoAcceptReceiveOffer;
         private CheckBox confirmationAutoPopup;
         private NumericUpDown autoRefreshInternal;
         private Label label1;
-        private CheckBox autoAcceptGiveOffer;
     }
 }
