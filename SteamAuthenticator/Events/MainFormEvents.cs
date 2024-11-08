@@ -4,6 +4,7 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
+using System.Diagnostics;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
 
@@ -21,7 +22,18 @@ namespace Steam_Authenticator
             }
         }
 
-        private void settingMenuItem_Click(object sender, EventArgs e)
+        private void SteamId_Click(object sender, EventArgs e)
+        {
+            var webClient = currentClient?.Client;
+            if (webClient == null || !webClient.LoggedIn)
+            {
+                return;
+            }
+
+            Process.Start("explorer.exe", $"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}");
+        }
+
+        private void globalSettingMenuItem_Click(object sender, EventArgs e)
         {
             Setting setting = new Setting();
             setting.ShowDialog();
@@ -655,26 +667,6 @@ namespace Steam_Authenticator
             }
         }
 
-        private void confirmMenuItem_Click(object sender, EventArgs e)
-        {
-            var webClient = currentClient?.Client;
-            if (webClient == null || !webClient.LoggedIn)
-            {
-                MessageBox.Show("请先登录Steam帐号");
-                return;
-            }
-
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
-            if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
-            {
-                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            Confirmations confirmation = new Confirmations(this, webClient);
-            confirmation.Show();
-        }
-
         private void importFileAuthenticatorMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -851,6 +843,26 @@ namespace Steam_Authenticator
             {
                 MessageBox.Show($"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void confirmationBtn_Click(object sender, EventArgs e)
+        {
+            var webClient = currentClient?.Client;
+            if (webClient == null || !webClient.LoggedIn)
+            {
+                MessageBox.Show("请先登录Steam帐号");
+                return;
+            }
+
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
+            {
+                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Confirmations confirmation = new Confirmations(this, webClient);
+            confirmation.Show();
         }
 
         private void offersBtn_Click(object sender, EventArgs e)

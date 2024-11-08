@@ -88,6 +88,7 @@
             // 
             // saveBtn
             // 
+            saveBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
             saveBtn.Location = new Point(1, 256);
             saveBtn.Name = "saveBtn";

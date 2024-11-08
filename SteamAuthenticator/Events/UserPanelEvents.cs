@@ -99,6 +99,18 @@ namespace Steam_Authenticator
             await SwitchUser(userClient);
         }
 
+        private void settingMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            var userSetting = new Forms.UserSetting(userClient.User);
+            userSetting.ShowDialog();
+        }
+
         private async void loginMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
@@ -354,6 +366,7 @@ namespace Steam_Authenticator
             UserImg.Image = Properties.Resources.userimg;
             UserName.ForeColor = Color.Black;
             UserName.Text = "---";
+            SteamId.Text = "---";
             Balance.Text = "￥0.00";
             DelayedBalance.Text = "￥0.00";
 
@@ -371,6 +384,7 @@ namespace Steam_Authenticator
                 }
                 UserName.ForeColor = Color.Green;
                 UserName.Text = $"{userClient.User.Account} [{userClient.User.NickName}]";
+                SteamId.Text = $"{userClient.User.SteamId}";
                 Balance.Text = "￥0.00";
                 DelayedBalance.Text = "￥0.00";
             }
