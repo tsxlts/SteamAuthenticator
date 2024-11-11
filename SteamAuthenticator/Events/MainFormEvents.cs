@@ -152,7 +152,7 @@ namespace Steam_Authenticator
             {
                 MessageBox.Show($"{webClient.Account} 已绑定令牌" +
                     $"{Environment.NewLine}" +
-                    $"如果你已在其他地方绑定令牌，你可以选择移动令牌令牌验证器到当前设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    $"如果你已在其他地方绑定令牌，你可以选择移动令牌验证器到当前设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
