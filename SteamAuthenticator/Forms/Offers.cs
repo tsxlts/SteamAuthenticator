@@ -318,7 +318,8 @@ namespace Steam_Authenticator.Forms
                     switch (offer.ConfirmationMethod)
                     {
                         case TradeOfferConfirmationMethod.Email:
-                            stringBuilder.AppendLine("*** 等待邮箱令牌确认 ***");
+                            stringBuilder.AppendLine("等待你 邮箱令牌确认");
+                            statusColor = Color.FromArgb(238, 0, 238);
                             break;
                         case TradeOfferConfirmationMethod.MobileApp:
                             statusBuilder.AppendLine("等待你 手机令牌确认");
