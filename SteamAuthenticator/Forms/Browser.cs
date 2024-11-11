@@ -6,6 +6,7 @@ namespace Steam_Authenticator.Forms
     public partial class Browser : Form
     {
         private readonly ChromiumWebBrowser browser;
+        private Task initializing;
 
         public Browser()
         {
@@ -17,10 +18,13 @@ namespace Steam_Authenticator.Forms
             };
             WebPanel.Controls.Clear();
             WebPanel.Controls.Add(browser);
+            initializing = Task.CompletedTask;
         }
 
         private void Browser_Load(object sender, EventArgs e)
         {
+            string loadingUrl = Path.Combine("file:///", AppContext.BaseDirectory, "html", "loading.html");
+            initializing = browser.LoadUrlAsync(loadingUrl);
         }
 
         public void LoadHtlm(string html)
@@ -46,14 +50,15 @@ namespace Steam_Authenticator.Forms
 
         public async Task<LoadUrlAsyncResponse> LoadUrl(Uri url)
         {
+            await initializing;
             var result = await browser.LoadUrlAsync(url.ToString());
             return result;
         }
 
         public async Task<LoadUrlAsyncResponse> LoadUrl(Uri url, params SteamKit.Cookie[] cookies)
         {
-            string loadingUrl = Path.Combine("file:///", AppContext.BaseDirectory, "html", "loading.html");
-            await browser.LoadUrlAsync(loadingUrl);
+            await initializing;
+
             if (cookies?.Any() ?? false)
             {
                 string main = $"{url.Scheme}://{url.Host}";

@@ -166,6 +166,11 @@ namespace Steam_Authenticator
             UserClient userClient = panel.UserClient;
             var webClient = userClient.Client;
 
+            if (webClient == null || !webClient.LoggedIn)
+            {
+                return;
+            }
+
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {

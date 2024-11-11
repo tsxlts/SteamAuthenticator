@@ -1,5 +1,6 @@
 ﻿using Steam_Authenticator.Controls;
 using Steam_Authenticator.Model;
+using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using System.Drawing.Drawing2D;
@@ -9,25 +10,25 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Confirmations : Form
     {
-        private readonly Form preForm;
+        private readonly Form mainForm;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
-        private IEnumerable<Confirmation> thisConfirmations = new List<Confirmation>();
+        private List<Confirmation> thisConfirmations = new List<Confirmation>();
 
-        public Confirmations(Form preForm, SteamCommunityClient webClient)
+        public Confirmations(Form mainForm, SteamCommunityClient webClient)
         {
             InitializeComponent();
-            this.preForm = preForm;
+            this.mainForm = mainForm;
             this.webClient = webClient;
 
-            Width = this.preForm.Width;
-            Height = this.preForm.Height;
+            Width = this.mainForm.Width;
+            Height = this.mainForm.Height;
         }
 
         private async void Confirmations_Load(object sender, EventArgs e)
         {
-            Location = this.preForm.Location;
-            preForm.Hide();
+            Location = this.mainForm.Location;
+            mainForm.Hide();
 
             if (!webClient.LoggedIn)
             {
@@ -43,7 +44,8 @@ namespace Steam_Authenticator.Forms
 
         private void Confirmations_FormClosed(object sender, FormClosedEventArgs e)
         {
-            preForm.Show();
+            mainForm.Location = this.Location;
+            mainForm.Show();
         }
 
         private async void refreshBtn_Click(object sender, EventArgs e)
@@ -248,13 +250,14 @@ namespace Steam_Authenticator.Forms
 
                 Browser browser = new Browser()
                 {
+                    Text = confirmation.ConfTypeName,
                     Width = 600,
                     Height = 400
                 };
-                var detail = await webClient.Confirmation.ConfirmationDetailAsync(confirmation.Id, guard.DeviceId, guard.IdentitySecret);
-                browser.Text = confirmation.ConfTypeName;
                 browser.Show();
-                browser.LoadHtlm(detail);
+
+                var detail = await SteamApi.ConfirmationDetailAsync(webClient.SteamId, confirmation.Id, guard.DeviceId, guard.IdentitySecret, webClient.WebCookie);
+                await browser.LoadUrl(detail.RequestUri, webClient.WebCookie.ToArray());
             }
             catch (Exception ex)
             {
@@ -319,11 +322,11 @@ namespace Steam_Authenticator.Forms
                             return;
                         }
 
-                        thisConfirmations = confirm.Confirmations;
+                        thisConfirmations = confirm.Confirmations.OrderBy(c => c.CreationTime).ToList();
 
                         confirmationsPanel.Controls.Clear();
 
-                        if (confirm.Confirmations.Count == 0)
+                        if (thisConfirmations.Count == 0)
                         {
                             Label errorLabel = new Label()
                             {
@@ -338,7 +341,7 @@ namespace Steam_Authenticator.Forms
                             return;
                         }
 
-                        foreach (var confirmation in confirm.Confirmations)
+                        foreach (var confirmation in thisConfirmations)
                         {
                             Panel panel = new Panel() { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding { Bottom = 10 } };
                             panel.Paint += (s, e) =>
@@ -358,7 +361,7 @@ namespace Steam_Authenticator.Forms
 
                             Label nameLabel = new Label()
                             {
-                                Text = $"{confirmation.Headline}\n{confirmation.CreatorId}",
+                                Text = $"{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(confirmation.CreationTime).ToLocalTime():yyyy/MM/dd HH:mm:ss}\n{confirmation.Headline}\n{confirmation.CreatorId}",
                                 AutoSize = true,
                                 ForeColor = Color.Green,
                                 Location = new Point(90, 20),
@@ -368,8 +371,7 @@ namespace Steam_Authenticator.Forms
 
                             Label summaryLabel = new Label()
                             {
-                                Text = $"[{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(confirmation.CreationTime).ToLocalTime():yyyy/MM/dd HH:mm:ss}]" +
-                                $"\n{string.Join("\n", confirmation.Summary)}",
+                                Text = $"{string.Join("\n", confirmation.Summary)}",
                                 AutoSize = true,
                                 ForeColor = Color.Green,
                                 Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),

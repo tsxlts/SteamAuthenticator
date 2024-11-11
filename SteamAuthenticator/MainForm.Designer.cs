@@ -504,7 +504,7 @@
             // 
             SteamId.AutoEllipsis = true;
             SteamId.Cursor = Cursors.Hand;
-            SteamId.ForeColor = Color.FromArgb(245, 128, 0);
+            SteamId.ForeColor = Color.FromArgb(0, 0, 238);
             SteamId.Location = new Point(118, 67);
             SteamId.Name = "SteamId";
             SteamId.Size = new Size(200, 18);
