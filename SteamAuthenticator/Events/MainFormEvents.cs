@@ -150,7 +150,7 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.Device)
             {
-                MessageBox.Show($"当前帐号已绑定令牌" +
+                MessageBox.Show($"{webClient.Account} 已绑定令牌" +
                     $"{Environment.NewLine}" +
                     $"如果你已在其他地方绑定令牌，你可以选择移动令牌令牌验证器到当前设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -322,7 +322,7 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
             {
-                MessageBox.Show($"当前帐号未绑定令牌" +
+                MessageBox.Show($"{webClient.Account} 未绑定令牌" +
                     $"{Environment.NewLine}" +
                     $"你可以直接添加令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -331,7 +331,7 @@ namespace Steam_Authenticator
             Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.Client.Account);
             if (authenticatorStatusResponse.TokenGID == guard?.TokenGID)
             {
-                MessageBox.Show($"当前帐号令牌验证器已绑定至此设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"{webClient.Account} 令牌验证器已绑定至此设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -561,7 +561,7 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.None)
             {
-                MessageBox.Show("当前帐号未设置令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"{webClient.Account} 未设置令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -572,9 +572,9 @@ namespace Steam_Authenticator
             DialogResult res = MessageBox.Show($"{webClient.Account}\n" +
                 $"你想要完全移除Steam令牌码？\n" +
                 $"是 - 完全移除Steam令牌\n" +
-                $"否 - 切换到邮箱验证",
+                $"否 - 切换到邮箱令牌",
                 "提示",
-                MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
 
             switch (res)
             {
