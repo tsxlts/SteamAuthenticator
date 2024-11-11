@@ -38,16 +38,15 @@
             WebPanel.Dock = DockStyle.Fill;
             WebPanel.Location = new Point(0, 0);
             WebPanel.Name = "WebPanel";
-            WebPanel.Size = new Size(339, 450);
+            WebPanel.Size = new Size(584, 361);
             WebPanel.TabIndex = 0;
             // 
             // Browser
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(339, 450);
+            ClientSize = new Size(584, 361);
             Controls.Add(WebPanel);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Browser";
             StartPosition = FormStartPosition.CenterScreen;

@@ -94,7 +94,11 @@ namespace Steam_Authenticator.Forms
 
         private void detailBtn_Click(object sender, EventArgs e)
         {
-            Confirmations confirmation = new Confirmations(webClient);
+            Confirmations confirmation = new Confirmations(this, webClient)
+            {
+                Width = 600,
+                Height = 400
+            };
             confirmation.ShowDialog();
         }
     }

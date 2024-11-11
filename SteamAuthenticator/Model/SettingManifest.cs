@@ -87,42 +87,10 @@ namespace Steam_Authenticator.Model
             public int AutoRefreshInternal { get; set; } = 5;
 
             /// <summary>
-            /// 是否检测所有账号确认信息
-            /// </summary>
-            [JsonProperty("check_all_confirmation")]
-            public bool CheckAllConfirmation { get; set; }
-
-            /// <summary>
             /// 自动弹出确认
             /// </summary>
             [JsonProperty("confirmation_auto_popup")]
             public bool ConfirmationAutoPopup { get; set; }
-
-            /// <summary>
-            /// 是否自动确认报价
-            /// </summary>
-            [JsonProperty("auto_confirm_trade")]
-            public bool AutoConfirmTrade { get; set; }
-
-            /// <summary>
-            /// 是否自动确认市场上架
-            /// </summary>
-            [JsonProperty("auto_confirm_market")]
-            public bool AutoConfirmMarket { get; set; }
-
-            /// <summary>
-            /// 是否自动接收赠送报价
-            /// 别人送给我的
-            /// </summary>
-            [JsonProperty("auto_accept_receive_offer")]
-            public bool AutoAcceptReceiveOffer { get; set; }
-
-            /// <summary>
-            /// 是否自动接收索取报价
-            /// 别人索取我的
-            /// </summary>
-            [JsonProperty("auto_accept_give_offer")]
-            public bool AutoAcceptGiveOffer { get; set; }
         }
     }
 }

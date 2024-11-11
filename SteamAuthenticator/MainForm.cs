@@ -32,7 +32,7 @@ namespace Steam_Authenticator
 
             CheckForIllegalCrossThreadCalls = false;
 
-            var match = Regex.Match(Application.ProductVersion, @"[\d.]+");
+            var match = Regex.Match(Application.ProductVersion, @"^[\d.]+");
             currentVersion = new Version(match.Value);
             versionLabel.Text = $"v{currentVersion}";
 
@@ -42,6 +42,7 @@ namespace Steam_Authenticator
 
             userContextMenuStrip = new ContextMenuStrip();
             userContextMenuStrip.Items.Add("切换").Click += setCurrentClientMenuItem_Click;
+            userContextMenuStrip.Items.Add("设置").Click += settingMenuItem_Click;
             userContextMenuStrip.Items.Add("复制Cookie").Click += copyCookieMenuItem_Click;
             userContextMenuStrip.Items.Add("复制AccessToken").Click += copyAccessTokenMenuItem_Click;
             userContextMenuStrip.Items.Add("复制RefreshToken").Click += copyRefreshTokenMenuItem_Click;
@@ -166,8 +167,8 @@ namespace Steam_Authenticator
                 }
 
                 List<Task> tasks = new List<Task>();
-                var clients = setting.CheckAllConfirmation ? Appsetting.Instance.Clients : new List<UserClient> { currentClient };
-                foreach (var client in clients)
+                var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
+                foreach (var client in checkClients)
                 {
                     if (client == null)
                     {
@@ -177,6 +178,7 @@ namespace Steam_Authenticator
                     var task = Task.Run(() =>
                     {
                         var webClient = client.Client;
+                        var user = client.User;
                         var buffClinet = client.BuffClient;
                         int offerCount = 0;
                         int buffOfferCount = 0;
@@ -195,7 +197,7 @@ namespace Steam_Authenticator
                             var receiveOffers = offers.Where(c => !(c.ItemsToGive?.Any() ?? false)).ToList();
                             var giveOffers = offers.Where(c => c.ItemsToGive?.Any() ?? false).ToList();
 
-                            if (receiveOffers.Any() && setting.AutoAcceptReceiveOffer)
+                            if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -220,7 +222,7 @@ namespace Steam_Authenticator
                                 }
                             }
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && setting.AutoAcceptGiveOffer)
+                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && user.Setting.AutoAcceptGiveOffer)
                             {
                                 HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -257,6 +259,47 @@ namespace Steam_Authenticator
                     tasks.Add(task);
                 }
 
+                var notCheckClients = Appsetting.Instance.Clients.Where(c => !c.User.Setting.PeriodicCheckingConfirmation).ToList();
+                tasks.Add(Task.Run(() =>
+                {
+                    foreach (var client in notCheckClients)
+                    {
+                        if (client == null)
+                        {
+                            continue;
+                        }
+
+                        if (client.User.SteamId == currentClient?.User.SteamId)
+                        {
+                            OfferCountLabel.Text = $"---";
+                            OfferCountLabel.Tag = new List<Offer>();
+                        }
+
+                        UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
+                        if (userPanel != null)
+                        {
+                            Label offerLabel = userPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
+                            if (offerLabel != null)
+                            {
+                                offerLabel.Text = $"---";
+                            }
+                        }
+
+                        if (client.BuffClient != null)
+                        {
+                            BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(client.BuffClient.User.UserId, false).FirstOrDefault() as BuffUserPanel;
+                            if (buffUserPanel != null)
+                            {
+                                Label offerLabel = buffUserPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
+                                if (offerLabel != null)
+                                {
+                                    offerLabel.Text = $"---";
+                                }
+                            }
+                        }
+                    }
+                }));
+
                 await Task.WhenAll(tasks);
             }
             catch
@@ -274,8 +317,8 @@ namespace Steam_Authenticator
             }
 
             List<Task> tasks = new List<Task>();
-            var clients = setting.CheckAllConfirmation ? Appsetting.Instance.Clients : new List<UserClient> { currentClient };
-            foreach (var client in clients)
+            var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
+            foreach (var client in checkClients)
             {
                 if (client == null)
                 {
@@ -292,6 +335,7 @@ namespace Steam_Authenticator
                     try
                     {
                         var webClient = client.Client;
+                        var user = client.User;
 
                         Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
                         if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
@@ -326,8 +370,8 @@ namespace Steam_Authenticator
 
                         foreach (var conf in confirmations)
                         {
-                            if ((conf.ConfType == ConfirmationType.MarketListing && setting.AutoConfirmMarket) ||
-                              (conf.ConfType == ConfirmationType.Trade && setting.AutoConfirmTrade))
+                            if ((conf.ConfType == ConfirmationType.MarketListing && user.Setting.AutoConfirmMarket) ||
+                              (conf.ConfType == ConfirmationType.Trade && user.Setting.AutoConfirmTrade))
                             {
                                 autoConfirm.Add(conf);
                                 continue;
@@ -364,6 +408,33 @@ namespace Steam_Authenticator
                 });
                 tasks.Add(task);
             }
+
+            var notCheckClients = Appsetting.Instance.Clients.Where(c => !c.User.Setting.PeriodicCheckingConfirmation).ToList();
+            tasks.Add(Task.Run(() =>
+            {
+                foreach (var client in notCheckClients)
+                {
+                    if (client == null)
+                    {
+                        continue;
+                    }
+
+                    if (client.User.SteamId == currentClient?.User.SteamId)
+                    {
+                        ConfirmationCountLable.Text = $"---";
+                    }
+
+                    UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId, false).FirstOrDefault() as UserPanel;
+                    if (userPanel != null)
+                    {
+                        Label confirmationLabel = userPanel.Controls.Find("confirmation", false).FirstOrDefault() as Label;
+                        if (confirmationLabel != null)
+                        {
+                            confirmationLabel.Text = $"---";
+                        }
+                    }
+                }
+            }));
 
             await Task.WhenAll(tasks);
         }

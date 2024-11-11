@@ -48,6 +48,11 @@ namespace Steam_Authenticator
             {
                 stringBuilder.Append($"{item.Name}={HttpUtility.UrlEncode(item.Value)}; ");
             }
+            if (stringBuilder.Length < 1)
+            {
+                return;
+            }
+
             Clipboard.SetText(stringBuilder.ToString());
         }
 
@@ -58,8 +63,13 @@ namespace Steam_Authenticator
 
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
+            string accessToken = userClient.Client.AccessToken;
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                return;
+            }
 
-            Clipboard.SetText(userClient.Client.AccessToken);
+            Clipboard.SetText(accessToken);
         }
 
         private void copyRefreshTokenMenuItem_Click(object sender, EventArgs e)
@@ -69,8 +79,13 @@ namespace Steam_Authenticator
 
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
+            string refreshToken = userClient.Client.RefreshToken;
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return;
+            }
 
-            Clipboard.SetText(userClient.Client.RefreshToken);
+            Clipboard.SetText(refreshToken);
         }
 
         private async void setCurrentClientMenuItem_Click(object sender, EventArgs e)
@@ -82,6 +97,18 @@ namespace Steam_Authenticator
             UserClient userClient = panel.UserClient;
 
             await SwitchUser(userClient);
+        }
+
+        private void settingMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
+            var userSetting = new Forms.UserSetting(userClient.User);
+            userSetting.ShowDialog();
         }
 
         private async void loginMenuItem_Click(object sender, EventArgs e)
@@ -128,7 +155,7 @@ namespace Steam_Authenticator
             UserPanel panel = control.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
 
-            Offers offersForm = new Offers(userClient.Client);
+            Offers offersForm = new Offers(this, userClient.Client);
             offersForm.ShowDialog();
         }
 
@@ -139,6 +166,11 @@ namespace Steam_Authenticator
             UserClient userClient = panel.UserClient;
             var webClient = userClient.Client;
 
+            if (webClient == null || !webClient.LoggedIn)
+            {
+                return;
+            }
+
             Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
@@ -146,7 +178,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Confirmations confirmations = new Confirmations(webClient);
+            Confirmations confirmations = new Confirmations(this, webClient);
             confirmations.ShowDialog();
         }
 
@@ -339,6 +371,7 @@ namespace Steam_Authenticator
             UserImg.Image = Properties.Resources.userimg;
             UserName.ForeColor = Color.Black;
             UserName.Text = "---";
+            SteamId.Text = "---";
             Balance.Text = "￥0.00";
             DelayedBalance.Text = "￥0.00";
 
@@ -356,6 +389,7 @@ namespace Steam_Authenticator
                 }
                 UserName.ForeColor = Color.Green;
                 UserName.Text = $"{userClient.User.Account} [{userClient.User.NickName}]";
+                SteamId.Text = $"{userClient.User.SteamId}";
                 Balance.Text = "￥0.00";
                 DelayedBalance.Text = "￥0.00";
             }

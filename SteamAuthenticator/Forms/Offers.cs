@@ -12,18 +12,26 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Offers : Form
     {
+        private readonly Form mainForm;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
         private IEnumerable<Offer> thisOffers = new List<Offer>();
 
-        public Offers(SteamCommunityClient webClient)
+        public Offers(Form mainForm, SteamCommunityClient webClient)
         {
             InitializeComponent();
+            this.mainForm = mainForm;
             this.webClient = webClient;
+
+            Width = this.mainForm.Width;
+            Height = this.mainForm.Height;
         }
 
         private async void Offers_Load(object sender, EventArgs e)
         {
+            Location = this.mainForm.Location;
+            mainForm.Hide();
+
             if (!webClient.LoggedIn)
             {
                 return;
@@ -33,7 +41,13 @@ namespace Steam_Authenticator.Forms
 
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
-            OffersView.Panel2.AutoScroll = true;
+            offersPanel.AutoScroll = true;
+        }
+
+        private void Offers_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainForm.Location = this.Location;
+            mainForm.Show();
         }
 
         private async void refreshBtn_Click(object sender, EventArgs e)
@@ -165,7 +179,7 @@ namespace Steam_Authenticator.Forms
 
         private async void btnDetail_Click(object sender, EventArgs e)
         {
-            string offerUrl = null;
+            Uri offerUrl = null;
             try
             {
                 var setting = Appsetting.Instance.AppSetting.Entry;
@@ -175,19 +189,18 @@ namespace Steam_Authenticator.Forms
 
                 Browser browser = new Browser()
                 {
-                    Width = 400,
-                    Height = 600
+                    Text = "交易报价",
+                    Width = 600,
+                    Height = 400
                 };
-
-                browser.Text = "交易报价";
                 browser.Show();
 
-                offerUrl = $"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/";
+                offerUrl = new Uri($"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
                 await browser.LoadUrl(offerUrl, webClient.WebCookie.ToArray());
             }
             catch (Exception ex)
             {
-                Process.Start("explorer.exe", offerUrl);
+                Process.Start("explorer.exe", offerUrl.ToString());
 
                 MessageBox.Show(ex.Message);
             }
@@ -204,29 +217,30 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = true;
 
-                refreshBtn.Text = "正在刷新...";
+                refreshBtn.Text = "正在刷新";
                 refreshBtn.Enabled = false;
 
                 var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true,
                     cancellationToken: cancellationToken);
 
                 var descriptions = queryOffers.Descriptions ?? new List<BaseDescription>();
-                var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                var offers = queryOffers?.TradeOffersReceived?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>();
                 thisOffers = offers;
 
-                OffersView.Panel2.Controls.Clear();
+                offersPanel.Controls.Clear();
 
                 if (offers.Count == 0)
                 {
                     Label errorLabel = new Label()
                     {
-                        Text = "当前没有任何报价信息",
+                        Text = "没有任何报价信息",
                         AutoSize = false,
                         ForeColor = Color.FromArgb(255, 140, 0),
                         TextAlign = ContentAlignment.TopCenter,
-                        Dock = DockStyle.Fill
+                        Dock = DockStyle.Fill,
+                        Padding = new Padding(0, 20, 0, 0)
                     };
-                    OffersView.Panel2.Controls.Add(errorLabel);
+                    offersPanel.Controls.Add(errorLabel);
                     return;
                 }
 
@@ -278,7 +292,7 @@ namespace Steam_Authenticator.Forms
 
                     if (giveDescription?.Any() ?? false)
                     {
-                        if (giveDescription.Count() > 1)
+                        if (offer.ItemsToGive.Count > 1)
                         {
                             stringBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName} 等多件物品");
                         }
@@ -289,7 +303,7 @@ namespace Steam_Authenticator.Forms
                     }
                     if (receiveDescription?.Any() ?? false)
                     {
-                        if (receiveDescription.Count() > 1)
+                        if (offer.ItemsToReceive.Count > 1)
                         {
                             stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} 等多件物品");
                         }
@@ -299,18 +313,22 @@ namespace Steam_Authenticator.Forms
                         }
                     }
 
+                    StringBuilder statusBuilder = new StringBuilder();
+                    Color statusColor = Color.FromArgb(0, 0, 238);
                     switch (offer.ConfirmationMethod)
                     {
                         case TradeOfferConfirmationMethod.Email:
-                            stringBuilder.AppendLine("等待邮箱令牌确认");
+                            stringBuilder.AppendLine("等待你 邮箱令牌确认");
+                            statusColor = Color.FromArgb(238, 0, 238);
                             break;
                         case TradeOfferConfirmationMethod.MobileApp:
-                            stringBuilder.AppendLine("等待手机令牌确认");
+                            statusBuilder.AppendLine("等待你 手机令牌确认");
+                            statusColor = Color.FromArgb(238, 0, 238);
                             break;
 
                         case TradeOfferConfirmationMethod.Invalid:
                         default:
-                            stringBuilder.AppendLine("等待你接受报价");
+                            statusBuilder.AppendLine("等待你 接受报价");
                             break;
                     }
 
@@ -326,18 +344,37 @@ namespace Steam_Authenticator.Forms
 
                     Label summaryLabel = new Label()
                     {
-                        Text = $"{offer.Message}",
+                        Location = new Point(90, nameLabel.Height + nameLabel.Location.Y),
+                        AutoSize = false,
+                        Height = 0
+                    };
+                    if (!string.IsNullOrWhiteSpace(offer.Message))
+                    {
+                        summaryLabel = new Label()
+                        {
+                            Text = $"{offer.Message}",
+                            AutoSize = true,
+                            ForeColor = Color.FromArgb(32, 64, 205),
+                            Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
+                            BackColor = Color.Transparent
+                        };
+                        panel.Controls.Add(summaryLabel);
+                    }
+
+                    Label statusLabel = new Label()
+                    {
+                        Text = $"{statusBuilder}",
                         AutoSize = true,
-                        ForeColor = Color.Green,
-                        Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
+                        ForeColor = statusColor,
+                        Location = new Point(90, summaryLabel.Height + summaryLabel.Location.Y + 10),
                         BackColor = Color.Transparent
                     };
-                    panel.Controls.Add(summaryLabel);
+                    panel.Controls.Add(statusLabel);
 
                     OfferButton acceptButton = new OfferButton()
                     {
                         Text = "接受",
-                        Location = new Point(90, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                        Location = new Point(90, statusLabel.Height + statusLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
@@ -352,7 +389,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton cancelButton = new OfferButton()
                     {
                         Text = "拒绝",
-                        Location = new Point(180, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                        Location = new Point(180, statusLabel.Height + statusLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
@@ -367,7 +404,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton detailButton = new OfferButton()
                     {
                         Text = "查看",
-                        Location = new Point(270, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                        Location = new Point(270, statusLabel.Height + statusLabel.Location.Y + 10),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
@@ -379,7 +416,7 @@ namespace Steam_Authenticator.Forms
                     detailButton.Click += btnDetail_Click;
                     panel.Controls.Add(detailButton);
 
-                    OffersView.Panel2.Controls.Add(panel);
+                    offersPanel.Controls.Add(panel);
                 }
             }
             catch (Exception ex)
@@ -390,11 +427,10 @@ namespace Steam_Authenticator.Forms
             {
                 refreshing = false;
 
-                refreshBtn.Text = "刷新";
+                refreshBtn.Text = "刷新报价";
                 refreshBtn.Enabled = true;
                 refreshBtn.Focus();
             }
         }
-
     }
 }

@@ -1,3 +1,4 @@
+using Steam_Authenticator.Factory;
 using Steam_Authenticator.Forms;
 using System.Diagnostics;
 using System.Net;
@@ -151,9 +152,31 @@ namespace Steam_Authenticator
                 }
 
             Run:
+                Application.ThreadException += Application_ThreadException;
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
                 Application.Run(new MainForm());
                 instance.ReleaseMutex();
             }
+        }
+
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            AppLogger.Instance.Error(e.Exception);
+
+            MessageBox.Show($"程序发生未知异常{Environment.NewLine}{e.Exception.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+            if (exception == null)
+            {
+                return;
+            }
+
+            AppLogger.Instance.Error(exception);
+
+            MessageBox.Show($"程序发生未知异常{Environment.NewLine}{exception.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public static Process PriorProcess()

@@ -38,7 +38,6 @@
             quitMenuItem = new ToolStripMenuItem();
             authenticatorMenu = new ToolStripMenuItem();
             guardMenuItem = new ToolStripMenuItem();
-            confirmMenuItem = new ToolStripMenuItem();
             addAuthenticatorMenuItem = new ToolStripMenuItem();
             moveAuthenticatorMenuItem = new ToolStripMenuItem();
             importAuthenticatorMenuItem = new ToolStripMenuItem();
@@ -72,6 +71,7 @@
             buffUsersPanel = new Panel();
             pictureBox2 = new PictureBox();
             statusPanel = new Panel();
+            SteamId = new Label();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -104,41 +104,41 @@
             // settingMenuItem
             // 
             settingMenuItem.Name = "settingMenuItem";
-            settingMenuItem.Size = new Size(180, 22);
-            settingMenuItem.Text = "设置";
-            settingMenuItem.Click += settingMenuItem_Click;
+            settingMenuItem.Size = new Size(124, 22);
+            settingMenuItem.Text = "全局设置";
+            settingMenuItem.Click += globalSettingMenuItem_Click;
             // 
             // proxySettingMenuItem
             // 
             proxySettingMenuItem.Name = "proxySettingMenuItem";
-            proxySettingMenuItem.Size = new Size(180, 22);
-            proxySettingMenuItem.Text = "代理";
+            proxySettingMenuItem.Size = new Size(124, 22);
+            proxySettingMenuItem.Text = "代理设置";
             proxySettingMenuItem.Click += proxySettingMenuItem_Click;
             // 
             // passwordMenuItem
             // 
             passwordMenuItem.Name = "passwordMenuItem";
-            passwordMenuItem.Size = new Size(180, 22);
+            passwordMenuItem.Size = new Size(124, 22);
             passwordMenuItem.Text = "访问密码";
             passwordMenuItem.Click += passwordMenuItem_Click;
             // 
             // checkVersionMenuItem
             // 
             checkVersionMenuItem.Name = "checkVersionMenuItem";
-            checkVersionMenuItem.Size = new Size(180, 22);
+            checkVersionMenuItem.Size = new Size(124, 22);
             checkVersionMenuItem.Text = "检查更新";
             checkVersionMenuItem.Click += checkVersionMenuItem_Click;
             // 
             // quitMenuItem
             // 
             quitMenuItem.Name = "quitMenuItem";
-            quitMenuItem.Size = new Size(180, 22);
+            quitMenuItem.Size = new Size(124, 22);
             quitMenuItem.Text = "退出";
             quitMenuItem.Click += quitMenuItem_Click;
             // 
             // authenticatorMenu
             // 
-            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, confirmMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
+            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
             authenticatorMenu.Name = "authenticatorMenu";
             authenticatorMenu.Size = new Size(80, 21);
             authenticatorMenu.Text = "令牌验证器";
@@ -149,13 +149,6 @@
             guardMenuItem.Size = new Size(124, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
-            // 
-            // confirmMenuItem
-            // 
-            confirmMenuItem.Name = "confirmMenuItem";
-            confirmMenuItem.Size = new Size(124, 22);
-            confirmMenuItem.Text = "确认";
-            confirmMenuItem.Click += confirmMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
@@ -224,7 +217,7 @@
             // 
             Balance.AutoEllipsis = true;
             Balance.ForeColor = Color.Green;
-            Balance.Location = new Point(118, 68);
+            Balance.Location = new Point(118, 94);
             Balance.Name = "Balance";
             Balance.Size = new Size(200, 18);
             Balance.TabIndex = 4;
@@ -257,7 +250,7 @@
             confirmationBtn.Size = new Size(32, 17);
             confirmationBtn.TabIndex = 7;
             confirmationBtn.Text = "查看";
-            confirmationBtn.Click += confirmMenuItem_Click;
+            confirmationBtn.Click += confirmationBtn_Click;
             // 
             // declineOfferBtn
             // 
@@ -432,7 +425,7 @@
             // 
             DelayedBalance.AutoEllipsis = true;
             DelayedBalance.ForeColor = Color.Gray;
-            DelayedBalance.Location = new Point(118, 90);
+            DelayedBalance.Location = new Point(118, 116);
             DelayedBalance.Name = "DelayedBalance";
             DelayedBalance.Size = new Size(200, 18);
             DelayedBalance.TabIndex = 15;
@@ -507,11 +500,25 @@
             statusPanel.Size = new Size(608, 30);
             statusPanel.TabIndex = 17;
             // 
+            // SteamId
+            // 
+            SteamId.AutoEllipsis = true;
+            SteamId.Cursor = Cursors.Hand;
+            SteamId.ForeColor = Color.FromArgb(0, 0, 238);
+            SteamId.Location = new Point(118, 67);
+            SteamId.Name = "SteamId";
+            SteamId.Size = new Size(200, 18);
+            SteamId.TabIndex = 18;
+            SteamId.Text = "---";
+            SteamId.TextAlign = ContentAlignment.MiddleLeft;
+            SteamId.Click += SteamId_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(690, 487);
+            Controls.Add(SteamId);
             Controls.Add(statusPanel);
             Controls.Add(tabControl);
             Controls.Add(DelayedBalance);
@@ -563,7 +570,6 @@
         private ToolStripMenuItem guardMenuItem;
         private ToolStripMenuItem addAuthenticatorMenuItem;
         private ToolStripMenuItem removeAuthenticatorMenuItem;
-        private ToolStripMenuItem confirmMenuItem;
         private ToolStripMenuItem importAuthenticatorMenuItem;
         private ToolStripMenuItem moveAuthenticatorMenuItem;
         private ToolStripMenuItem proxySettingMenuItem;
@@ -592,5 +598,6 @@
         private Panel buffUsersPanel;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
+        private Label SteamId;
     }
 }
