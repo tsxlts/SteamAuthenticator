@@ -576,10 +576,20 @@ namespace Steam_Authenticator
                 {
                     var assets = resultObj.Value<JArray>("assets");
                     string updateUrl = assets.FirstOrDefault()?.Value<string>("browser_download_url");
-
+                    string body = resultObj.Value<string>("body");
+                    DateTime published = resultObj.Value<DateTime>("published_at");
                     if (!string.IsNullOrWhiteSpace(updateUrl))
                     {
-                        DialogResult updateDialog = MessageBox.Show($"有最新版本可用（{tag_name}），是否立即更新", "版本更新", MessageBoxButtons.YesNo);
+                        DialogResult updateDialog = MessageBox.Show($"有最新版本可用（{tag_name}）" +
+                            $"{Environment.NewLine}" +
+                            $"发布时间：{published.ToLocalTime():yyyy年MM月dd日 HH时mm分}" +
+                            $"{Environment.NewLine}" +
+                            $"更新内容：" +
+                            $"{Environment.NewLine}" +
+                            $"{body}" +
+                            $"{Environment.NewLine}" +
+                            $"{Environment.NewLine}" +
+                            $"是否立即更新？", "版本更新", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                         if (updateDialog == DialogResult.Yes)
                         {
                             Process.Start("explorer.exe", updateUrl);
