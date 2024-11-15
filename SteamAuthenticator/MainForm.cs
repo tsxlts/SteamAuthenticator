@@ -86,9 +86,9 @@ namespace Steam_Authenticator
                     tasks.Add(QueryConfirmations(tokenSource.Token));
 
                     tasks.Add(QueryWalletDetails(tokenSource.Token));
-                }
 
-                Task.WaitAll(tasks.ToArray());
+                    Task.WaitAll(tasks.ToArray());
+                }
             }
             catch
             {
@@ -384,7 +384,13 @@ namespace Steam_Authenticator
                         {
                             try
                             {
-                                bool accept = HandleConfirmation(webClient, guard, autoConfirm, true, cancellationToken).Result;
+                                using (var maxcts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                                {
+                                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, maxcts.Token))
+                                    {
+                                        bool accept = HandleConfirmation(webClient, guard, autoConfirm, true, cts.Token).Result;
+                                    }
+                                }
                             }
                             catch
                             {
