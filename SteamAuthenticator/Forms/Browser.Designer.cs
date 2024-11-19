@@ -50,6 +50,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Browser";
             StartPosition = FormStartPosition.CenterScreen;
+            FormClosing += Browser_FormClosing;
             Load += Browser_Load;
             ResumeLayout(false);
         }

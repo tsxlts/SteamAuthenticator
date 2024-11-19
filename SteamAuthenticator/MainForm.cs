@@ -50,7 +50,7 @@ namespace Steam_Authenticator
             userContextMenuStrip.Items.Add("退出登录").Click += removeUserMenuItem_Click;
 
             buffUserContextMenuStrip = new ContextMenuStrip();
-            buffUserContextMenuStrip.Items.Add("设置").Click += buffSettingMenuItem_Click;
+            //buffUserContextMenuStrip.Items.Add("设置").Click += buffSettingMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("重新登录").Click += buffLoginMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("退出登录").Click += removeBuffUserMenuItem_Click;
         }
@@ -184,6 +184,9 @@ namespace Steam_Authenticator
                         int buffOfferCount = 0;
                         try
                         {
+                            bool accpetBuff = user.Setting.AutoAcceptGiveOffer || user.Setting.AutoAcceptGiveOffer_Buff;
+                            bool accpetOther = user.Setting.AutoAcceptGiveOffer || user.Setting.AutoAcceptGiveOffer_Other;
+
                             var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
                             offerCount = offers.Count;
@@ -216,13 +219,13 @@ namespace Steam_Authenticator
 
                                 giveOffers.RemoveAll(c => buffOffers.Any(b => b.TradeOfferId == c.TradeOfferId));
 
-                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && buffClinet.User.Setting.AutoAcceptGiveOffer)
+                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetBuff)
                                 {
                                     HandleOffer(webClient, buffOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                                 }
                             }
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && user.Setting.AutoAcceptGiveOffer)
+                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetOther)
                             {
                                 HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }

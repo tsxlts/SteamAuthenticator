@@ -76,6 +76,13 @@ namespace Steam_Authenticator
             BuffClient client = panel.Client;
 
             await client.RefreshAsync(true);
+
+            if (client.LoggedIn)
+            {
+                return;
+            }
+
+            BuffLogin($"登录信息已失效{Environment.NewLine}请重新扫码登录 BUFF 帐号");
         }
 
         private void removeBuffUserMenuItem_Click(object sender, EventArgs e)

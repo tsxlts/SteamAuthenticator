@@ -47,11 +47,25 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptReceiveOffer { get; set; }
 
         /// <summary>
-        /// 是否自动接收索取报价
+        /// 是否自动接受 全部 索取报价
         /// 别人索取我的
         /// </summary>
         [JsonProperty("auto_accept_give_offer")]
         public bool AutoAcceptGiveOffer { get; set; }
+
+        /// <summary>
+        /// 是否自动接受 BUFF 索取报价
+        /// 别人索取我的
+        /// </summary>
+        [JsonProperty("auto_accept_give_offer_buff")]
+        public bool AutoAcceptGiveOffer_Buff { get; set; }
+
+        /// <summary>
+        /// 是否自动接受 其他 索取报价
+        /// 别人索取我的
+        /// </summary>
+        [JsonProperty("auto_accept_give_offer_other")]
+        public bool AutoAcceptGiveOffer_Other { get; set; }
     }
 
     public class BuffUser

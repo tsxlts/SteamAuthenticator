@@ -195,8 +195,17 @@ namespace Steam_Authenticator.Forms
                 };
                 browser.Show();
 
-                offerUrl = new Uri($"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
-                await browser.LoadUrl(offerUrl, webClient.WebCookie.ToArray());
+                if (!string.IsNullOrWhiteSpace(setting.Domain.SteamCommunity))
+                {
+                    offerUrl = new Uri($"{setting.Domain.SteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
+                }
+                else
+                {
+                    offerUrl = new Uri($"{SteamBulider.DefaultSteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
+                }
+
+                browser.SetCookies($"{offerUrl.Scheme}://{offerUrl.Host}", webClient.WebCookie.ToArray());
+                await browser.LoadUrl(offerUrl);
             }
             catch (Exception ex)
             {
