@@ -3,6 +3,7 @@ using Steam_Authenticator.Forms;
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
+using static SteamKit.HttpBulider;
 using static SteamKit.SteamBulider;
 
 namespace Steam_Authenticator
@@ -39,37 +40,46 @@ namespace Steam_Authenticator
                 {
                     var setting = Appsetting.Instance.AppSetting.Entry;
                     var proxy = Proxy.Instance;
-                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamCommunity))
+
+                    if (setting.UseCustomerDomain)
                     {
-                        proxy.WithSteamCommunity(setting.Domain.SteamCommunity);
-                    }
-                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamApi))
-                    {
-                        proxy.WithSteamApi(setting.Domain.SteamApi);
-                    }
-                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamPowered))
-                    {
-                        proxy.WithSteamStore(setting.Domain.SteamPowered);
-                    }
-                    if (!string.IsNullOrWhiteSpace(setting.Domain.SteamLogin))
-                    {
-                        proxy.WithSteamLogin(setting.Domain.SteamLogin);
+                        if (!string.IsNullOrWhiteSpace(setting.Domain.SteamCommunity))
+                        {
+                            proxy.WithSteamCommunity(setting.Domain.SteamCommunity);
+                        }
+                        if (!string.IsNullOrWhiteSpace(setting.Domain.SteamApi))
+                        {
+                            proxy.WithSteamApi(setting.Domain.SteamApi);
+                        }
+                        if (!string.IsNullOrWhiteSpace(setting.Domain.SteamPowered))
+                        {
+                            proxy.WithSteamStore(setting.Domain.SteamPowered);
+                        }
+                        if (!string.IsNullOrWhiteSpace(setting.Domain.SteamLogin))
+                        {
+                            proxy.WithSteamLogin(setting.Domain.SteamLogin);
+                        }
                     }
 
-                    if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address) || !string.IsNullOrWhiteSpace(setting.Proxy?.Host))
+                    if (setting.UseCustomerProxy)
                     {
-                        if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address))
+                        if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address) || !string.IsNullOrWhiteSpace(setting.Proxy?.Host))
                         {
-                            proxy.WithProxy(new WebProxy(new Uri(setting.Proxy.Address)));
-                        }
-                        else
-                        {
-                            proxy.WithProxy(new WebProxy(setting.Proxy.Host, setting.Proxy.Port));
+                            if (!string.IsNullOrWhiteSpace(setting.Proxy?.Address))
+                            {
+                                proxy.WithProxy(new WebProxy(new Uri(setting.Proxy.Address)));
+                            }
+                            else
+                            {
+                                proxy.WithProxy(new WebProxy(setting.Proxy.Host, setting.Proxy.Port));
+                            }
                         }
                     }
 
                     return proxy;
                 });
+
+                WithHttpClientFactory(new HttpClientFactory());
 
                 if (Appsetting.Instance.AppSetting.Entry.FirstUsed)
                 {

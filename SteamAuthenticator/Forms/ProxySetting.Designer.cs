@@ -38,28 +38,26 @@
             apiBox = new TextBox();
             label4 = new Label();
             saveBtn = new Button();
-            cancelBtn = new Button();
-            splitContainer1 = new SplitContainer();
             groupBox1 = new GroupBox();
+            useCustomerDomain = new CheckBox();
             groupBox2 = new GroupBox();
+            useCustomerProxy = new CheckBox();
             proxyPortBox = new NumericUpDown();
             label5 = new Label();
             proxyAddressBox = new TextBox();
             label6 = new Label();
             proxyHostBox = new TextBox();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
+            panel1 = new Panel();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)proxyPortBox).BeginInit();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(6, 31);
+            label1.Location = new Point(6, 58);
             label1.Name = "label1";
             label1.Size = new Size(92, 17);
             label1.TabIndex = 0;
@@ -67,22 +65,22 @@
             // 
             // communityBox
             // 
-            communityBox.Location = new Point(104, 29);
+            communityBox.Location = new Point(104, 56);
             communityBox.Name = "communityBox";
-            communityBox.Size = new Size(255, 23);
-            communityBox.TabIndex = 1;
+            communityBox.Size = new Size(280, 23);
+            communityBox.TabIndex = 2002;
             // 
             // loginBox
             // 
-            loginBox.Location = new Point(104, 72);
+            loginBox.Location = new Point(104, 93);
             loginBox.Name = "loginBox";
-            loginBox.Size = new Size(255, 23);
-            loginBox.TabIndex = 3;
+            loginBox.Size = new Size(280, 23);
+            loginBox.TabIndex = 2003;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(6, 75);
+            label2.Location = new Point(6, 96);
             label2.Name = "label2";
             label2.Size = new Size(92, 17);
             label2.TabIndex = 2;
@@ -90,15 +88,15 @@
             // 
             // storeBox
             // 
-            storeBox.Location = new Point(104, 115);
+            storeBox.Location = new Point(104, 130);
             storeBox.Name = "storeBox";
-            storeBox.Size = new Size(255, 23);
-            storeBox.TabIndex = 5;
+            storeBox.Size = new Size(280, 23);
+            storeBox.TabIndex = 2004;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(6, 117);
+            label3.Location = new Point(6, 132);
             label3.Name = "label3";
             label3.Size = new Size(92, 17);
             label3.TabIndex = 4;
@@ -106,15 +104,15 @@
             // 
             // apiBox
             // 
-            apiBox.Location = new Point(104, 159);
+            apiBox.Location = new Point(104, 168);
             apiBox.Name = "apiBox";
-            apiBox.Size = new Size(255, 23);
-            apiBox.TabIndex = 7;
+            apiBox.Size = new Size(280, 23);
+            apiBox.TabIndex = 2005;
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(6, 161);
+            label4.Location = new Point(6, 170);
             label4.Name = "label4";
             label4.Size = new Size(87, 17);
             label4.TabIndex = 6;
@@ -126,43 +124,16 @@
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
             saveBtn.Location = new Point(0, 0);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(191, 40);
-            saveBtn.TabIndex = 8;
+            saveBtn.Size = new Size(415, 45);
+            saveBtn.TabIndex = 99999;
             saveBtn.Text = "保存";
             saveBtn.UseVisualStyleBackColor = true;
             saveBtn.Click += saveBtn_Click;
             // 
-            // cancelBtn
-            // 
-            cancelBtn.Dock = DockStyle.Fill;
-            cancelBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            cancelBtn.Location = new Point(0, 0);
-            cancelBtn.Name = "cancelBtn";
-            cancelBtn.Size = new Size(195, 40);
-            cancelBtn.TabIndex = 9;
-            cancelBtn.Text = "取消";
-            cancelBtn.UseVisualStyleBackColor = true;
-            cancelBtn.Click += cancelBtn_Click;
-            // 
-            // splitContainer1
-            // 
-            splitContainer1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            splitContainer1.Location = new Point(1, 384);
-            splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            splitContainer1.Panel1.Controls.Add(cancelBtn);
-            // 
-            // splitContainer1.Panel2
-            // 
-            splitContainer1.Panel2.Controls.Add(saveBtn);
-            splitContainer1.Size = new Size(390, 40);
-            splitContainer1.SplitterDistance = 195;
-            splitContainer1.TabIndex = 10;
-            // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(useCustomerDomain);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(communityBox);
             groupBox1.Controls.Add(apiBox);
@@ -173,13 +144,25 @@
             groupBox1.Controls.Add(label3);
             groupBox1.Location = new Point(12, 158);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(365, 196);
-            groupBox1.TabIndex = 11;
+            groupBox1.Size = new Size(394, 209);
+            groupBox1.TabIndex = 12;
             groupBox1.TabStop = false;
             groupBox1.Text = "域名配置";
             // 
+            // useCustomerDomain
+            // 
+            useCustomerDomain.AutoSize = true;
+            useCustomerDomain.Location = new Point(9, 24);
+            useCustomerDomain.Name = "useCustomerDomain";
+            useCustomerDomain.Size = new Size(99, 21);
+            useCustomerDomain.TabIndex = 2001;
+            useCustomerDomain.Text = "使用以下域名";
+            useCustomerDomain.UseVisualStyleBackColor = true;
+            // 
             // groupBox2
             // 
+            groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(useCustomerProxy);
             groupBox2.Controls.Add(proxyPortBox);
             groupBox2.Controls.Add(label5);
             groupBox2.Controls.Add(proxyAddressBox);
@@ -187,24 +170,34 @@
             groupBox2.Controls.Add(proxyHostBox);
             groupBox2.Location = new Point(12, 18);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(365, 114);
-            groupBox2.TabIndex = 12;
+            groupBox2.Size = new Size(394, 134);
+            groupBox2.TabIndex = 11;
             groupBox2.TabStop = false;
             groupBox2.Text = "代理配置";
             // 
+            // useCustomerProxy
+            // 
+            useCustomerProxy.AutoSize = true;
+            useCustomerProxy.Location = new Point(9, 24);
+            useCustomerProxy.Name = "useCustomerProxy";
+            useCustomerProxy.Size = new Size(99, 21);
+            useCustomerProxy.TabIndex = 1001;
+            useCustomerProxy.Text = "使用以下代理";
+            useCustomerProxy.UseVisualStyleBackColor = true;
+            // 
             // proxyPortBox
             // 
-            proxyPortBox.Location = new Point(281, 70);
+            proxyPortBox.Location = new Point(306, 91);
             proxyPortBox.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
             proxyPortBox.Name = "proxyPortBox";
             proxyPortBox.Size = new Size(78, 23);
-            proxyPortBox.TabIndex = 11;
+            proxyPortBox.TabIndex = 1004;
             proxyPortBox.Value = new decimal(new int[] { 8080, 0, 0, 0 });
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(6, 30);
+            label5.Location = new Point(6, 57);
             label5.Name = "label5";
             label5.Size = new Size(80, 17);
             label5.TabIndex = 6;
@@ -212,15 +205,15 @@
             // 
             // proxyAddressBox
             // 
-            proxyAddressBox.Location = new Point(104, 27);
+            proxyAddressBox.Location = new Point(104, 54);
             proxyAddressBox.Name = "proxyAddressBox";
-            proxyAddressBox.Size = new Size(255, 23);
-            proxyAddressBox.TabIndex = 7;
+            proxyAddressBox.Size = new Size(280, 23);
+            proxyAddressBox.TabIndex = 1002;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(6, 73);
+            label6.Location = new Point(6, 94);
             label6.Name = "label6";
             label6.Size = new Size(80, 17);
             label6.TabIndex = 8;
@@ -228,21 +221,29 @@
             // 
             // proxyHostBox
             // 
-            proxyHostBox.Location = new Point(104, 70);
+            proxyHostBox.Location = new Point(104, 91);
             proxyHostBox.Name = "proxyHostBox";
-            proxyHostBox.Size = new Size(171, 23);
-            proxyHostBox.TabIndex = 9;
+            proxyHostBox.Size = new Size(196, 23);
+            proxyHostBox.TabIndex = 1003;
+            // 
+            // panel1
+            // 
+            panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panel1.Controls.Add(saveBtn);
+            panel1.Location = new Point(1, 380);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(415, 45);
+            panel1.TabIndex = 13;
             // 
             // ProxySetting
             // 
             AcceptButton = saveBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            CancelButton = cancelBtn;
-            ClientSize = new Size(391, 426);
+            ClientSize = new Size(418, 426);
+            Controls.Add(panel1);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            Controls.Add(splitContainer1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -251,15 +252,12 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "代理设置";
             Load += ProxySetting_Load;
-            splitContainer1.Panel1.ResumeLayout(false);
-            splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
-            splitContainer1.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)proxyPortBox).EndInit();
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -274,8 +272,6 @@
         private TextBox apiBox;
         private Label label4;
         private Button saveBtn;
-        private Button cancelBtn;
-        private SplitContainer splitContainer1;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
         private Label label5;
@@ -283,5 +279,8 @@
         private Label label6;
         private NumericUpDown proxyPortBox;
         private TextBox proxyHostBox;
+        private CheckBox useCustomerDomain;
+        private CheckBox useCustomerProxy;
+        private Panel panel1;
     }
 }

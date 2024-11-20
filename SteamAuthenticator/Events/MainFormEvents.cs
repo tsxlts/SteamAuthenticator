@@ -15,7 +15,7 @@ namespace Steam_Authenticator
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             refreshUserTimer.Dispose();
-            timer.Dispose();
+            refreshClientInfoTimer.Dispose();
             foreach (var client in Appsetting.Instance.Clients)
             {
                 client.Client.Dispose();

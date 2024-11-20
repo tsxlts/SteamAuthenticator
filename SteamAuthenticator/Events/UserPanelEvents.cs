@@ -256,7 +256,8 @@ namespace Steam_Authenticator
             }
             finally
             {
-                ResetTimer(TimeSpan.Zero, timerMinPeriod);
+                ResetRefreshMsgTimer(TimeSpan.Zero, refreshMsgTimerMinPeriod);
+                ResetRefreshClientInfoTimer(TimeSpan.Zero, refreshClientInfoTimerMinPeriod);
                 ResetRefreshUserTimer(TimeSpan.Zero, TimeSpan.FromMinutes(10));
             }
         }
@@ -265,7 +266,10 @@ namespace Steam_Authenticator
         {
             if (relogin)
             {
-                MessageBox.Show($"帐号 {account} 已掉线，请重新登录", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (MessageBox.Show($"帐号 {account} 已掉线，是否请重新登录", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                {
+                    return null;
+                }
             }
 
             Login login = new Login(account);
@@ -344,7 +348,7 @@ namespace Steam_Authenticator
                 {
                     if (!await userClient.LoginAsync())
                     {
-                        userClient = await Login(true, userClient.User.Account);
+                        userClient = await Login(true, userClient.User.Account) ?? userClient;
                     }
                 }
 

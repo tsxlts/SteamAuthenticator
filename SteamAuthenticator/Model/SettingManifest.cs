@@ -64,8 +64,18 @@ namespace Steam_Authenticator.Model
             /// <summary>
             /// 
             /// </summary>
+            public bool UseCustomerDomain { get; set; } = true;
+
+            /// <summary>
+            /// 
+            /// </summary>
             [JsonProperty("domain")]
             public Domain Domain { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool UseCustomerProxy { get; set; } = true;
 
             /// <summary>
             /// 
