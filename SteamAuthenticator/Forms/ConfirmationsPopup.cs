@@ -24,8 +24,13 @@ namespace Steam_Authenticator.Forms
         {
             int tradeCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.Trade);
             int marketCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.MarketListing);
+            var otherConfirms = confirmations.Where(c => !new[]
+            {
+                SteamEnum.ConfirmationType.Trade, SteamEnum.ConfirmationType.MarketListing
+            }.Contains(c.ConfType)).ToList();
 
-            StringBuilder stringBuilder = new StringBuilder($"你有");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($"你有");
             if (tradeCount > 0)
             {
                 stringBuilder.AppendLine($"{tradeCount}个报价");
@@ -33,6 +38,10 @@ namespace Steam_Authenticator.Forms
             if (marketCount > 0)
             {
                 stringBuilder.AppendLine($"{marketCount}个市场上架");
+            }
+            if (otherConfirms.Count > 0)
+            {
+                stringBuilder.AppendLine($"{otherConfirms.Count}个{otherConfirms.First().Headline}等其他事项");
             }
             stringBuilder.AppendLine("待确认");
 

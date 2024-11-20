@@ -257,7 +257,8 @@ namespace Steam_Authenticator.Forms
                 browser.Show();
 
                 var detail = await SteamApi.ConfirmationDetailAsync(webClient.SteamId, confirmation.Id, guard.DeviceId, guard.IdentitySecret, webClient.WebCookie);
-                await browser.LoadUrl(detail.RequestUri, webClient.WebCookie.ToArray());
+                browser.SetCookies($"{detail.RequestUri.Scheme}://{detail.RequestUri.Host}", webClient.WebCookie.ToArray());
+                await browser.LoadUrl(detail.RequestUri);
             }
             catch (Exception ex)
             {
@@ -387,8 +388,10 @@ namespace Steam_Authenticator.Forms
                                 FlatAppearance = { BorderSize = 0 },
                                 BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
-                                AutoSize = true,
-                                AutoSizeMode = AutoSizeMode.GrowOnly,
+                                AutoSize = false,
+                                AutoEllipsis = true,
+                                Size = new Size(90, 28),
+                                TextAlign = ContentAlignment.MiddleCenter,
                                 Confirmation = confirmation
                             };
                             acceptButton.Click += btnAccept_Click;
@@ -397,13 +400,15 @@ namespace Steam_Authenticator.Forms
                             ConfirmationButton cancelButton = new ConfirmationButton()
                             {
                                 Text = confirmation.Cancel,
-                                Location = new Point(180, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                                Location = new Point(190, summaryLabel.Height + summaryLabel.Location.Y + 10),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },
                                 BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
-                                AutoSize = true,
-                                AutoSizeMode = AutoSizeMode.GrowOnly,
+                                AutoSize = false,
+                                AutoEllipsis = true,
+                                Size = new Size(90, 28),
+                                TextAlign = ContentAlignment.MiddleCenter,
                                 Confirmation = confirmation
                             };
                             cancelButton.Click += btnCancel_Click;
@@ -412,13 +417,15 @@ namespace Steam_Authenticator.Forms
                             ConfirmationButton detailButton = new ConfirmationButton()
                             {
                                 Text = "查看",
-                                Location = new Point(270, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                                Location = new Point(290, summaryLabel.Height + summaryLabel.Location.Y + 10),
                                 FlatStyle = FlatStyle.Flat,
                                 FlatAppearance = { BorderSize = 0 },
                                 BackColor = Color.FromArgb(102, 153, 255),
                                 ForeColor = Color.Snow,
-                                AutoSize = true,
-                                AutoSizeMode = AutoSizeMode.GrowOnly,
+                                AutoSize = false,
+                                AutoEllipsis = true,
+                                Size = new Size(90, 28),
+                                TextAlign = ContentAlignment.MiddleCenter,
                                 Confirmation = confirmation
                             };
                             detailButton.Click += btnDetail_Click;

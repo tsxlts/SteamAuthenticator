@@ -14,10 +14,12 @@ namespace Steam_Authenticator.Forms
             Appsetting.Instance.AppSetting.Entry.Proxy = Appsetting.Instance.AppSetting.Entry.Proxy ?? new HostProxy();
             Appsetting.Instance.AppSetting.Entry.Domain = Appsetting.Instance.AppSetting.Entry.Domain ?? new Domain();
 
+            useCustomerProxy.Checked = Appsetting.Instance.AppSetting.Entry.UseCustomerProxy;
             proxyAddressBox.Text = Appsetting.Instance.AppSetting.Entry.Proxy.Address;
             proxyHostBox.Text = Appsetting.Instance.AppSetting.Entry.Proxy.Host;
             proxyPortBox.Value = Appsetting.Instance.AppSetting.Entry.Proxy.Port;
 
+            useCustomerDomain.Checked = Appsetting.Instance.AppSetting.Entry.UseCustomerDomain;
             communityBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity;
             apiBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamApi;
             storeBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamPowered;
@@ -45,10 +47,12 @@ namespace Steam_Authenticator.Forms
                     var testProxy = await SteamKit.SteamApi.GetAsync("https://www.baidu.com", proxy: webProxy);
                 }
 
+                Appsetting.Instance.AppSetting.Entry.UseCustomerProxy = useCustomerProxy.Checked;
                 Appsetting.Instance.AppSetting.Entry.Proxy.Address = proxyAddressBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Proxy.Host = proxyHostBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Proxy.Port = (int)proxyPortBox.Value;
 
+                Appsetting.Instance.AppSetting.Entry.UseCustomerDomain = useCustomerDomain.Checked;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity = communityBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamApi = apiBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamPowered = storeBox.Text;
@@ -57,6 +61,8 @@ namespace Steam_Authenticator.Forms
                 Appsetting.Instance.AppSetting.Save();
 
                 MessageBox.Show("已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                Close();
             }
             catch (HttpRequestException ex)
             {
@@ -71,11 +77,5 @@ namespace Steam_Authenticator.Forms
                 saveBtn.Enabled = Enabled;
             }
         }
-
-        private void cancelBtn_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
     }
 }

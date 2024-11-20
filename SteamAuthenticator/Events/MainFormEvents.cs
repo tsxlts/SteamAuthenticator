@@ -15,7 +15,7 @@ namespace Steam_Authenticator
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             refreshUserTimer.Dispose();
-            timer.Dispose();
+            refreshClientInfoTimer.Dispose();
             foreach (var client in Appsetting.Instance.Clients)
             {
                 client.Client.Dispose();
@@ -339,7 +339,7 @@ namespace Steam_Authenticator
                      $"{Environment.NewLine}" +
                      $"Steam将发送一条验证短信到你绑定的安全手机号" +
                     $"{Environment.NewLine}" +
-                     $"移动令牌后你在48小时内产生的交易报价将被Steam暂挂，但是你可以正常进行交易" +
+                     $"移动令牌后你在48小时内不能使用交易报价功能" +
                      $"{Environment.NewLine}" +
                      $"你是否要继续移动你的Steam令牌？", "移动令牌", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialogResult != DialogResult.Yes)

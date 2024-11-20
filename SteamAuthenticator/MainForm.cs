@@ -15,10 +15,12 @@ namespace Steam_Authenticator
     public partial class MainForm : Form
     {
         private readonly Version currentVersion;
-        private readonly System.Threading.Timer timer;
+        private readonly System.Threading.Timer refreshMsgTimer;
+        private readonly System.Threading.Timer refreshClientInfoTimer;
         private readonly System.Threading.Timer refreshUserTimer;
         private readonly System.Threading.Timer refreshBuffUserTimer;
-        private readonly TimeSpan timerMinPeriod = TimeSpan.FromSeconds(20);
+        private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
+        private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(20);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
@@ -36,7 +38,8 @@ namespace Steam_Authenticator
             currentVersion = new Version(match.Value);
             versionLabel.Text = $"v{currentVersion}";
 
-            timer = new System.Threading.Timer(RefreshClientMsg, null, -1, -1);
+            refreshMsgTimer = new System.Threading.Timer(RefreshMsg, null, -1, -1);
+            refreshClientInfoTimer = new System.Threading.Timer(RefreshClientInfo, null, -1, -1);
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
 
@@ -50,7 +53,7 @@ namespace Steam_Authenticator
             userContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += removeUserMenuItem_Click;
 
             buffUserContextMenuStrip = new ContextMenuStrip();
-            buffUserContextMenuStrip.Items.Add("ÉèÖÃ").Click += buffSettingMenuItem_Click;
+            //buffUserContextMenuStrip.Items.Add("ÉèÖÃ").Click += buffSettingMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += buffLoginMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += removeBuffUserMenuItem_Click;
         }
@@ -70,10 +73,8 @@ namespace Steam_Authenticator
             await CheckVersion();
         }
 
-        private void RefreshClientMsg(object _)
+        private void RefreshMsg(object _)
         {
-            var setting = Appsetting.Instance.AppSetting.Entry;
-
             try
             {
                 List<Task> tasks = new List<Task>();
@@ -81,10 +82,6 @@ namespace Steam_Authenticator
                 using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
                 {
                     tasks.Add(QueryAuthSessionsForAccount(tokenSource.Token));
-
-                    tasks.Add(QueryOffers(tokenSource.Token));
-                    tasks.Add(QueryConfirmations(tokenSource.Token));
-
                     tasks.Add(QueryWalletDetails(tokenSource.Token));
 
                     Task.WaitAll(tasks.ToArray());
@@ -96,9 +93,35 @@ namespace Steam_Authenticator
             }
             finally
             {
+                ResetRefreshMsgTimer(TimeSpan.FromSeconds(2), refreshMsgTimerMinPeriod);
+            }
+        }
+
+        private void RefreshClientInfo(object _)
+        {
+            var setting = Appsetting.Instance.AppSetting.Entry;
+
+            try
+            {
+                List<Task> tasks = new List<Task>();
+
+                using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+                {
+                    tasks.Add(QueryOffers(tokenSource.Token));
+                    tasks.Add(QueryConfirmations(tokenSource.Token));
+
+                    Task.WaitAll(tasks.ToArray());
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
                 TimeSpan dueTime = TimeSpan.FromSeconds(Math.Max(1, setting.AutoRefreshInternal));
-                TimeSpan period = TimeSpan.FromSeconds(Math.Max(timerMinPeriod.TotalSeconds, setting.AutoRefreshInternal * 2));
-                ResetTimer(dueTime, period);
+                TimeSpan period = TimeSpan.FromSeconds(Math.Max(refreshClientInfoTimerMinPeriod.TotalSeconds, setting.AutoRefreshInternal * 2));
+                ResetRefreshClientInfoTimer(dueTime, period);
             }
         }
 
@@ -184,6 +207,10 @@ namespace Steam_Authenticator
                         int buffOfferCount = 0;
                         try
                         {
+                            bool acceptAll = user.Setting.AutoAcceptGiveOffer;
+                            bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
+                            bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
+
                             var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
                             offerCount = offers.Count;
@@ -202,7 +229,7 @@ namespace Steam_Authenticator
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
 
-                            if (giveOffers.Any() && buffClinet != null)
+                            if (!acceptAll && giveOffers.Any() && buffClinet != null)
                             {
                                 var buffOffer = buffClinet.QuerySteamTrade().Result;
                                 if (!(buffOffer.Body?.IsSuccess ?? false))
@@ -216,13 +243,13 @@ namespace Steam_Authenticator
 
                                 giveOffers.RemoveAll(c => buffOffers.Any(b => b.TradeOfferId == c.TradeOfferId));
 
-                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && buffClinet.User.Setting.AutoAcceptGiveOffer)
+                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetBuff)
                                 {
                                     HandleOffer(webClient, buffOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                                 }
                             }
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && user.Setting.AutoAcceptGiveOffer)
+                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetOther)
                             {
                                 HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
@@ -544,9 +571,14 @@ namespace Steam_Authenticator
             }
         }
 
-        private void ResetTimer(TimeSpan dueTime, TimeSpan period)
+        private void ResetRefreshMsgTimer(TimeSpan dueTime, TimeSpan period)
         {
-            timer.Change(dueTime, period);
+            refreshMsgTimer.Change(dueTime, period);
+        }
+
+        private void ResetRefreshClientInfoTimer(TimeSpan dueTime, TimeSpan period)
+        {
+            refreshClientInfoTimer.Change(dueTime, period);
         }
 
         private void ResetRefreshUserTimer(TimeSpan dueTime, TimeSpan period)
