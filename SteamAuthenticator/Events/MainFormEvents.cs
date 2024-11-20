@@ -186,7 +186,7 @@ namespace Steam_Authenticator
                             }
 
                             string phone = input.Phone;
-                            string country = input.Country;
+                            string country = input.CountryCode;
                             var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {
@@ -386,7 +386,7 @@ namespace Steam_Authenticator
                             }
 
                             string phone = phoneInput.Phone;
-                            string country = phoneInput.Country;
+                            string country = phoneInput.CountryCode;
                             var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {

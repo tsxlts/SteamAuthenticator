@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using SteamKit.Model;
+using System.Text.RegularExpressions;
 
 namespace Steam_Authenticator.Forms
 {
@@ -14,16 +15,25 @@ namespace Steam_Authenticator.Forms
             this.tips = tips;
         }
 
-        private void Input_Load(object sender, EventArgs e)
+        private async void Input_Load(object sender, EventArgs e)
         {
             Text = title;
             TipsLabel.Text = tips;
             PhoneBox.Text = Phone;
-            CountryBox.Text = Country;
+
+            CountryBox.DisplayMember = nameof(SteamKit.Model.Country.Name);
+            CountryBox.ValueMember = nameof(SteamKit.Model.Country.CountryCode);
+            await LoadCountry();
         }
 
         private void acceptBtn_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(Phone))
+            {
+                DialogResult = DialogResult.Cancel;
+                return;
+            }
+
             Phone = PhoneBox.Text;
             if (Phone[0] != '+')
             {
@@ -31,12 +41,7 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            Country = CountryBox.Text;
-            if (string.IsNullOrWhiteSpace(Phone))
-            {
-                DialogResult = DialogResult.Cancel;
-                return;
-            }
+            CountryCode = (CountryBox.SelectedItem as Country)?.CountryCode;
 
             DialogResult = DialogResult.OK;
         }
@@ -74,8 +79,34 @@ namespace Steam_Authenticator.Forms
             }
         }
 
+        private async Task LoadCountry()
+        {
+            int selectIndex = 0;
+
+            List<Country> list = new List<Country>();
+            var countryResponse = await SteamKit.SteamApi.QueryCountryAsync();
+            var countries = countryResponse.Body?.Countries ?? new List<Country> { new Country { Name = "中国", CountryCode = "CN" } };
+            countries = countries.OrderBy(x => x.Name).ToList();
+            for (int index = 0; index < countries.Count; index++)
+            {
+                var country = countries[index];
+                if (country.CountryCode == CountryCode)
+                {
+                    selectIndex = index;
+                }
+
+                list.Add(new Country
+                {
+                    Name = $"{country.Name} ({country.CountryCode})",
+                    CountryCode = country.CountryCode
+                });
+            }
+            CountryBox.DataSource = list;
+            CountryBox.SelectedIndex = selectIndex;
+        }
+
         public string Phone { get; set; }
 
-        public string Country { get; set; }
+        public string CountryCode { get; set; } = "CN";
     }
 }
