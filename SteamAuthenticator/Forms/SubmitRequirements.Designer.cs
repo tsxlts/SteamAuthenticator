@@ -117,9 +117,9 @@
             // contactInfoBox
             // 
             contactInfoBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            contactInfoBox.Location = new Point(86, 183);
+            contactInfoBox.Location = new Point(85, 183);
             contactInfoBox.Name = "contactInfoBox";
-            contactInfoBox.Size = new Size(267, 23);
+            contactInfoBox.Size = new Size(268, 23);
             contactInfoBox.TabIndex = 8;
             // 
             // label5
@@ -137,7 +137,7 @@
             submit.Dock = DockStyle.Fill;
             submit.Location = new Point(0, 0);
             submit.Name = "submit";
-            submit.Size = new Size(382, 36);
+            submit.Size = new Size(268, 36);
             submit.TabIndex = 9;
             submit.Text = "提交";
             submit.UseVisualStyleBackColor = true;
@@ -147,9 +147,9 @@
             // 
             panel2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel2.Controls.Add(submit);
-            panel2.Location = new Point(1, 224);
+            panel2.Location = new Point(85, 224);
             panel2.Name = "panel2";
-            panel2.Size = new Size(382, 36);
+            panel2.Size = new Size(268, 36);
             panel2.TabIndex = 10;
             // 
             // SubmitRequirements
@@ -170,7 +170,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(400, 300);
             Name = "SubmitRequirements";
-            Text = "提交需求";
+            Text = "联系我们";
             Load += SubmitRequirements_Load;
             panel1.ResumeLayout(false);
             panel2.ResumeLayout(false);

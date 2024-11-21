@@ -2,6 +2,7 @@
 using SteamKit;
 using System.Diagnostics;
 using System.Net.Http.Json;
+using static Steam_Authenticator.Factory.HttpClientFactory;
 
 namespace Steam_Authenticator.Forms
 {
@@ -54,12 +55,13 @@ namespace Steam_Authenticator.Forms
                     Subject = subject,
                     Body = body,
                     ContactInfo = contactInfo,
-                }));
+                }), proxy: NoProxy.Instance);
                 var responseBody = response.Body;
                 if (responseBody == null)
                 {
                     MessageBox.Show($"提交失败，请前往SteamAuthenticator项目主页提交需求", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Process.Start("explorer.exe", $"https://github.com/tsxlts/SteamAuthenticator/issues");
+                    Process.Start(new ProcessStartInfo($"https://github.com/tsxlts/SteamAuthenticator/issues") { UseShellExecute = true });
+                    DialogResult = DialogResult.OK;
                     return;
                 }
 
@@ -77,7 +79,8 @@ namespace Steam_Authenticator.Forms
             catch (HttpRequestException)
             {
                 MessageBox.Show($"提交失败，请前往SteamAuthenticator项目主页提交需求", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Process.Start("explorer.exe", $"https://github.com/tsxlts/SteamAuthenticator/issues");
+                Process.Start(new ProcessStartInfo($"https://github.com/tsxlts/SteamAuthenticator/issues") { UseShellExecute = true });
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {

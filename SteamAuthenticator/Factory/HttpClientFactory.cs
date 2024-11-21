@@ -26,7 +26,7 @@ namespace Steam_Authenticator.Factory
             if (proxy != null)
             {
                 httpClientHandler.Proxy = proxy;
-                httpClientHandler.UseProxy = true;
+                httpClientHandler.UseProxy = !(proxy is NoProxy);
             }
             else
             {
@@ -48,6 +48,27 @@ namespace Steam_Authenticator.Factory
         public void Complete(HttpClient client)
         {
             client.Dispose();
+        }
+
+        public class NoProxy : IWebProxy
+        {
+            public static NoProxy Instance = new NoProxy();
+
+            private NoProxy()
+            {
+            }
+
+            public ICredentials Credentials { get; set; }
+
+            public Uri GetProxy(Uri destination)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool IsBypassed(Uri host)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
