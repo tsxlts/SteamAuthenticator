@@ -126,6 +126,11 @@ namespace Steam_Authenticator
             }
         }
 
+        private void submitRequirementsLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            SubmitRequirements();
+        }
+
         private void quitMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -845,6 +850,11 @@ namespace Steam_Authenticator
             }
         }
 
+        private void submitRequirementsMenuItem_Click(object sender, EventArgs e)
+        {
+            SubmitRequirements();
+        }
+
         private void confirmationBtn_Click(object sender, EventArgs e)
         {
             var webClient = currentClient?.Client;
@@ -955,6 +965,12 @@ namespace Steam_Authenticator
             {
                 declineOfferBtn.Enabled = true;
             }
+        }
+
+        private void SubmitRequirements()
+        {
+            var submitRequirements = new SubmitRequirements(this);
+            submitRequirements.ShowDialog();
         }
     }
 }

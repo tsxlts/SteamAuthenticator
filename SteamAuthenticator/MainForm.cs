@@ -60,7 +60,6 @@ namespace Steam_Authenticator
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
-            new PhoneInput("添加手机号", $"请输入手机号").Show();
             await LoadUsers();
             await LoadBuffUsers();
 

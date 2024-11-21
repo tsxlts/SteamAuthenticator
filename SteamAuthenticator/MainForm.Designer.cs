@@ -36,7 +36,7 @@
             passwordMenuItem = new ToolStripMenuItem();
             checkVersionMenuItem = new ToolStripMenuItem();
             quitMenuItem = new ToolStripMenuItem();
-            authenticatorMenu = new ToolStripMenuItem();
+            authenticatorMenuItem = new ToolStripMenuItem();
             guardMenuItem = new ToolStripMenuItem();
             addAuthenticatorMenuItem = new ToolStripMenuItem();
             moveAuthenticatorMenuItem = new ToolStripMenuItem();
@@ -44,6 +44,7 @@
             importFileAuthenticatorMenuItem = new ToolStripMenuItem();
             importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
+            submitRequirementsMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
             UserName = new Label();
             Balance = new Label();
@@ -72,6 +73,7 @@
             pictureBox2 = new PictureBox();
             statusPanel = new Panel();
             SteamId = new Label();
+            submitRequirementsLabel = new LinkLabel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -87,7 +89,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenu });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, submitRequirementsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(690, 25);
@@ -136,12 +138,12 @@
             quitMenuItem.Text = "退出";
             quitMenuItem.Click += quitMenuItem_Click;
             // 
-            // authenticatorMenu
+            // authenticatorMenuItem
             // 
-            authenticatorMenu.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
-            authenticatorMenu.Name = "authenticatorMenu";
-            authenticatorMenu.Size = new Size(80, 21);
-            authenticatorMenu.Text = "令牌验证器";
+            authenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
+            authenticatorMenuItem.Name = "authenticatorMenuItem";
+            authenticatorMenuItem.Size = new Size(80, 21);
+            authenticatorMenuItem.Text = "令牌验证器";
             // 
             // guardMenuItem
             // 
@@ -191,6 +193,13 @@
             removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
+            // 
+            // submitRequirementsMenuItem
+            // 
+            submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
+            submitRequirementsMenuItem.Size = new Size(140, 21);
+            submitRequirementsMenuItem.Text = "联系我们（提交需求）";
+            submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // UserImg
             // 
@@ -390,13 +399,13 @@
             // versionLabel
             // 
             versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            versionLabel.Location = new Point(578, 464);
+            versionLabel.Location = new Point(618, 457);
             versionLabel.Name = "versionLabel";
-            versionLabel.Size = new Size(100, 23);
+            versionLabel.Size = new Size(60, 23);
             versionLabel.TabIndex = 12;
             versionLabel.TabStop = true;
             versionLabel.Text = "v1.0.0";
-            versionLabel.TextAlign = ContentAlignment.TopRight;
+            versionLabel.TextAlign = ContentAlignment.MiddleRight;
             versionLabel.LinkClicked += versionLabel_LinkClicked;
             // 
             // label6
@@ -497,7 +506,7 @@
             statusPanel.Controls.Add(label5);
             statusPanel.Location = new Point(12, 453);
             statusPanel.Name = "statusPanel";
-            statusPanel.Size = new Size(608, 30);
+            statusPanel.Size = new Size(496, 30);
             statusPanel.TabIndex = 17;
             // 
             // SteamId
@@ -513,11 +522,25 @@
             SteamId.TextAlign = ContentAlignment.MiddleLeft;
             SteamId.Click += SteamId_Click;
             // 
+            // submitRequirementsLabel
+            // 
+            submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            submitRequirementsLabel.LinkColor = Color.FromArgb(192, 0, 192);
+            submitRequirementsLabel.Location = new Point(552, 457);
+            submitRequirementsLabel.Name = "submitRequirementsLabel";
+            submitRequirementsLabel.Size = new Size(60, 23);
+            submitRequirementsLabel.TabIndex = 19;
+            submitRequirementsLabel.TabStop = true;
+            submitRequirementsLabel.Text = "联系我们";
+            submitRequirementsLabel.TextAlign = ContentAlignment.MiddleCenter;
+            submitRequirementsLabel.LinkClicked += submitRequirementsLabel_LinkClicked;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(690, 487);
+            Controls.Add(submitRequirementsLabel);
             Controls.Add(SteamId);
             Controls.Add(statusPanel);
             Controls.Add(tabControl);
@@ -566,7 +589,7 @@
         private Label OfferCountLabel;
         private Label label2;
         private Label label1;
-        private ToolStripMenuItem authenticatorMenu;
+        private ToolStripMenuItem authenticatorMenuItem;
         private ToolStripMenuItem guardMenuItem;
         private ToolStripMenuItem addAuthenticatorMenuItem;
         private ToolStripMenuItem removeAuthenticatorMenuItem;
@@ -599,5 +622,7 @@
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private Label SteamId;
+        private LinkLabel submitRequirementsLabel;
+        private ToolStripMenuItem submitRequirementsMenuItem;
     }
 }
