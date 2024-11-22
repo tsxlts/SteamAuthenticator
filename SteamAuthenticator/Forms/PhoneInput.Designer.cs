@@ -33,10 +33,10 @@
             TipsLabel = new Label();
             acceptBtn = new Button();
             cancelBtn = new Button();
-            CountryBox = new TextBox();
             label1 = new Label();
             label2 = new Label();
             panel1 = new Panel();
+            CountryBox = new ComboBox();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -79,15 +79,6 @@
             cancelBtn.UseVisualStyleBackColor = true;
             cancelBtn.Click += cancelBtn_Click;
             // 
-            // CountryBox
-            // 
-            CountryBox.Location = new Point(74, 108);
-            CountryBox.Name = "CountryBox";
-            CountryBox.Size = new Size(105, 23);
-            CountryBox.TabIndex = 4;
-            CountryBox.Text = "CN";
-            CountryBox.KeyPress += CountryBox_KeyPress;
-            // 
             // label1
             // 
             label1.AutoSize = true;
@@ -114,16 +105,29 @@
             panel1.Size = new Size(167, 83);
             panel1.TabIndex = 7;
             // 
+            // CountryBox
+            // 
+            CountryBox.BackColor = SystemColors.Window;
+            CountryBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            CountryBox.FormattingEnabled = true;
+            CountryBox.IntegralHeight = false;
+            CountryBox.Location = new Point(74, 108);
+            CountryBox.MaxDropDownItems = 5;
+            CountryBox.MaxLength = 5;
+            CountryBox.Name = "CountryBox";
+            CountryBox.Size = new Size(105, 25);
+            CountryBox.TabIndex = 2;
+            // 
             // PhoneInput
             // 
             AcceptButton = acceptBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(191, 197);
+            Controls.Add(CountryBox);
             Controls.Add(panel1);
             Controls.Add(label2);
             Controls.Add(label1);
-            Controls.Add(CountryBox);
             Controls.Add(cancelBtn);
             Controls.Add(acceptBtn);
             Controls.Add(PhoneBox);
@@ -146,9 +150,9 @@
         private Label TipsLabel;
         private Button acceptBtn;
         private Button cancelBtn;
-        private TextBox CountryBox;
         private Label label1;
         private Label label2;
         private Panel panel1;
+        private ComboBox CountryBox;
     }
 }

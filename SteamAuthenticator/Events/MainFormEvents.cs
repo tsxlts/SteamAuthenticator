@@ -30,7 +30,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Process.Start("explorer.exe", $"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}");
+            Process.Start(new ProcessStartInfo($"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}") { UseShellExecute = true });
         }
 
         private void globalSettingMenuItem_Click(object sender, EventArgs e)
@@ -126,6 +126,11 @@ namespace Steam_Authenticator
             }
         }
 
+        private void submitRequirementsLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            SubmitRequirements();
+        }
+
         private void quitMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -186,7 +191,7 @@ namespace Steam_Authenticator
                             }
 
                             string phone = input.Phone;
-                            string country = input.Country;
+                            string country = input.CountryCode;
                             var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {
@@ -386,7 +391,7 @@ namespace Steam_Authenticator
                             }
 
                             string phone = phoneInput.Phone;
-                            string country = phoneInput.Country;
+                            string country = phoneInput.CountryCode;
                             var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {
@@ -845,6 +850,11 @@ namespace Steam_Authenticator
             }
         }
 
+        private void submitRequirementsMenuItem_Click(object sender, EventArgs e)
+        {
+            SubmitRequirements();
+        }
+
         private void confirmationBtn_Click(object sender, EventArgs e)
         {
             var webClient = currentClient?.Client;
@@ -955,6 +965,12 @@ namespace Steam_Authenticator
             {
                 declineOfferBtn.Enabled = true;
             }
+        }
+
+        private void SubmitRequirements()
+        {
+            var submitRequirements = new SubmitRequirements(this);
+            submitRequirements.ShowDialog();
         }
     }
 }

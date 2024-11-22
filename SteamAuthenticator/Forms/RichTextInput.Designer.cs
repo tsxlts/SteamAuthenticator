@@ -34,11 +34,13 @@
             acceptBtn = new Button();
             InputBox = new RichTextBox();
             splitContainer1 = new SplitContainer();
+            panel2 = new Panel();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -84,10 +86,11 @@
             // 
             // InputBox
             // 
-            InputBox.BorderStyle = BorderStyle.FixedSingle;
-            InputBox.Location = new Point(10, 41);
+            InputBox.BorderStyle = BorderStyle.None;
+            InputBox.Dock = DockStyle.Fill;
+            InputBox.Location = new Point(0, 0);
             InputBox.Name = "InputBox";
-            InputBox.Size = new Size(342, 104);
+            InputBox.Size = new Size(340, 102);
             InputBox.TabIndex = 9;
             InputBox.Text = "";
             // 
@@ -108,14 +111,23 @@
             splitContainer1.SplitterDistance = 171;
             splitContainer1.TabIndex = 10;
             // 
+            // panel2
+            // 
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Controls.Add(InputBox);
+            panel2.Location = new Point(10, 41);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(342, 104);
+            panel2.TabIndex = 11;
+            // 
             // RichTextInput
             // 
             AcceptButton = acceptBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(362, 197);
+            Controls.Add(panel2);
             Controls.Add(splitContainer1);
-            Controls.Add(InputBox);
             Controls.Add(panel1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
@@ -129,6 +141,7 @@
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -140,5 +153,6 @@
         private Button acceptBtn;
         private RichTextBox InputBox;
         private SplitContainer splitContainer1;
+        private Panel panel2;
     }
 }

@@ -630,7 +630,7 @@ namespace Steam_Authenticator
                             $"是否立即更新？", "版本更新", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                         if (updateDialog == DialogResult.Yes)
                         {
-                            Process.Start("explorer.exe", updateUrl);
+                            Process.Start(new ProcessStartInfo(updateUrl) { UseShellExecute = true });
                         }
                     }
                     return true;

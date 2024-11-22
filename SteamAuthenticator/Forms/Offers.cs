@@ -209,7 +209,7 @@ namespace Steam_Authenticator.Forms
             }
             catch (Exception ex)
             {
-                Process.Start("explorer.exe", offerUrl.ToString());
+                Process.Start(new ProcessStartInfo(offerUrl.ToString()) { UseShellExecute = true });
 
                 MessageBox.Show(ex.Message);
             }
