@@ -13,15 +13,17 @@ namespace Steam_Authenticator.Forms
     public partial class Offers : Form
     {
         private readonly Form mainForm;
+        private readonly UserClient client;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
         private IEnumerable<Offer> thisOffers = new List<Offer>();
 
-        public Offers(Form mainForm, SteamCommunityClient webClient)
+        public Offers(Form mainForm, UserClient client)
         {
             InitializeComponent();
             this.mainForm = mainForm;
-            this.webClient = webClient;
+            this.client = client;
+            this.webClient = client.Client;
 
             Width = this.mainForm.Width;
             Height = this.mainForm.Height;
@@ -37,7 +39,7 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            Text = $"交易报价 [{webClient.Account}]";
+            Text = $"交易报价 [{client.GetAccount()}]";
 
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 

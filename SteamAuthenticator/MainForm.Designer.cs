@@ -7,19 +7,6 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -28,6 +15,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
             UserToolStripMenuItem = new ToolStripMenuItem();
@@ -74,6 +62,7 @@
             statusPanel = new Panel();
             SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
+            mainNotifyIcon = new NotifyIcon(components);
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -535,6 +524,13 @@
             submitRequirementsLabel.TextAlign = ContentAlignment.MiddleCenter;
             submitRequirementsLabel.LinkClicked += submitRequirementsLabel_LinkClicked;
             // 
+            // mainNotifyIcon
+            // 
+            mainNotifyIcon.Icon = (Icon)resources.GetObject("mainNotifyIcon.Icon");
+            mainNotifyIcon.Text = "SteamAuthenticator";
+            mainNotifyIcon.Visible = true;
+            mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -624,5 +620,6 @@
         private Label SteamId;
         private LinkLabel submitRequirementsLabel;
         private ToolStripMenuItem submitRequirementsMenuItem;
+        private NotifyIcon mainNotifyIcon;
     }
 }

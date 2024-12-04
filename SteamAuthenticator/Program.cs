@@ -1,8 +1,8 @@
 using Steam_Authenticator.Factory;
 using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
 using System.Diagnostics;
 using System.Net;
-using System.Runtime.InteropServices;
 using static SteamKit.HttpBulider;
 using static SteamKit.SteamBulider;
 
@@ -29,8 +29,7 @@ namespace Steam_Authenticator
                         return;
                     }
 
-                    ShowWindowAsync(processs.MainWindowHandle, 1);
-                    SetForegroundWindow(processs.MainWindowHandle);
+                    WindowsApi.SendMessage(processs.MainWindowHandle, WindowsApi.WM_SHOWWINDOW, new IntPtr(1), new IntPtr(99));
 
                     Application.Exit();
                     return;
@@ -209,13 +208,5 @@ namespace Steam_Authenticator
                 return null;
             }
         }
-
-
-        [DllImport("User32.dll")]
-        public static extern bool ShowWindowAsync(IntPtr hWnd, int cmdShow);
-
-        [DllImport("user32.dll")]
-        public static extern void SetForegroundWindow(IntPtr hwnd);
-
     }
 }

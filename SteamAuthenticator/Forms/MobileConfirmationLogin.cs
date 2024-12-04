@@ -7,25 +7,27 @@ namespace Steam_Authenticator.Forms
 {
     public partial class MobileConfirmationLogin : Form
     {
+        private readonly UserClient client;
         private readonly SteamCommunityClient webClient;
         private readonly ulong clientId;
         private readonly int version;
 
-        public MobileConfirmationLogin(SteamCommunityClient webClient, ulong clientId, int varsion)
+        public MobileConfirmationLogin(UserClient client, ulong clientId, int varsion)
         {
             InitializeComponent();
 
-            this.webClient = webClient;
+            this.client = client;
+            this.webClient = client.Client;
             this.clientId = clientId;
             this.version = varsion;
         }
 
         private async void acceptBtn_Click(object sender, EventArgs e)
         {
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
             if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
             {
-                MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"用户[{client.GetAccount()}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -43,10 +45,10 @@ namespace Steam_Authenticator.Forms
 
         private async void declineBtn_Click(object sender, EventArgs e)
         {
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
             if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
             {
-                MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"用户[{client.GetAccount()}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

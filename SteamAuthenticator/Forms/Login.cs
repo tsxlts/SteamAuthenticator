@@ -97,7 +97,7 @@ namespace Steam_Authenticator.Forms
                                 code = input.InputValue;
                             }
 
-                            await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.DeviceCode, code, default);
+                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.DeviceCode, code, default);
                             continue;
                         }
 
@@ -110,7 +110,7 @@ namespace Steam_Authenticator.Forms
                             }
 
                             string code = input.InputValue;
-                            await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.EmailCode, code, default);
+                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.EmailCode, code, default);
                             continue;
                         }
                     }

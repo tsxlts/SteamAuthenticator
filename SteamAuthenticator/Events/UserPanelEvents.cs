@@ -155,7 +155,7 @@ namespace Steam_Authenticator
             UserPanel panel = control.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
 
-            Offers offersForm = new Offers(this, userClient.Client);
+            Offers offersForm = new Offers(this, userClient);
             offersForm.ShowDialog();
         }
 
@@ -171,14 +171,14 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(userClient.GetAccount());
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
-                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{userClient.GetAccount()} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Confirmations confirmations = new Confirmations(this, webClient);
+            Confirmations confirmations = new Confirmations(this, userClient);
             confirmations.ShowDialog();
         }
 

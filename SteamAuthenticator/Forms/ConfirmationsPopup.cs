@@ -9,14 +9,16 @@ namespace Steam_Authenticator.Forms
 {
     public partial class ConfirmationsPopup : Form
     {
+        private readonly UserClient client;
         private readonly SteamCommunityClient webClient;
         private readonly List<SteamKit.Model.Confirmation> confirmations;
 
-        public ConfirmationsPopup(SteamCommunityClient webClient, IEnumerable<SteamKit.Model.Confirmation> confirmations)
+        public ConfirmationsPopup(UserClient client, IEnumerable<SteamKit.Model.Confirmation> confirmations)
         {
             InitializeComponent();
 
-            this.webClient = webClient;
+            this.client = client;
+            this.webClient = client.Client;
             this.confirmations = confirmations.ToList();
         }
 
@@ -45,7 +47,7 @@ namespace Steam_Authenticator.Forms
             }
             stringBuilder.AppendLine("待确认");
 
-            userLabel.Text = webClient.Account;
+            userLabel.Text = client.GetAccount();
             tipsLabel.Text = stringBuilder.ToString();
         }
 
@@ -56,10 +58,10 @@ namespace Steam_Authenticator.Forms
             {
                 button.Enabled = false;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -103,7 +105,7 @@ namespace Steam_Authenticator.Forms
 
         private void detailBtn_Click(object sender, EventArgs e)
         {
-            Confirmations confirmation = new Confirmations(this, webClient)
+            Confirmations confirmation = new Confirmations(this, client)
             {
                 Width = 600,
                 Height = 400

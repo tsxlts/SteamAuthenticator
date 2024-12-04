@@ -12,15 +12,6 @@ namespace Steam_Authenticator
 {
     public partial class MainForm
     {
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            refreshUserTimer.Dispose();
-            refreshClientInfoTimer.Dispose();
-            foreach (var client in Appsetting.Instance.Clients)
-            {
-                client.Client.Dispose();
-            }
-        }
 
         private void SteamId_Click(object sender, EventArgs e)
         {
@@ -138,7 +129,7 @@ namespace Steam_Authenticator
 
         private void guardMenuItem_Click(object sender, EventArgs e)
         {
-            StreamGuard streamGuard = new StreamGuard(currentClient?.Client?.Account);
+            StreamGuard streamGuard = new StreamGuard(currentClient?.GetAccount());
             streamGuard.Show();
         }
 
@@ -155,9 +146,15 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.Device)
             {
-                MessageBox.Show($"{webClient.Account} 已绑定令牌" +
+                MessageBox.Show($"{currentClient.GetAccount()} 已绑定令牌" +
                     $"{Environment.NewLine}" +
                     $"如果你已在其他地方绑定令牌，你可以选择移动令牌验证器到当前设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(currentClient.GetAccount()))
+            {
+                MessageBox.Show("获取你的登陆账户名失败");
                 return;
             }
 
@@ -327,16 +324,22 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
             {
-                MessageBox.Show($"{webClient.Account} 未绑定令牌" +
+                MessageBox.Show($"{currentClient.GetAccount()} 未绑定令牌" +
                     $"{Environment.NewLine}" +
                     $"你可以直接添加令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.Client.Account);
+            if (string.IsNullOrWhiteSpace(currentClient.GetAccount()))
+            {
+                MessageBox.Show("获取你的登陆账户名失败");
+                return;
+            }
+
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
             if (authenticatorStatusResponse.TokenGID == guard?.TokenGID)
             {
-                MessageBox.Show($"{webClient.Account} 令牌验证器已绑定至此设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"{currentClient.GetAccount()} 令牌验证器已绑定至此设备", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -566,7 +569,7 @@ namespace Steam_Authenticator
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.None)
             {
-                MessageBox.Show($"{webClient.Account} 未设置令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"{currentClient.GetAccount()} 未设置令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -574,7 +577,7 @@ namespace Steam_Authenticator
             string code = null;
             string msg = null;
 
-            DialogResult res = MessageBox.Show($"{webClient.Account}\n" +
+            DialogResult res = MessageBox.Show($"{currentClient.GetAccount()}\n" +
                 $"你想要完全移除Steam令牌码？\n" +
                 $"是 - 完全移除Steam令牌\n" +
                 $"否 - 切换到邮箱令牌",
@@ -601,7 +604,7 @@ namespace Steam_Authenticator
 
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.Device)
             {
-                var guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                var guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
                 code = guard?.RevocationCode;
                 if (string.IsNullOrWhiteSpace(code))
                 {
@@ -615,7 +618,7 @@ namespace Steam_Authenticator
                 }
             }
 
-            if (MessageBox.Show($"{webClient.Account}\n" +
+            if (MessageBox.Show($"{currentClient.GetAccount()}\n" +
                 $"你确认要{(guardScheme == SteamGuardScheme.None ?
                 "移除全部令牌吗？" :
                 "切换到邮箱令牌吗？")}",
@@ -667,7 +670,7 @@ namespace Steam_Authenticator
                 authenticatorStatusResponse = authenticatorStatus.Body;
                 if (authenticatorStatusResponse != null && authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
                 {
-                    Appsetting.Instance.Manifest.RemoveGuard(webClient.Account, out var guard);
+                    Appsetting.Instance.Manifest.RemoveGuard(currentClient.GetAccount(), out var guard);
                 }
             }
         }
@@ -772,10 +775,16 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                var guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                if (string.IsNullOrWhiteSpace(currentClient.GetAccount()))
+                {
+                    MessageBox.Show("获取你的登陆账户名失败");
+                    return;
+                }
+
+                var guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
                 if (guard != null)
                 {
-                    MessageBox.Show($"帐号 {webClient.Account} 已在当前设备绑定令牌" +
+                    MessageBox.Show($"帐号 {currentClient.GetAccount()} 已在当前设备绑定令牌" +
                         $"{Environment.NewLine}" +
                         $"如果当前设备的令牌信息已失效，请先前往 [令牌验证器 -> 令牌] 删除令牌",
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -786,14 +795,14 @@ namespace Steam_Authenticator
                 var authenticatorStatusResponse = authenticatorStatus.Body;
                 if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
                 {
-                    MessageBox.Show($"帐号 {webClient.Account} 未绑定手机令牌" +
+                    MessageBox.Show($"帐号 {currentClient.GetAccount()} 未绑定手机令牌" +
                         $"{Environment.NewLine}" +
-                        $"你可以选择添加令牌为帐号 {webClient.Account} 添加令牌",
+                        $"你可以选择添加令牌为帐号 {currentClient.GetAccount()} 添加令牌",
                         "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                ImportAuthenticator importAuthenticator = new ImportAuthenticator(webClient);
+                ImportAuthenticator importAuthenticator = new ImportAuthenticator(currentClient);
                 if (importAuthenticator.ShowDialog() != DialogResult.OK)
                 {
                     return;
@@ -801,7 +810,7 @@ namespace Steam_Authenticator
 
                 guard = new Guard
                 {
-                    AccountName = webClient.Account,
+                    AccountName = currentClient.GetAccount(),
                     DeviceId = authenticatorStatusResponse.DeviceId,
                     TokenGID = authenticatorStatusResponse.TokenGID,
                     GuardScheme = authenticatorStatusResponse.GuardScheme,
@@ -836,7 +845,7 @@ namespace Steam_Authenticator
                     }
                 }
 
-                Appsetting.Instance.Manifest.AddGuard(webClient.Account, guard);
+                Appsetting.Instance.Manifest.AddGuard(currentClient.GetAccount(), guard);
 
                 MessageBox.Show($"令牌导入成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -864,14 +873,14 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+            Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
             if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
             {
-                MessageBox.Show($"{webClient.Account} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{currentClient.GetAccount()} 未提供令牌信息，无法获取待确认数据", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Confirmations confirmation = new Confirmations(this, webClient);
+            Confirmations confirmation = new Confirmations(this, currentClient);
             confirmation.Show();
         }
 
@@ -886,7 +895,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                Offers offersForm = new Offers(this, webClient);
+                Offers offersForm = new Offers(this, currentClient);
                 offersForm.Show();
             }
             catch (Exception ex)

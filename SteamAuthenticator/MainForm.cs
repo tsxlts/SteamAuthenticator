@@ -1,7 +1,7 @@
-
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
@@ -22,6 +22,7 @@ namespace Steam_Authenticator
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
         private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(20);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
+        private readonly ContextMenuStrip mainNotifyMenuStrip;
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
 
@@ -43,6 +44,15 @@ namespace Steam_Authenticator
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
 
+            mainNotifyMenuStrip = new ContextMenuStrip();
+            mainNotifyMenuStrip.Items.Add("退出").Click += (sender, e) =>
+            {
+                this.mainNotifyIcon.Visible = false;
+                this.Close();
+                this.Dispose();
+                Environment.Exit(Environment.ExitCode);
+            };
+
             userContextMenuStrip = new ContextMenuStrip();
             userContextMenuStrip.Items.Add("切换").Click += setCurrentClientMenuItem_Click;
             userContextMenuStrip.Items.Add("设置").Click += settingMenuItem_Click;
@@ -60,6 +70,8 @@ namespace Steam_Authenticator
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
+            mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
+
             await LoadUsers();
             await LoadBuffUsers();
 
@@ -71,6 +83,38 @@ namespace Steam_Authenticator
             }
 
             await CheckVersion();
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                this.WindowState = FormWindowState.Minimized;
+                this.mainNotifyIcon.Visible = true;
+                this.Hide();
+                return;
+            }
+
+            Dispose();
+        }
+
+        private void mainNotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (this.Visible)
+            {
+                if (this.WindowState == FormWindowState.Minimized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
+
+                this.Activate();
+                return;
+            }
+
+            this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
         }
 
         private void RefreshMsg(object _)
@@ -135,7 +179,7 @@ namespace Steam_Authenticator
             {
                 var webClient = currentClient.Client;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
                 {
                     return;
@@ -161,7 +205,7 @@ namespace Steam_Authenticator
                     };
                     var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
 
-                    MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(webClient, (ulong)clients[0], sessionInfo.Version);
+                    MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
                     mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{webClient.SteamId} 有新的登录请求";
                     mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
                     mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
@@ -364,7 +408,7 @@ namespace Steam_Authenticator
                         var webClient = client.Client;
                         var user = client.User;
 
-                        Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                        Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                         if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                         {
                             return;
@@ -427,7 +471,7 @@ namespace Steam_Authenticator
 
                         if (waitConfirm.Any() && setting.ConfirmationAutoPopup)
                         {
-                            ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(webClient, waitConfirm);
+                            ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
                             confirmationPopup.ShowDialog();
                         }
                     }
@@ -646,6 +690,44 @@ namespace Steam_Authenticator
             }
 
             return false;
+        }
+
+        protected override void DefWndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case WindowsApi.WM_SHOWWINDOW:
+                    {
+                        if (m.LParam != new IntPtr(99))
+                        {
+                            base.DefWndProc(ref m);
+                            break;
+                        }
+                        this.Visible = true;
+                        this.WindowState = FormWindowState.Normal;
+                        this.Activate();
+                    }
+                    break;
+                default:
+                    base.DefWndProc(ref m);
+                    break;
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+
+            refreshUserTimer.Dispose();
+            refreshClientInfoTimer.Dispose();
+            foreach (var client in Appsetting.Instance.Clients)
+            {
+                client.Client.Dispose();
+            }
         }
     }
 }

@@ -101,6 +101,20 @@ namespace Steam_Authenticator
             return this;
         }
 
+        /// <summary>
+        /// 获取账号名
+        /// </summary>
+        /// <returns></returns>
+        public string GetAccount()
+        {
+            if (!string.IsNullOrWhiteSpace(Client?.Account))
+            {
+                return Client.Account;
+            }
+
+            return User?.Account;
+        }
+
         public async Task<bool> LoginAsync()
         {
             bool result = false;
