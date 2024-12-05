@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfirmationsPopup));
             acceptBtn = new Button();
             declineBtn = new Button();
             userLabel = new Label();
@@ -84,11 +85,11 @@
             panel1.Size = new Size(213, 111);
             panel1.TabIndex = 3;
             // 
-            // TipsLabel
+            // tipsLabel
             // 
             tipsLabel.Dock = DockStyle.Fill;
             tipsLabel.Location = new Point(0, 0);
-            tipsLabel.Name = "TipsLabel";
+            tipsLabel.Name = "tipsLabel";
             tipsLabel.Size = new Size(213, 111);
             tipsLabel.TabIndex = 2;
             tipsLabel.Text = "你有0个报价待确认";
@@ -138,6 +139,7 @@
             Controls.Add(declineBtn);
             Controls.Add(acceptBtn);
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ConfirmationsPopup";

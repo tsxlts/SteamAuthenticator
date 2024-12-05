@@ -527,7 +527,7 @@
             // mainNotifyIcon
             // 
             mainNotifyIcon.Icon = (Icon)resources.GetObject("mainNotifyIcon.Icon");
-            mainNotifyIcon.Text = "SteamAuthenticator";
+            mainNotifyIcon.Text = "Steam验证器";
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 

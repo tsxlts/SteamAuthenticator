@@ -1,7 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
-using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
@@ -26,6 +25,7 @@ namespace Steam_Authenticator
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
 
+        private bool showBalloonTip = true;
         private string initialDirectory = null;
         private UserClient currentClient = null;
 
@@ -45,6 +45,10 @@ namespace Steam_Authenticator
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
 
             mainNotifyMenuStrip = new ContextMenuStrip();
+            mainNotifyMenuStrip.Items.Add("打开").Click += (sender, e) =>
+            {
+                this.ShowForm();
+            };
             mainNotifyMenuStrip.Items.Add("退出").Click += (sender, e) =>
             {
                 this.mainNotifyIcon.Visible = false;
@@ -90,9 +94,14 @@ namespace Steam_Authenticator
             if (e.CloseReason == CloseReason.UserClosing)
             {
                 e.Cancel = true;
-                this.WindowState = FormWindowState.Minimized;
-                this.mainNotifyIcon.Visible = true;
                 this.Hide();
+
+                this.mainNotifyIcon.Visible = true;
+                if (showBalloonTip)
+                {
+                    showBalloonTip = false;
+                    this.mainNotifyIcon.ShowBalloonTip(3000, "提示", "应用程序以缩小到托盘，双击图标可打开窗口", ToolTipIcon.Info);
+                }
                 return;
             }
 
@@ -101,20 +110,7 @@ namespace Steam_Authenticator
 
         private void mainNotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (this.Visible)
-            {
-                if (this.WindowState == FormWindowState.Minimized)
-                {
-                    this.WindowState = FormWindowState.Normal;
-                }
-
-                this.Activate();
-                return;
-            }
-
-            this.Visible = true;
-            this.WindowState = FormWindowState.Normal;
-            this.Activate();
+            ShowForm();
         }
 
         private void RefreshMsg(object _)
@@ -692,26 +688,21 @@ namespace Steam_Authenticator
             return false;
         }
 
-        protected override void DefWndProc(ref Message m)
+        internal void ShowForm()
         {
-            switch (m.Msg)
+            if (this.Visible)
             {
-                case WindowsApi.WM_SHOWWINDOW:
-                    {
-                        if (m.LParam != new IntPtr(99))
-                        {
-                            base.DefWndProc(ref m);
-                            break;
-                        }
-                        this.Visible = true;
-                        this.WindowState = FormWindowState.Normal;
-                        this.Activate();
-                    }
-                    break;
-                default:
-                    base.DefWndProc(ref m);
-                    break;
+                if (this.WindowState == FormWindowState.Minimized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
+
+                this.Activate();
+                return;
             }
+
+            this.Show();
+            this.Activate();
         }
 
         protected override void Dispose(bool disposing)

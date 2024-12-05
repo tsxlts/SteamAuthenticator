@@ -29,7 +29,7 @@ namespace Steam_Authenticator
                         return;
                     }
 
-                    WindowsApi.SendMessage(processs.MainWindowHandle, WindowsApi.WM_SHOWWINDOW, new IntPtr(1), new IntPtr(99));
+                    WindowsApi.PostThreadMessage(processs.Threads[0].Id, WindowsApi.MsgStrat + 1, IntPtr.Zero, IntPtr.Zero);
 
                     Application.Exit();
                     return;
@@ -161,9 +161,12 @@ namespace Steam_Authenticator
                 }
 
             Run:
+                var main = new MainForm();
                 Application.ThreadException += Application_ThreadException;
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-                Application.Run(new MainForm());
+                Application.EnableVisualStyles();
+                Application.AddMessageFilter(new MsgFilter(main));
+                Application.Run(main);
                 instance.ReleaseMutex();
             }
         }

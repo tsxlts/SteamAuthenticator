@@ -6,12 +6,12 @@
     <Nullable>disable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>File\tl.ico</ApplicationIcon>
     <RootNamespace>Steam_Authenticator</RootNamespace>
     <AssemblyName>SteamAuthenticator</AssemblyName>
     <AssemblyVersion>1.1.1</AssemblyVersion>
     <FileVersion>1.1.1</FileVersion>
     <Version>1.1.1</Version>
+    <ApplicationIcon>File\steam32.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,9 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="File\steam32.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="File\add.png" />
     <Resource Include="File\loading.gif" />
-    <Resource Include="File\tl.ico" />
+    <Resource Include="File\steam.ico" />
   </ItemGroup>
 
   <ItemGroup>
