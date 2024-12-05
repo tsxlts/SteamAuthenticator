@@ -87,7 +87,7 @@ namespace Steam_Authenticator.Forms
             user.Setting.AutoAcceptGiveOffer_Buff = autoAcceptGiveOffer_Buff.Checked;
             user.Setting.AutoAcceptGiveOffer_Other = autoAcceptGiveOffer_Other.Checked;
 
-            Appsetting.Instance.Manifest.AddUser(user.SteamId, user);
+            Appsetting.Instance.Manifest.SaveSteamUser(user.SteamId, user);
 
             MessageBox.Show("已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 

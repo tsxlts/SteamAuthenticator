@@ -76,8 +76,7 @@ namespace Steam_Authenticator
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
 
-            await LoadUsers();
-            await LoadBuffUsers();
+            await Task.WhenAll(LoadUsers(), LoadBuffUsers());
 
             var user = Appsetting.Instance.Clients?.FirstOrDefault(c => c.User.SteamId == Appsetting.Instance.AppSetting.Entry.CurrentUser);
             user = user ?? Appsetting.Instance.Clients?.FirstOrDefault();
@@ -231,6 +230,7 @@ namespace Steam_Authenticator
 
                 List<Task> tasks = new List<Task>();
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
+                var buffClients = Appsetting.Instance.BuffClients;
                 foreach (var client in checkClients)
                 {
                     if (client == null)
@@ -242,7 +242,7 @@ namespace Steam_Authenticator
                     {
                         var webClient = client.Client;
                         var user = client.User;
-                        var buffClinet = client.BuffClient;
+                        var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
                         int offerCount = 0;
                         int buffOfferCount = 0;
                         try
@@ -352,9 +352,10 @@ namespace Steam_Authenticator
                             }
                         }
 
-                        if (client.BuffClient != null)
+                        var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == c.User.SteamId);
+                        if (buffClinet != null)
                         {
-                            BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(client.BuffClient.User.UserId, false).FirstOrDefault() as BuffUserPanel;
+                            BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
                             if (buffUserPanel != null)
                             {
                                 Label offerLabel = buffUserPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
@@ -585,7 +586,7 @@ namespace Steam_Authenticator
                             {
                                 user.NickName = player.SteamName;
                                 user.Avatar = player.AvatarFull;
-                                Appsetting.Instance.Manifest.AddUser(client.SteamId, user);
+                                Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
 
                                 PictureBox pictureBox = userPanel.Controls.Find("useravatar", false)?.FirstOrDefault() as PictureBox;
                                 pictureBox?.LoadAsync(user.Avatar);

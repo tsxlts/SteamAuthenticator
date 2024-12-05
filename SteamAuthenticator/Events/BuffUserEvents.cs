@@ -58,13 +58,9 @@ namespace Steam_Authenticator
             }
 
             var setting = buffSetting.Setting;
+            client.User.Setting = setting;
 
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == client.User.SteamId);
-            foreach (var item in clients)
-            {
-                item.SaveSetting(setting);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
+            Appsetting.Instance.Manifest.SaveBuffUser(client.User.UserId, client.User);
         }
 
         private async void buffLoginMenuItem_Click(object sender, EventArgs e)
@@ -93,14 +89,7 @@ namespace Steam_Authenticator
             BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
             BuffClient client = panel.Client;
 
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == client.User.SteamId);
-
-            buffUsersPanel.Controls.Remove(panel);
-            foreach (var item in clients)
-            {
-                item.SetBuffClient(null);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
+            Appsetting.Instance.Manifest.RemoveBuffUser(client.User.UserId, out var entry);
 
             ResetBuffUserPanel();
         }
@@ -113,11 +102,16 @@ namespace Steam_Authenticator
 
                 int startX = GetBuffUserControlStartPointX(out int cells);
 
-                var clients = Appsetting.Instance.Clients.Where(c => c.BuffClient != null);
+                Appsetting.Instance.BuffClients.RemoveAll(c => !c.LoggedIn);
+
+                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetBuffUser();
                 int index = 0;
-                foreach (var client in clients)
+                foreach (string account in accounts)
                 {
-                    BuffUserPanel panel = CreateUserPanel(startX, cells, index, client.BuffClient);
+                    BuffUser user = Appsetting.Instance.Manifest.GetBuffUser(account);
+                    BuffClient client = new BuffClient(user);
+
+                    BuffUserPanel panel = CreateUserPanel(startX, cells, index, client);
                     buffUsersPanel.Controls.Add(panel);
 
                     index++;
@@ -159,7 +153,7 @@ namespace Steam_Authenticator
                     buffUsersPanel.Controls.Add(panel);
                 }
 
-                var tasks = clients.Select(c => c.BuffClient.RefreshAsync(true));
+                var tasks = Appsetting.Instance.BuffClients.Select(c => c.RefreshAsync(true));
                 await Task.WhenAll(tasks);
             }
             catch
@@ -179,12 +173,6 @@ namespace Steam_Authenticator
             {
                 return null;
             }
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == buffAuth.Result.Body.data.steamid);
-            if (!clients.Any())
-            {
-                MessageBox.Show($"未在当前设备已登录的Steam帐号中找到你的BUFF帐号绑定的Steam账号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return null;
-            }
 
             var buffUser = new BuffUser
             {
@@ -199,11 +187,7 @@ namespace Steam_Authenticator
                 LoggedIn = true
             };
 
-            foreach (var item in clients)
-            {
-                item.SetBuffClient(buffClient);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
+            Appsetting.Instance.Manifest.SaveBuffUser(buffClient.User.UserId, buffClient.User);
 
             var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToList();
             var index = controlCollection.FindIndex(c => c.Client.User.UserId == buffUser.UserId);

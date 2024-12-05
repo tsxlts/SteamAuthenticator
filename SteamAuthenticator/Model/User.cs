@@ -15,8 +15,6 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public UserSetting Setting { get; set; } = new UserSetting();
-
-        public BuffUser BuffUser { get; set; }
     }
 
     public class UserSetting
@@ -68,7 +66,7 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptGiveOffer_Other { get; set; }
     }
 
-    public class BuffUser
+    public class BuffUser : JsonStreamSerializer<BuffUser>
     {
         public string BuffCookies { get; set; }
 

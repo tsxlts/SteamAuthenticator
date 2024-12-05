@@ -27,6 +27,9 @@ namespace Steam_Authenticator
         public List<UserClient> Clients { get; private set; } = new List<UserClient>();
 
         [JsonIgnore]
+        public List<BuffClient> BuffClients { get; private set; } = new List<BuffClient>();
+
+        [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
     }
 
@@ -49,7 +52,7 @@ namespace Steam_Authenticator
 
     public class UserClient
     {
-        public static UserClient None = new UserClient(new User(), new SteamCommunityClient(), null);
+        public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
@@ -57,37 +60,15 @@ namespace Steam_Authenticator
         private Action startLogin = null;
         private Action<bool> endLogin = null;
 
-        public UserClient(User user, SteamCommunityClient client, BuffClient buffClient)
+        public UserClient(User user, SteamCommunityClient client)
         {
             User = user;
             Client = client;
-            BuffClient = buffClient;
         }
 
         public SteamCommunityClient Client { get; set; }
 
         public User User { get; set; }
-
-        public BuffClient BuffClient { get; private set; }
-
-        public UserClient SetBuffClient(BuffClient buffClient)
-        {
-            BuffClient = buffClient;
-            if (User != null)
-            {
-                User.BuffUser = buffClient?.User;
-            }
-            return this;
-        }
-
-        public UserClient SaveSetting(BuffUserSetting setting)
-        {
-            if (User?.BuffUser != null)
-            {
-                User.BuffUser.Setting = setting;
-            }
-            return this;
-        }
 
         public UserClient WithStartLogin(Action action)
         {
@@ -192,12 +173,7 @@ namespace Steam_Authenticator
                 User.Avatar = buffUser.avatar;
                 User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
 
-                var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == User.SteamId);
-                foreach (var client in clients)
-                {
-                    client.SetBuffClient(this);
-                    Appsetting.Instance.Manifest.AddUser(client.User.SteamId, client.User);
-                }
+                Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
             }
             finally
             {

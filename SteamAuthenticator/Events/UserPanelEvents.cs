@@ -138,7 +138,7 @@ namespace Steam_Authenticator
             await userClient.Client.LogoutAsync();
             userClient.Client.Dispose();
 
-            Appsetting.Instance.Manifest.RemoveUser(userClient.User.SteamId, out var entry);
+            Appsetting.Instance.Manifest.RemoveSteamUser(userClient.User.SteamId, out var entry);
             Appsetting.Instance.Clients.Remove(userClient);
             usersPanel.Controls.Remove(panel);
             ResetUserPanel();
@@ -192,18 +192,13 @@ namespace Steam_Authenticator
 
                 Appsetting.Instance.Clients.RemoveAll(c => !c.Client.LoggedIn);
 
-                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetUsers();
+                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetSteamUsers();
                 int index = 0;
                 foreach (string account in accounts)
                 {
-                    User user = Appsetting.Instance.Manifest.GetUser(account);
-                    BuffClient buffClient = null;
-                    if (user.BuffUser != null)
-                    {
-                        buffClient = new BuffClient(user.BuffUser);
-                    }
+                    User user = Appsetting.Instance.Manifest.GetSteamUser(account);
 
-                    UserPanel panel = CreateUserPanel(startX, cells, index, new UserClient(user, new SteamCommunityClient(), buffClient));
+                    UserPanel panel = CreateUserPanel(startX, cells, index, new UserClient(user, new SteamCommunityClient()));
                     usersPanel.Controls.Add(panel);
 
                     index++;
@@ -325,12 +320,11 @@ namespace Steam_Authenticator
                     RefreshToken = client.RefreshToken,
                     NickName = player?.SteamName ?? client.SteamId,
                     Avatar = player?.AvatarFull ?? "",
-                    BuffUser = null
                 };
 
-                UserClient userClient = new UserClient(user, client, null);
+                UserClient userClient = new UserClient(user, client);
 
-                Appsetting.Instance.Manifest.AddUser(client.SteamId, user);
+                Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
 
                 Appsetting.Instance.Clients.RemoveAll(c => c.User.SteamId == user.SteamId);
                 Appsetting.Instance.Clients.Add(userClient);
