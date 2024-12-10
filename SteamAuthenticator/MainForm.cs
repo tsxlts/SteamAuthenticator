@@ -302,11 +302,7 @@ namespace Steam_Authenticator
                             UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
                             if (userPanel != null)
                             {
-                                Label offerLabel = userPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
-                                if (offerLabel != null)
-                                {
-                                    offerLabel.Text = $"{offerCount}";
-                                }
+                                userPanel.SetOffer(offerCount);
                             }
 
                             if (buffClinet != null)
@@ -314,11 +310,7 @@ namespace Steam_Authenticator
                                 BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
                                 if (buffUserPanel != null)
                                 {
-                                    Label offerLabel = buffUserPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
-                                    if (offerLabel != null)
-                                    {
-                                        offerLabel.Text = $"{buffOfferCount}";
-                                    }
+                                    buffUserPanel.SetOffer(buffOfferCount);
                                 }
                             }
                         }
@@ -345,11 +337,7 @@ namespace Steam_Authenticator
                         UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
                         if (userPanel != null)
                         {
-                            Label offerLabel = userPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
-                            if (offerLabel != null)
-                            {
-                                offerLabel.Text = $"---";
-                            }
+                            userPanel.SetOffer(null);
                         }
 
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == c.User.SteamId);
@@ -358,11 +346,7 @@ namespace Steam_Authenticator
                             BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
                             if (buffUserPanel != null)
                             {
-                                Label offerLabel = buffUserPanel.Controls.Find("offer", false).FirstOrDefault() as Label;
-                                if (offerLabel != null)
-                                {
-                                    offerLabel.Text = $"---";
-                                }
+                                buffUserPanel.SetOffer(null);
                             }
                         }
                     }
@@ -412,7 +396,7 @@ namespace Steam_Authenticator
                         }
 
                         var queryConfirmations = webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, cancellationToken).Result;
-                        if (!queryConfirmations.Success)
+                        if (!(queryConfirmations?.Success ?? false))
                         {
                             return;
                         }
@@ -426,11 +410,7 @@ namespace Steam_Authenticator
                         UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId, false).FirstOrDefault() as UserPanel;
                         if (userPanel != null)
                         {
-                            Label confirmationLabel = userPanel.Controls.Find("confirmation", false).FirstOrDefault() as Label;
-                            if (confirmationLabel != null)
-                            {
-                                confirmationLabel.Text = $"{confirmations.Count}";
-                            }
+                            userPanel.SetConfirmation(confirmations.Count);
                         }
 
                         List<Confirmation> autoConfirm = new List<Confirmation>();
@@ -501,11 +481,7 @@ namespace Steam_Authenticator
                     UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId, false).FirstOrDefault() as UserPanel;
                     if (userPanel != null)
                     {
-                        Label confirmationLabel = userPanel.Controls.Find("confirmation", false).FirstOrDefault() as Label;
-                        if (confirmationLabel != null)
-                        {
-                            confirmationLabel.Text = $"---";
-                        }
+                        userPanel.SetConfirmation(null);
                     }
                 }
             }));
@@ -551,9 +527,7 @@ namespace Steam_Authenticator
                     var controlCollection = usersPanel.Controls.Cast<UserPanel>().ToArray();
                     foreach (UserPanel userPanel in controlCollection)
                     {
-                        //var nameLabel = userPanel.Controls.Cast<Control>().FirstOrDefault(c => c.Name == "username") as Label;
-                        var nameLabel = userPanel.Controls.Find("username", false)?.FirstOrDefault() as Label;
-                        if (nameLabel == null)
+                        if (string.IsNullOrWhiteSpace(userPanel.UserName))
                         {
                             continue;
                         }
@@ -570,11 +544,11 @@ namespace Steam_Authenticator
                         bool reloadCurrent = false;
                         if (client.LoggedIn)
                         {
-                            nameLabel.ForeColor = Color.Green;
+                            userPanel.SetUserName(userPanel.UserName, Color.Green);
                         }
                         else
                         {
-                            nameLabel.ForeColor = Color.Red;
+                            userPanel.SetUserName(userPanel.UserName, Color.Red);
 
                             reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
                         }
@@ -588,8 +562,7 @@ namespace Steam_Authenticator
                                 user.Avatar = player.AvatarFull;
                                 Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
 
-                                PictureBox pictureBox = userPanel.Controls.Find("useravatar", false)?.FirstOrDefault() as PictureBox;
-                                pictureBox?.LoadAsync(user.Avatar);
+                                userPanel.SetUserAvatar(user.Avatar);
 
                                 reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
                             }

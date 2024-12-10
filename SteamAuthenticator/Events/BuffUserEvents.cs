@@ -90,6 +90,8 @@ namespace Steam_Authenticator
             BuffClient client = panel.Client;
 
             Appsetting.Instance.Manifest.RemoveBuffUser(client.User.UserId, out var entry);
+            Appsetting.Instance.BuffClients.Remove(client);
+            buffUsersPanel.Controls.Remove(panel);
 
             ResetBuffUserPanel();
         }
@@ -118,7 +120,7 @@ namespace Steam_Authenticator
                 }
 
                 {
-                    BuffUserPanel panel = new BuffUserPanel()
+                    BuffUserPanel panel = new BuffUserPanel(false)
                     {
                         Size = new Size(80, 116),
                         Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
@@ -214,7 +216,7 @@ namespace Steam_Authenticator
 
         private BuffUserPanel CreateUserPanel(int startX, int cells, int index, BuffClient buffClient)
         {
-            BuffUserPanel panel = new BuffUserPanel()
+            BuffUserPanel panel = new BuffUserPanel(true)
             {
                 Name = buffClient.User.UserId,
                 Size = new Size(80, 116),
@@ -240,7 +242,7 @@ namespace Steam_Authenticator
             }
             pictureBox.MouseClick += btnBuffUser_Click;
             pictureBox.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.Controls.Add(pictureBox);
+            panel.SetUserAvatarBox(pictureBox);
 
             Label nameLabel = new Label()
             {
@@ -256,7 +258,7 @@ namespace Steam_Authenticator
             };
             nameLabel.MouseClick += btnBuffUser_Click;
             nameLabel.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.Controls.Add(nameLabel);
+            panel.SetUserNameBox(nameLabel);
 
             Label offerLabel = new Label()
             {
@@ -271,7 +273,7 @@ namespace Steam_Authenticator
                 Location = new Point(0, 98)
             };
             offerLabel.Click += buffOffersNumberBtn_Click;
-            panel.Controls.Add(offerLabel);
+            panel.SetOfferBox(offerLabel);
 
             panel.Client
                 .WithStartLogin((relogin) =>
@@ -336,9 +338,7 @@ namespace Steam_Authenticator
                     var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToArray();
                     foreach (BuffUserPanel userPanel in controlCollection)
                     {
-                        //var nameLabel = userPanel.Controls.Cast<Control>().FirstOrDefault(c => c.Name == "username") as Label;
-                        var nameLabel = userPanel.Controls.Find("username", false)?.FirstOrDefault() as Label;
-                        if (nameLabel == null)
+                        if (string.IsNullOrWhiteSpace(userPanel.UserName))
                         {
                             continue;
                         }

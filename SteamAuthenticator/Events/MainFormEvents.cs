@@ -124,7 +124,7 @@ namespace Steam_Authenticator
 
         private void quitMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            Environment.Exit(Environment.ExitCode);
         }
 
         private void guardMenuItem_Click(object sender, EventArgs e)

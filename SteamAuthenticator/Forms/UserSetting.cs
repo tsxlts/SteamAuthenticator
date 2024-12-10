@@ -24,6 +24,7 @@ namespace Steam_Authenticator.Forms
             autoAcceptGiveOffer.Checked = user.Setting.AutoAcceptGiveOffer;
             autoAcceptGiveOffer_Buff.Checked = user.Setting.AutoAcceptGiveOffer_Buff;
             autoAcceptGiveOffer_Other.Checked = user.Setting.AutoAcceptGiveOffer_Other;
+            autoAcceptGiveOffer_Custom.Checked = user.Setting.AutoAcceptGiveOffer_Custom;
 
             SetControlsEnabledState(periodicChecking.Checked);
 
@@ -77,6 +78,16 @@ namespace Steam_Authenticator.Forms
             autoAcceptGiveOffer.Checked = autoAcceptGiveOffer_Buff.Checked && autoAcceptGiveOffer_Other.Checked;
         }
 
+        private void autoAcceptGiveOffer_Custom_CheckedChanged(object sender, EventArgs e)
+        {
+            autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = !autoAcceptGiveOffer_Custom.Checked;
+        }
+
+        private void setAcceptGiveOfferRoleBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
         private void saveBtn_Click(object sender, EventArgs e)
         {
             user.Setting.PeriodicCheckingConfirmation = periodicChecking.Checked;
@@ -86,10 +97,9 @@ namespace Steam_Authenticator.Forms
             user.Setting.AutoAcceptGiveOffer = autoAcceptGiveOffer.Checked;
             user.Setting.AutoAcceptGiveOffer_Buff = autoAcceptGiveOffer_Buff.Checked;
             user.Setting.AutoAcceptGiveOffer_Other = autoAcceptGiveOffer_Other.Checked;
+            user.Setting.AutoAcceptGiveOffer_Custom = autoAcceptGiveOffer_Custom.Checked;
 
             Appsetting.Instance.Manifest.SaveSteamUser(user.SteamId, user);
-
-            MessageBox.Show("已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             DialogResult = DialogResult.OK;
         }

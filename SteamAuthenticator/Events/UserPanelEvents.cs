@@ -109,6 +109,7 @@ namespace Steam_Authenticator
 
             var userSetting = new Forms.UserSetting(userClient.User);
             userSetting.ShowDialog();
+            panel.RefreshIcon();
         }
 
         private async void loginMenuItem_Click(object sender, EventArgs e)
@@ -192,7 +193,7 @@ namespace Steam_Authenticator
 
                 Appsetting.Instance.Clients.RemoveAll(c => !c.Client.LoggedIn);
 
-                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetSteamUsers();
+                var accounts = Appsetting.Instance.Manifest.GetSteamUsers().ToList();
                 int index = 0;
                 foreach (string account in accounts)
                 {
@@ -207,10 +208,10 @@ namespace Steam_Authenticator
                 }
 
                 {
-                    UserPanel panel = new UserPanel()
+                    UserPanel panel = new UserPanel(false)
                     {
-                        Size = new Size(80, 116),
-                        Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
+                        Size = new Size(80, 136),
+                        Location = new Point(startX * (index % cells) + 10, 146 * (index / cells) + 10),
                         UserClient = UserClient.None
                     };
 
@@ -224,7 +225,16 @@ namespace Steam_Authenticator
                     };
                     pictureBox.Image = Properties.Resources.add;
                     pictureBox.Click += addUserBtn_Click;
-                    panel.Controls.Add(pictureBox);
+                    panel.SetUserAvatarBox(pictureBox);
+
+                    IconLabel iconLabel = new IconLabel()
+                    {
+                        Name = "icons",
+                        Size = new Size(80, 20),
+                        IconSize = new Size(16, 16),
+                        Location = new Point(0, 80),
+                    };
+                    panel.SetIconsBox(iconLabel);
 
                     Label nameLabel = new Label()
                     {
@@ -235,10 +245,10 @@ namespace Steam_Authenticator
                         Size = new Size(80, 18),
                         TextAlign = ContentAlignment.TopCenter,
                         ForeColor = Color.FromArgb(244, 164, 96),
-                        Location = new Point(0, 80)
+                        Location = new Point(0, iconLabel.Location.Y + iconLabel.Height)
                     };
                     nameLabel.Click += addUserBtn_Click;
-                    panel.Controls.Add(nameLabel);
+                    panel.SetUserNameBox(nameLabel);
                     usersPanel.Controls.Add(panel);
                 }
 
@@ -400,13 +410,63 @@ namespace Steam_Authenticator
         private UserPanel CreateUserPanel(int startX, int cells, int index, UserClient userClient)
         {
             userClient.Client.SetLanguage(Language.Schinese);
-            UserPanel panel = new UserPanel()
+            UserPanel panel = new UserPanel(true)
             {
                 Name = userClient.User.SteamId,
-                Size = new Size(80, 116),
-                Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
+                Size = new Size(80, 136),
+                Location = new Point(startX * (index % cells) + 10, 146 * (index / cells) + 10),
                 UserClient = userClient
             };
+            var auto_deliver = new CustomIcon(Properties.Resources.auto_deliver_32, new CustomIcon.Options
+            {
+                Convert = (icon) =>
+                {
+                    if (userClient.User.Setting.AutoAcceptGiveOffer)
+                    {
+                        return icon;
+                    }
+                    if (userClient.User.Setting.AutoAcceptGiveOffer_Buff)
+                    {
+                        return icon;
+                    }
+                    if (userClient.User.Setting.AutoAcceptGiveOffer_Other)
+                    {
+                        return icon;
+                    }
+                    if (userClient.User.Setting.AutoAcceptGiveOffer_Custom)
+                    {
+                        return icon;
+                    }
+                    return CustomIcon.ConvertToGrayscale(icon);
+                }
+            });
+            var auto_confirm = new CustomIcon(Properties.Resources.auto_confirm_32, new CustomIcon.Options
+            {
+                Convert = (icon) =>
+                {
+                    if (userClient.User.Setting.AutoConfirmTrade)
+                    {
+                        return icon;
+                    }
+                    if (userClient.User.Setting.AutoConfirmMarket)
+                    {
+                        return icon;
+                    }
+                    return CustomIcon.ConvertToGrayscale(icon);
+                }
+            });
+            var auto_accept = new CustomIcon(Properties.Resources.auto_accept_32, new CustomIcon.Options
+            {
+                Convert = (icon) =>
+                {
+                    if (userClient.User.Setting.AutoAcceptReceiveOffer)
+                    {
+                        return icon;
+                    }
+                    return CustomIcon.ConvertToGrayscale(icon);
+                }
+            });
+            var icons = new CustomIcon[] { auto_deliver, auto_confirm, auto_accept };
 
             PictureBox pictureBox = new PictureBox()
             {
@@ -426,7 +486,16 @@ namespace Steam_Authenticator
             }
             pictureBox.MouseClick += btnUser_Click;
             pictureBox.ContextMenuStrip = userContextMenuStrip;
-            panel.Controls.Add(pictureBox);
+            panel.SetUserAvatarBox(pictureBox);
+
+            IconLabel iconLabel = new IconLabel(icons)
+            {
+                Name = "icons",
+                Size = new Size(80, 20),
+                IconSize = new Size(16, 16),
+                Location = new Point(0, 80),
+            };
+            panel.SetIconsBox(iconLabel);
 
             Label nameLabel = new Label()
             {
@@ -438,11 +507,11 @@ namespace Steam_Authenticator
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
-                Location = new Point(0, 80)
+                Location = new Point(0, iconLabel.Location.Y + iconLabel.Height)
             };
             nameLabel.MouseClick += btnUser_Click;
             nameLabel.ContextMenuStrip = userContextMenuStrip;
-            panel.Controls.Add(nameLabel);
+            panel.SetUserNameBox(nameLabel);
 
             Label offerLabel = new Label()
             {
@@ -454,10 +523,10 @@ namespace Steam_Authenticator
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopRight,
                 ForeColor = Color.FromArgb(255, 128, 0),
-                Location = new Point(0, 98)
+                Location = new Point(0, nameLabel.Location.Y + nameLabel.Height)
             };
             offerLabel.Click += offersNumberBtn_Click;
-            panel.Controls.Add(offerLabel);
+            panel.SetOfferBox(offerLabel);
 
             Label confirmationLabel = new Label()
             {
@@ -469,10 +538,10 @@ namespace Steam_Authenticator
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopLeft,
                 ForeColor = Color.FromArgb(0, 128, 255),
-                Location = new Point(42, 98)
+                Location = new Point(42, nameLabel.Location.Y + nameLabel.Height)
             };
             confirmationLabel.Click += confirmationNumberBtn_Click;
-            panel.Controls.Add(confirmationLabel);
+            panel.SetConfirmationBox(confirmationLabel);
 
             panel.UserClient
                 .WithStartLogin(() => nameLabel.ForeColor = Color.FromArgb(128, 128, 128))
@@ -495,7 +564,7 @@ namespace Steam_Authenticator
                 int index = 0;
                 foreach (Control control in controlCollection)
                 {
-                    control.Location = new Point(x * (index % cells) + 10, 126 * (index / cells) + 10);
+                    control.Location = new Point(x * (index % cells) + 10, 146 * (index / cells) + 10);
                     index++;
                 }
 
