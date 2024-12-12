@@ -170,6 +170,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(400, 300);
             Name = "SubmitRequirements";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "联系我们";
             Load += SubmitRequirements_Load;
             panel1.ResumeLayout(false);

@@ -70,6 +70,11 @@ namespace Steam_Authenticator.Model
         /// 别人索取我的
         /// </summary>
         public bool AutoAcceptGiveOffer_Custom { get; set; }
+
+        /// <summary>
+        /// 自动接受索取报价 自定义 规则
+        /// </summary>
+        public AcceptOfferRuleSetting AutoAcceptGiveOfferRule { get; set; } = new AcceptOfferRuleSetting();
     }
 
     public class BuffUser : JsonStreamSerializer<BuffUser>

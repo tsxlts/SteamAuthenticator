@@ -2,7 +2,6 @@
 
 namespace Steam_Authenticator.Controls
 {
-
     internal class CustomIcon
     {
         private readonly Icon source;
@@ -31,6 +30,28 @@ namespace Steam_Authenticator.Controls
                    new float[] {.11f, .11f, .11f, 0, 0},
                    new float[] {0, 0, 0, 1, 0},
                    new float[] {0, 0, 0, 0, 1}
+               });
+            ImageAttributes img = new ImageAttributes();
+            img.SetColorMatrix(colorMatrix);
+            g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, img);
+            g.Dispose();
+
+            return Icon.FromHandle(newBmp.GetHicon());
+        }
+
+        public static Icon ConvertToPurple(Icon icon)
+        {
+            Bitmap original = icon.ToBitmap();
+            Bitmap newBmp = new Bitmap(original.Width, original.Height);
+            Graphics g = Graphics.FromImage(newBmp);
+            ColorMatrix colorMatrix = new ColorMatrix(
+               new float[][]
+               {
+                   new float[] { .88f, 0, .88f, 0, 0 },
+                   new float[] { .88f, 0, .88f, 0, 0 },
+                   new float[] { 0, 0, .88f, 0, 0 },
+                   new float[] { 0, 0, 0, .75f, 0 },
+                   new float[] { 0, 0, 0, 0, 1 }
                });
             ImageAttributes img = new ImageAttributes();
             img.SetColorMatrix(colorMatrix);

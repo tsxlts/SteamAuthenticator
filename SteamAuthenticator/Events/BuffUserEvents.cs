@@ -63,7 +63,7 @@ namespace Steam_Authenticator
             Appsetting.Instance.Manifest.SaveBuffUser(client.User.UserId, client.User);
         }
 
-        private async void buffLoginMenuItem_Click(object sender, EventArgs e)
+        private async void buffReloginMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
@@ -79,6 +79,19 @@ namespace Steam_Authenticator
             }
 
             BuffLogin($"登录信息已失效{Environment.NewLine}请重新扫码登录 BUFF 帐号");
+        }
+
+        private async void buffLogoutMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
+            BuffClient client = panel.Client;
+
+            await client.LogoutAsync();
+
+            ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10 * 60));
         }
 
         private void removeBuffUserMenuItem_Click(object sender, EventArgs e)
@@ -117,6 +130,8 @@ namespace Steam_Authenticator
                     buffUsersPanel.Controls.Add(panel);
 
                     index++;
+
+                    Appsetting.Instance.BuffClients.Add(panel.Client);
                 }
 
                 {
@@ -182,7 +197,8 @@ namespace Steam_Authenticator
                 SteamId = buffAuth.Result.Body.data.steamid,
                 Nickname = buffAuth.Result.Body.data.nickname,
                 Avatar = buffAuth.Result.Body.data.avatar,
-                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"))
+                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}")),
+                Setting = Appsetting.Instance.Manifest.GetBuffUser(buffAuth.Result.Body.data.id)?.Setting ?? new Model.BuffUserSetting()
             };
             var buffClient = new BuffClient(buffUser)
             {

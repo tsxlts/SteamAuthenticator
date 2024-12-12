@@ -112,7 +112,7 @@ namespace Steam_Authenticator
             panel.RefreshIcon();
         }
 
-        private async void loginMenuItem_Click(object sender, EventArgs e)
+        private async void reloginMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
@@ -125,10 +125,10 @@ namespace Steam_Authenticator
                 return;
             }
 
-            await Login(false, userClient.User.Account);
+            await Login(false, userClient.GetAccount());
         }
 
-        private async void removeUserMenuItem_Click(object sender, EventArgs e)
+        private async void logoutMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
@@ -136,7 +136,19 @@ namespace Steam_Authenticator
             UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
             UserClient userClient = panel.UserClient;
 
-            await userClient.Client.LogoutAsync();
+            await userClient.LogoutAsync();
+
+            ResetRefreshUserTimer(TimeSpan.FromMinutes(0), TimeSpan.FromMinutes(10));
+        }
+
+        private void removeUserMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
+            UserClient userClient = panel.UserClient;
+
             userClient.Client.Dispose();
 
             Appsetting.Instance.Manifest.RemoveSteamUser(userClient.User.SteamId, out var entry);
@@ -318,6 +330,8 @@ namespace Steam_Authenticator
         {
             if (client?.LoggedIn ?? false)
             {
+                var localUser = Appsetting.Instance.Manifest.GetSteamUser(client.SteamId);
+
                 client.SetLanguage(Language.Schinese);
 
                 var players = await SteamApi.QueryPlayerSummariesAsync(null, client.WebApiToken, new[] { client.SteamId });
@@ -325,11 +339,15 @@ namespace Steam_Authenticator
 
                 var user = new User
                 {
-                    Account = client.Account,
+                    Account = !string.IsNullOrWhiteSpace(client.Account) ? client.Account : localUser.Account,
+
                     SteamId = client.SteamId,
                     RefreshToken = client.RefreshToken,
-                    NickName = player?.SteamName ?? client.SteamId,
-                    Avatar = player?.AvatarFull ?? "",
+
+                    NickName = player?.SteamName ?? localUser?.NickName ?? client.SteamId,
+                    Avatar = player?.AvatarFull ?? localUser?.Avatar ?? "",
+
+                    Setting = localUser?.Setting ?? new Model.UserSetting()
                 };
 
                 UserClient userClient = new UserClient(user, client);
@@ -352,7 +370,7 @@ namespace Steam_Authenticator
                 {
                     if (!await userClient.LoginAsync())
                     {
-                        userClient = await Login(true, userClient.User.Account) ?? userClient;
+                        userClient = await Login(true, userClient.GetAccount()) ?? userClient;
                     }
                 }
 
@@ -388,7 +406,7 @@ namespace Steam_Authenticator
 
             if (userClient?.Client?.LoggedIn ?? false)
             {
-                Text = $"Steam验证器 {userClient.User.Account}[{userClient.User.NickName}]";
+                Text = $"Steam验证器 {userClient.GetAccount()}[{userClient.User.NickName}]";
 
                 UserImg.Image = Properties.Resources.userimg;
                 if (!string.IsNullOrWhiteSpace(userClient.User.Avatar))
@@ -396,7 +414,7 @@ namespace Steam_Authenticator
                     UserImg.LoadAsync(userClient.User.Avatar);
                 }
                 UserName.ForeColor = Color.Green;
-                UserName.Text = $"{userClient.User.Account} [{userClient.User.NickName}]";
+                UserName.Text = $"{userClient.GetAccount()} [{userClient.User.NickName}]";
                 SteamId.Text = $"{userClient.User.SteamId}";
                 Balance.Text = "￥0.00";
                 DelayedBalance.Text = "￥0.00";
@@ -421,6 +439,11 @@ namespace Steam_Authenticator
             {
                 Convert = (icon) =>
                 {
+                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
+                    {
+                        return CustomIcon.ConvertToPurple(icon);
+                    }
+
                     if (userClient.User.Setting.AutoAcceptGiveOffer)
                     {
                         return icon;
@@ -437,6 +460,7 @@ namespace Steam_Authenticator
                     {
                         return icon;
                     }
+
                     return CustomIcon.ConvertToGrayscale(icon);
                 }
             });
@@ -444,6 +468,11 @@ namespace Steam_Authenticator
             {
                 Convert = (icon) =>
                 {
+                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
+                    {
+                        return CustomIcon.ConvertToPurple(icon);
+                    }
+
                     if (userClient.User.Setting.AutoConfirmTrade)
                     {
                         return icon;
@@ -452,6 +481,7 @@ namespace Steam_Authenticator
                     {
                         return icon;
                     }
+
                     return CustomIcon.ConvertToGrayscale(icon);
                 }
             });
@@ -459,10 +489,16 @@ namespace Steam_Authenticator
             {
                 Convert = (icon) =>
                 {
+                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
+                    {
+                        return CustomIcon.ConvertToPurple(icon);
+                    }
+
                     if (userClient.User.Setting.AutoAcceptReceiveOffer)
                     {
                         return icon;
                     }
+
                     return CustomIcon.ConvertToGrayscale(icon);
                 }
             });
@@ -500,7 +536,7 @@ namespace Steam_Authenticator
             Label nameLabel = new Label()
             {
                 Name = "username",
-                Text = $"{userClient.User.Account} [{userClient.User.NickName}]",
+                Text = $"{userClient.GetAccount()} [{userClient.User.NickName}]",
                 AutoSize = false,
                 AutoEllipsis = true,
                 Cursor = Cursors.Hand,

@@ -85,7 +85,8 @@ namespace Steam_Authenticator.Forms
 
         private void setAcceptGiveOfferRoleBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-
+            AcceptOfferRule acceptOfferRule = new AcceptOfferRule(user);
+            acceptOfferRule.ShowDialog();
         }
 
         private void saveBtn_Click(object sender, EventArgs e)
@@ -108,8 +109,16 @@ namespace Steam_Authenticator.Forms
         {
             autoConfirmMarket.Enabled = autoConfirmTrade.Enabled
                 = autoAcceptReceiveOffer.Enabled
-                = autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled
+                = autoAcceptGiveOffer.Enabled
+                = autoAcceptGiveOffer_Buff.Enabled
+                = autoAcceptGiveOffer_Other.Enabled
+                = autoAcceptGiveOffer_Custom.Enabled
                 = enabled;
+
+            if (autoAcceptGiveOffer_Custom.Checked)
+            {
+                autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
+            }
         }
 
         private void ShowWarning(CheckBox affectedBox)

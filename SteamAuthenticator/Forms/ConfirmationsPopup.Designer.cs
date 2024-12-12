@@ -143,7 +143,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ConfirmationsPopup";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "令牌确认";
             Load += ConfirmationsPopup_Load;
             panel1.ResumeLayout(false);
