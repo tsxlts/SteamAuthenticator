@@ -58,16 +58,12 @@ namespace Steam_Authenticator
             }
 
             var setting = buffSetting.Setting;
+            client.User.Setting = setting;
 
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == client.User.SteamId);
-            foreach (var item in clients)
-            {
-                item.SaveSetting(setting);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
+            Appsetting.Instance.Manifest.SaveBuffUser(client.User.UserId, client.User);
         }
 
-        private async void buffLoginMenuItem_Click(object sender, EventArgs e)
+        private async void buffReloginMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
@@ -85,6 +81,19 @@ namespace Steam_Authenticator
             BuffLogin($"登录信息已失效{Environment.NewLine}请重新扫码登录 BUFF 帐号");
         }
 
+        private async void buffLogoutMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
+            BuffClient client = panel.Client;
+
+            await client.LogoutAsync();
+
+            ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10 * 60));
+        }
+
         private void removeBuffUserMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
@@ -93,14 +102,9 @@ namespace Steam_Authenticator
             BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
             BuffClient client = panel.Client;
 
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == client.User.SteamId);
-
+            Appsetting.Instance.Manifest.RemoveBuffUser(client.User.UserId, out var entry);
+            Appsetting.Instance.BuffClients.Remove(client);
             buffUsersPanel.Controls.Remove(panel);
-            foreach (var item in clients)
-            {
-                item.SetBuffClient(null);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
 
             ResetBuffUserPanel();
         }
@@ -113,18 +117,25 @@ namespace Steam_Authenticator
 
                 int startX = GetBuffUserControlStartPointX(out int cells);
 
-                var clients = Appsetting.Instance.Clients.Where(c => c.BuffClient != null);
+                Appsetting.Instance.BuffClients.RemoveAll(c => !c.LoggedIn);
+
+                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetBuffUser();
                 int index = 0;
-                foreach (var client in clients)
+                foreach (string account in accounts)
                 {
-                    BuffUserPanel panel = CreateUserPanel(startX, cells, index, client.BuffClient);
+                    BuffUser user = Appsetting.Instance.Manifest.GetBuffUser(account);
+                    BuffClient client = new BuffClient(user);
+
+                    BuffUserPanel panel = CreateUserPanel(startX, cells, index, client);
                     buffUsersPanel.Controls.Add(panel);
 
                     index++;
+
+                    Appsetting.Instance.BuffClients.Add(panel.Client);
                 }
 
                 {
-                    BuffUserPanel panel = new BuffUserPanel()
+                    BuffUserPanel panel = new BuffUserPanel(false)
                     {
                         Size = new Size(80, 116),
                         Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
@@ -159,7 +170,7 @@ namespace Steam_Authenticator
                     buffUsersPanel.Controls.Add(panel);
                 }
 
-                var tasks = clients.Select(c => c.BuffClient.RefreshAsync(true));
+                var tasks = Appsetting.Instance.BuffClients.Select(c => c.RefreshAsync(true));
                 await Task.WhenAll(tasks);
             }
             catch
@@ -179,12 +190,6 @@ namespace Steam_Authenticator
             {
                 return null;
             }
-            var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == buffAuth.Result.Body.data.steamid);
-            if (!clients.Any())
-            {
-                MessageBox.Show($"未在当前设备已登录的Steam帐号中找到你的BUFF帐号绑定的Steam账号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return null;
-            }
 
             var buffUser = new BuffUser
             {
@@ -192,18 +197,15 @@ namespace Steam_Authenticator
                 SteamId = buffAuth.Result.Body.data.steamid,
                 Nickname = buffAuth.Result.Body.data.nickname,
                 Avatar = buffAuth.Result.Body.data.avatar,
-                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"))
+                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}")),
+                Setting = Appsetting.Instance.Manifest.GetBuffUser(buffAuth.Result.Body.data.id)?.Setting ?? new Model.BuffUserSetting()
             };
             var buffClient = new BuffClient(buffUser)
             {
                 LoggedIn = true
             };
 
-            foreach (var item in clients)
-            {
-                item.SetBuffClient(buffClient);
-                Appsetting.Instance.Manifest.AddUser(item.User.SteamId, item.User);
-            }
+            Appsetting.Instance.Manifest.SaveBuffUser(buffClient.User.UserId, buffClient.User);
 
             var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToList();
             var index = controlCollection.FindIndex(c => c.Client.User.UserId == buffUser.UserId);
@@ -230,7 +232,7 @@ namespace Steam_Authenticator
 
         private BuffUserPanel CreateUserPanel(int startX, int cells, int index, BuffClient buffClient)
         {
-            BuffUserPanel panel = new BuffUserPanel()
+            BuffUserPanel panel = new BuffUserPanel(true)
             {
                 Name = buffClient.User.UserId,
                 Size = new Size(80, 116),
@@ -256,7 +258,7 @@ namespace Steam_Authenticator
             }
             pictureBox.MouseClick += btnBuffUser_Click;
             pictureBox.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.Controls.Add(pictureBox);
+            panel.SetUserAvatarBox(pictureBox);
 
             Label nameLabel = new Label()
             {
@@ -272,7 +274,7 @@ namespace Steam_Authenticator
             };
             nameLabel.MouseClick += btnBuffUser_Click;
             nameLabel.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.Controls.Add(nameLabel);
+            panel.SetUserNameBox(nameLabel);
 
             Label offerLabel = new Label()
             {
@@ -287,7 +289,7 @@ namespace Steam_Authenticator
                 Location = new Point(0, 98)
             };
             offerLabel.Click += buffOffersNumberBtn_Click;
-            panel.Controls.Add(offerLabel);
+            panel.SetOfferBox(offerLabel);
 
             panel.Client
                 .WithStartLogin((relogin) =>
@@ -352,9 +354,7 @@ namespace Steam_Authenticator
                     var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToArray();
                     foreach (BuffUserPanel userPanel in controlCollection)
                     {
-                        //var nameLabel = userPanel.Controls.Cast<Control>().FirstOrDefault(c => c.Name == "username") as Label;
-                        var nameLabel = userPanel.Controls.Find("username", false)?.FirstOrDefault() as Label;
-                        if (nameLabel == null)
+                        if (string.IsNullOrWhiteSpace(userPanel.UserName))
                         {
                             continue;
                         }

@@ -15,8 +15,6 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public UserSetting Setting { get; set; } = new UserSetting();
-
-        public BuffUser BuffUser { get; set; }
     }
 
     public class UserSetting
@@ -66,9 +64,20 @@ namespace Steam_Authenticator.Model
         /// </summary>
         [JsonProperty("auto_accept_give_offer_other")]
         public bool AutoAcceptGiveOffer_Other { get; set; }
+
+        /// <summary>
+        /// 是否自动接受 自定义 索取报价
+        /// 别人索取我的
+        /// </summary>
+        public bool AutoAcceptGiveOffer_Custom { get; set; }
+
+        /// <summary>
+        /// 自动接受索取报价 自定义 规则
+        /// </summary>
+        public AcceptOfferRuleSetting AutoAcceptGiveOfferRule { get; set; } = new AcceptOfferRuleSetting();
     }
 
-    public class BuffUser
+    public class BuffUser : JsonStreamSerializer<BuffUser>
     {
         public string BuffCookies { get; set; }
 

@@ -156,7 +156,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MobileConfirmationLogin";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "请求登录";
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);

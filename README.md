@@ -9,12 +9,13 @@
 5、支持多账号管理<br>
 6、支持扫码登录<br>
 7、支持添加BUFF帐号，自动处理BUFF报价<br>
+8、支持自定义接受报价规则，自动接受指定规则的报价<br>
 
 ![main](images/1_main.png)<br>
 ![main](images/1_main_menu1.png)<br>
 ![main](images/1_main_menu2.png)<br>
 ![main](images/1_main_steam_menu.png)<br>
-![main](images/2_main.png)<br>
+![main](images/2_main_buff.png)<br>
 ![main](images/2_main_buff_menu.png)<br>
 ![login](images/3_login.png)<br>
 ![qrAuth](images/4_qrAuth.png)<br>
@@ -25,8 +26,7 @@
 ![guard](images/9_guard.png)<br>
 ![setting](images/10_setting.png)<br>
 ![steamSetting](images/11_steamSetting.png)<br>
-![buffSetting](images/12_buffSetting.png)<br>
-
+![confirmLogin](images/12_confirm_login.png)<br>
 
 
 

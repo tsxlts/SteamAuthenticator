@@ -5,6 +5,7 @@ using Steam_Authenticator.Model.BUFF;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Steam_Authenticator
@@ -25,6 +26,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public List<UserClient> Clients { get; private set; } = new List<UserClient>();
+
+        [JsonIgnore]
+        public List<BuffClient> BuffClients { get; private set; } = new List<BuffClient>();
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
@@ -49,7 +53,7 @@ namespace Steam_Authenticator
 
     public class UserClient
     {
-        public static UserClient None = new UserClient(new User(), new SteamCommunityClient(), null);
+        public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
@@ -57,37 +61,15 @@ namespace Steam_Authenticator
         private Action startLogin = null;
         private Action<bool> endLogin = null;
 
-        public UserClient(User user, SteamCommunityClient client, BuffClient buffClient)
+        public UserClient(User user, SteamCommunityClient client)
         {
             User = user;
             Client = client;
-            BuffClient = buffClient;
         }
 
         public SteamCommunityClient Client { get; set; }
 
         public User User { get; set; }
-
-        public BuffClient BuffClient { get; private set; }
-
-        public UserClient SetBuffClient(BuffClient buffClient)
-        {
-            BuffClient = buffClient;
-            if (User != null)
-            {
-                User.BuffUser = buffClient?.User;
-            }
-            return this;
-        }
-
-        public UserClient SaveSetting(BuffUserSetting setting)
-        {
-            if (User?.BuffUser != null)
-            {
-                User.BuffUser.Setting = setting;
-            }
-            return this;
-        }
 
         public UserClient WithStartLogin(Action action)
         {
@@ -99,6 +81,20 @@ namespace Steam_Authenticator
         {
             endLogin = action;
             return this;
+        }
+
+        /// <summary>
+        /// 获取账号名
+        /// </summary>
+        /// <returns></returns>
+        public string GetAccount()
+        {
+            if (!string.IsNullOrWhiteSpace(Client?.Account))
+            {
+                return Client.Account;
+            }
+
+            return User?.Account;
         }
 
         public async Task<bool> LoginAsync()
@@ -115,11 +111,31 @@ namespace Steam_Authenticator
                 }
 
                 result = await Client.LoginAsync(User.RefreshToken);
+                if (string.IsNullOrWhiteSpace(User.Account) && Client.Account != User.Account)
+                {
+                    User.Account = Client.Account;
+                }
+
+                Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
                 return result;
             }
             finally
             {
                 endLogin?.Invoke(result);
+            }
+        }
+
+        public async Task LogoutAsync()
+        {
+            User.RefreshToken = string.Empty;
+            Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
+            try
+            {
+                endLogin?.Invoke(false);
+                await Client.LogoutAsync();
+            }
+            catch
+            {
             }
         }
     }
@@ -178,12 +194,7 @@ namespace Steam_Authenticator
                 User.Avatar = buffUser.avatar;
                 User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
 
-                var clients = Appsetting.Instance.Clients.Where(c => c.Client.SteamId == User.SteamId);
-                foreach (var client in clients)
-                {
-                    client.SetBuffClient(this);
-                    Appsetting.Instance.Manifest.AddUser(client.User.SteamId, client.User);
-                }
+                Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
             }
             finally
             {
@@ -191,9 +202,95 @@ namespace Steam_Authenticator
             }
         }
 
+        public Task LogoutAsync()
+        {
+            User.BuffCookies = string.Empty;
+            Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
+            LoggedIn = false;
+            endLogin?.Invoke(false, false);
+            return Task.CompletedTask;
+        }
+
         public async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade()
         {
             return await BuffApi.QuerySteamTrade(cookies: Cookies);
+        }
+    }
+
+    /// <summary>
+    /// 接受报价
+    /// </summary>
+    public class AcceptOfferRuleSetting
+    {
+        public Rule OfferMessage { get; set; } = new Rule
+        {
+            Enabled = true,
+            Type = RuleType.报价消息,
+            Condition = ConditionType.正则匹配,
+            Value = @"^(\d+)T(\d+),令牌确认请留意对方Steam昵称，等级，账户年资，确保一致!!!$"
+        };
+
+        public Rule AssetName { get; set; } = new Rule
+        {
+            Type = RuleType.饰品名称
+        };
+
+        public class Rule
+        {
+            public RuleType Type { get; set; }
+
+            public bool Enabled { get; set; } = false;
+
+            public ConditionType Condition { get; set; } = ConditionType.包含;
+
+            public string Value { get; set; } = string.Empty;
+
+            public bool Check(string input)
+            {
+                input = input.Trim();
+                if (string.IsNullOrWhiteSpace(Value) || string.IsNullOrWhiteSpace(input))
+                {
+                    return false;
+                }
+
+                var vaules = Value.Split(Environment.NewLine).Select(c => c.Trim()).Where(c => !string.IsNullOrWhiteSpace(c));
+                if (!vaules.Any())
+                {
+                    return false;
+                }
+                switch (Condition)
+                {
+                    case ConditionType.等于:
+                        return vaules.Any(value => input.Equals(value, StringComparison.OrdinalIgnoreCase));
+                    case ConditionType.不等于:
+                        return vaules.All(value => !input.Equals(value, StringComparison.OrdinalIgnoreCase));
+                    case ConditionType.包含:
+                        return vaules.Any(value => input.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    case ConditionType.不包含:
+                        return vaules.All(value => !input.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    case ConditionType.正则匹配:
+                        return vaules.Any(value => Regex.IsMatch(input, value, RegexOptions.IgnoreCase));
+                }
+
+                return false;
+            }
+        }
+
+        public enum RuleType
+        {
+            报价消息 = 1,
+            饰品名称 = 2
+        }
+
+        public enum ConditionType
+        {
+            等于 = 101,
+            不等于 = 102,
+
+            包含 = 201,
+            不包含 = 202,
+
+            正则匹配 = 301
         }
     }
 }

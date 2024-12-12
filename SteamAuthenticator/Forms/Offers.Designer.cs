@@ -107,7 +107,7 @@
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Offers";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "报价";
             FormClosed += Offers_FormClosed;
             Load += Offers_Load;

@@ -47,14 +47,6 @@
             splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
-            // AccountNameBox
-            // 
-            AccountNameBox.Font = new Font("Microsoft YaHei UI", 12F);
-            AccountNameBox.Location = new Point(118, 63);
-            AccountNameBox.Name = "AccountNameBox";
-            AccountNameBox.Size = new Size(212, 28);
-            AccountNameBox.TabIndex = 0;
-            // 
             // label1
             // 
             label1.Font = new Font("Microsoft YaHei UI", 8F);
@@ -156,6 +148,14 @@
             label4.Size = new Size(318, 34);
             label4.TabIndex = 7;
             label4.Text = "如果你想要使用令牌功能，必须填写登录秘钥\r\n如果你想要使用令牌确认功能，必须填写身份秘钥";
+            // 
+            // AccountNameBox
+            // 
+            AccountNameBox.Font = new Font("Microsoft YaHei UI", 12F);
+            AccountNameBox.Location = new Point(118, 63);
+            AccountNameBox.Name = "AccountNameBox";
+            AccountNameBox.Size = new Size(212, 28);
+            AccountNameBox.TabIndex = 0;
             // 
             // label5
             // 

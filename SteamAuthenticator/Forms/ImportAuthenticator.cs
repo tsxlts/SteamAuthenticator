@@ -1,18 +1,14 @@
-﻿using SteamKit.WebClient;
-
-namespace Steam_Authenticator.Forms
+﻿namespace Steam_Authenticator.Forms
 {
     public partial class ImportAuthenticator : Form
     {
 
-        private readonly SteamCommunityClient webClient;
-
-        public ImportAuthenticator(SteamCommunityClient webClient)
+        public ImportAuthenticator(UserClient client)
         {
             InitializeComponent();
 
             AccountNameBox.Enabled = false;
-            AccountNameBox.Text = webClient.Account;
+            AccountNameBox.Text = client.GetAccount();
         }
 
         private void acceptBtn_Click(object sender, EventArgs e)

@@ -106,7 +106,7 @@
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Confirmations";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "令牌确认";
             FormClosed += Confirmations_FormClosed;
             Load += Confirmations_Load;

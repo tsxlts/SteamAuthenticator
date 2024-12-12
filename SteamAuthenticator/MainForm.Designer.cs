@@ -7,19 +7,6 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -28,6 +15,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
             UserToolStripMenuItem = new ToolStripMenuItem();
@@ -72,8 +60,15 @@
             buffUsersPanel = new Panel();
             pictureBox2 = new PictureBox();
             statusPanel = new Panel();
+            label9 = new Label();
+            label8 = new Label();
+            pictureBox4 = new PictureBox();
+            pictureBox3 = new PictureBox();
             SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
+            mainNotifyIcon = new NotifyIcon(components);
+            label10 = new Label();
+            pictureBox5 = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -85,6 +80,9 @@
             buffUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             statusPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -92,7 +90,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, submitRequirementsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(690, 25);
+            menuStrip1.Size = new Size(764, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -244,7 +242,7 @@
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(470, 38);
+            panel1.Location = new Point(544, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
@@ -349,7 +347,7 @@
             usersPanel.Controls.Add(pictureBox1);
             usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
-            usersPanel.Size = new Size(656, 274);
+            usersPanel.Size = new Size(730, 298);
             usersPanel.TabIndex = 7;
             usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
@@ -399,7 +397,7 @@
             // versionLabel
             // 
             versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            versionLabel.Location = new Point(618, 457);
+            versionLabel.Location = new Point(692, 481);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(60, 23);
             versionLabel.TabIndex = 12;
@@ -449,7 +447,7 @@
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(670, 310);
+            tabControl.Size = new Size(744, 334);
             tabControl.TabIndex = 16;
             // 
             // steamPage
@@ -458,7 +456,7 @@
             steamPage.Location = new Point(4, 26);
             steamPage.Name = "steamPage";
             steamPage.Padding = new Padding(3);
-            steamPage.Size = new Size(662, 280);
+            steamPage.Size = new Size(736, 304);
             steamPage.TabIndex = 0;
             steamPage.Text = "Steam 帐号";
             steamPage.UseVisualStyleBackColor = true;
@@ -499,15 +497,63 @@
             // statusPanel
             // 
             statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            statusPanel.Controls.Add(label10);
+            statusPanel.Controls.Add(pictureBox5);
+            statusPanel.Controls.Add(label9);
+            statusPanel.Controls.Add(label8);
+            statusPanel.Controls.Add(pictureBox4);
+            statusPanel.Controls.Add(pictureBox3);
             statusPanel.Controls.Add(label3);
             statusPanel.Controls.Add(label4);
             statusPanel.Controls.Add(label6);
             statusPanel.Controls.Add(label7);
             statusPanel.Controls.Add(label5);
-            statusPanel.Location = new Point(12, 453);
+            statusPanel.Location = new Point(12, 477);
             statusPanel.Name = "statusPanel";
-            statusPanel.Size = new Size(496, 30);
+            statusPanel.Size = new Size(599, 30);
             statusPanel.TabIndex = 17;
+            // 
+            // label9
+            // 
+            label9.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label9.AutoSize = true;
+            label9.ForeColor = Color.FromArgb(121, 193, 38);
+            label9.Location = new Point(405, 7);
+            label9.Name = "label9";
+            label9.Size = new Size(56, 17);
+            label9.TabIndex = 18;
+            label9.Text = "自动确认";
+            // 
+            // label8
+            // 
+            label8.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label8.AutoSize = true;
+            label8.ForeColor = Color.FromArgb(93, 151, 255);
+            label8.Location = new Point(320, 7);
+            label8.Name = "label8";
+            label8.Size = new Size(56, 17);
+            label8.TabIndex = 17;
+            label8.Text = "自动发货";
+            // 
+            // pictureBox4
+            // 
+            pictureBox4.Image = Properties.Resources.auto_deliver;
+            pictureBox4.Location = new Point(296, 5);
+            pictureBox4.Name = "pictureBox4";
+            pictureBox4.Size = new Size(21, 21);
+            pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox4.TabIndex = 16;
+            pictureBox4.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.Image = Properties.Resources.auto_confirm;
+            pictureBox3.Location = new Point(381, 5);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(21, 21);
+            pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox3.TabIndex = 15;
+            pictureBox3.TabStop = false;
             // 
             // SteamId
             // 
@@ -526,7 +572,7 @@
             // 
             submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             submitRequirementsLabel.LinkColor = Color.FromArgb(192, 0, 192);
-            submitRequirementsLabel.Location = new Point(552, 457);
+            submitRequirementsLabel.Location = new Point(626, 481);
             submitRequirementsLabel.Name = "submitRequirementsLabel";
             submitRequirementsLabel.Size = new Size(60, 23);
             submitRequirementsLabel.TabIndex = 19;
@@ -535,11 +581,39 @@
             submitRequirementsLabel.TextAlign = ContentAlignment.MiddleCenter;
             submitRequirementsLabel.LinkClicked += submitRequirementsLabel_LinkClicked;
             // 
+            // mainNotifyIcon
+            // 
+            mainNotifyIcon.Icon = (Icon)resources.GetObject("mainNotifyIcon.Icon");
+            mainNotifyIcon.Text = "Steam验证器";
+            mainNotifyIcon.Visible = true;
+            mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
+            // 
+            // label10
+            // 
+            label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label10.AutoSize = true;
+            label10.ForeColor = Color.FromArgb(57, 89, 220);
+            label10.Location = new Point(491, 7);
+            label10.Name = "label10";
+            label10.Size = new Size(56, 17);
+            label10.TabIndex = 20;
+            label10.Text = "自动收货";
+            // 
+            // pictureBox5
+            // 
+            pictureBox5.Image = Properties.Resources.auto_accept;
+            pictureBox5.Location = new Point(467, 5);
+            pictureBox5.Name = "pictureBox5";
+            pictureBox5.Size = new Size(21, 21);
+            pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox5.TabIndex = 19;
+            pictureBox5.TabStop = false;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(690, 487);
+            ClientSize = new Size(764, 511);
             Controls.Add(submitRequirementsLabel);
             Controls.Add(SteamId);
             Controls.Add(statusPanel);
@@ -553,7 +627,7 @@
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
-            MinimumSize = new Size(700, 500);
+            MinimumSize = new Size(780, 550);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Steam验证器";
@@ -573,6 +647,9 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -624,5 +701,12 @@
         private Label SteamId;
         private LinkLabel submitRequirementsLabel;
         private ToolStripMenuItem submitRequirementsMenuItem;
+        private NotifyIcon mainNotifyIcon;
+        private PictureBox pictureBox3;
+        private PictureBox pictureBox4;
+        private Label label8;
+        private Label label9;
+        private Label label10;
+        private PictureBox pictureBox5;
     }
 }

@@ -11,15 +11,17 @@ namespace Steam_Authenticator.Forms
     public partial class Confirmations : Form
     {
         private readonly Form mainForm;
+        private readonly UserClient client;
         private readonly SteamCommunityClient webClient;
         private bool refreshing = false;
         private List<Confirmation> thisConfirmations = new List<Confirmation>();
 
-        public Confirmations(Form mainForm, SteamCommunityClient webClient)
+        public Confirmations(Form mainForm, UserClient client)
         {
             InitializeComponent();
             this.mainForm = mainForm;
-            this.webClient = webClient;
+            this.client = client;
+            this.webClient = client.Client;
 
             Width = this.mainForm.Width;
             Height = this.mainForm.Height;
@@ -35,7 +37,7 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            Text = $"令牌确认 [{webClient.Account}]";
+            Text = $"令牌确认 [{client.GetAccount()}]";
 
             await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
@@ -76,10 +78,10 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -127,10 +129,10 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -168,10 +170,10 @@ namespace Steam_Authenticator.Forms
             {
                 button.Enabled = false;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -205,10 +207,10 @@ namespace Steam_Authenticator.Forms
             {
                 button.Enabled = false;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -241,10 +243,10 @@ namespace Steam_Authenticator.Forms
                 var button = (ConfirmationButton)sender;
                 var confirmation = button.Confirmation;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
-                    MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"用户[{client.GetAccount()}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -280,12 +282,12 @@ namespace Steam_Authenticator.Forms
                 refreshBtn.Text = "正在刷新";
                 refreshBtn.Enabled = false;
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(webClient.Account);
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
                 if (string.IsNullOrWhiteSpace(guard?.IdentitySecret))
                 {
                     if (showError)
                     {
-                        MessageBox.Show($"用户[{webClient.Account}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"用户[{client.GetAccount()}]未提供登录令牌信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     return;
                 }
