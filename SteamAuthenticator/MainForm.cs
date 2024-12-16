@@ -4,7 +4,6 @@ using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
@@ -86,6 +85,28 @@ namespace Steam_Authenticator
             {
                 SetCurrentClient(user);
             }
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    var setup = new FileInfo(Appsetting.Instance.SetupApplication);
+                    var install = new FileInfo(Appsetting.Instance.Install);
+                    if (install.Exists)
+                    {
+                        if (setup.Directory.Exists)
+                        {
+                            Directory.Delete(setup.DirectoryName, true);
+                        }
+
+                        install.Directory.MoveTo(setup.DirectoryName);
+                    }
+                }
+                catch
+                {
+
+                }
+            });
 
             await CheckVersion();
         }
@@ -688,25 +709,14 @@ namespace Steam_Authenticator
                 if (currentVersion < newVersion)
                 {
                     var assets = resultObj.Value<JArray>("assets");
+                    string name = assets.FirstOrDefault()?.Value<string>("name");
                     string updateUrl = assets.FirstOrDefault()?.Value<string>("browser_download_url");
                     string body = resultObj.Value<string>("body");
                     DateTime published = resultObj.Value<DateTime>("published_at");
                     if (!string.IsNullOrWhiteSpace(updateUrl))
                     {
-                        DialogResult updateDialog = MessageBox.Show($"有最新版本可用（{tag_name}）" +
-                            $"{Environment.NewLine}" +
-                            $"发布时间：{published.ToLocalTime():yyyy年MM月dd日 HH时mm分}" +
-                            $"{Environment.NewLine}" +
-                            $"更新内容：" +
-                            $"{Environment.NewLine}" +
-                            $"{body}" +
-                            $"{Environment.NewLine}" +
-                            $"{Environment.NewLine}" +
-                            $"是否立即更新？", "版本更新", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                        if (updateDialog == DialogResult.Yes)
-                        {
-                            Process.Start(new ProcessStartInfo(updateUrl) { UseShellExecute = true });
-                        }
+                        ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, name);
+                        DialogResult updateDialog = applicationUpgrade.ShowDialog();
                     }
                     return true;
                 }

@@ -32,6 +32,23 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
+
+        [JsonIgnore]
+        public string DownloadDirectory
+        {
+            get
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "download");
+                Directory.CreateDirectory(path);
+                return path;
+            }
+        }
+
+        [JsonIgnore]
+        public string Install => Path.Combine(AppContext.BaseDirectory, "setup", "Install.exe");
+
+        [JsonIgnore]
+        public string SetupApplication => Path.Combine(AppContext.BaseDirectory, "!setup", "Install.exe");
     }
 
     public class Domain

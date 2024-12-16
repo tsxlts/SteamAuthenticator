@@ -15,5 +15,9 @@ namespace Steam_Authenticator.Internal
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool PostThreadMessage(int threadId, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32", EntryPoint = "HideCaret")]
+        public static extern bool HideCaret(IntPtr hWnd);
+
     }
 }

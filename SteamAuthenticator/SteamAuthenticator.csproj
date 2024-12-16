@@ -11,7 +11,7 @@
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
     <Version>2.0.0</Version>
-    <ApplicationIcon>File\steam32.ico</ApplicationIcon>
+    <ApplicationIcon>File\steam.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +22,10 @@
     <None Remove="File\loading.gif" />
     <None Remove="File\steam.png" />
     <None Remove="File\steam16.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="File\steam.ico" />
   </ItemGroup>
 
   <ItemGroup>
