@@ -715,7 +715,7 @@ namespace Steam_Authenticator
                     DateTime published = resultObj.Value<DateTime>("published_at");
                     if (!string.IsNullOrWhiteSpace(updateUrl))
                     {
-                        ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, name);
+                        ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, updateUrl, name);
                         DialogResult updateDialog = applicationUpgrade.ShowDialog();
                     }
                     return true;

@@ -1,9 +1,7 @@
 ﻿
 using Newtonsoft.Json;
 using Steam_Authenticator.Model;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Net;
 
 namespace Steam_Authenticator.Forms
 {
@@ -14,12 +12,16 @@ namespace Steam_Authenticator.Forms
         private readonly DateTime latestVersionTime;
         private readonly string versionSummary;
         private readonly string updateUrl;
+        private readonly string downloadUrl;
         private readonly string appName;
 
-        private Task downloadTask = null;
+        private Task downloadTask = Task.CompletedTask;
+        private bool downloadCompleted = false;
         private string downloadFileName = null;
 
-        public ApplicationUpgrade(Version currentVersion, Version latestVersion, DateTime latestVersionTime, string versionSummary, string updateUrl, string name)
+        private CancellationTokenSource downloadCts = new CancellationTokenSource();
+
+        public ApplicationUpgrade(Version currentVersion, Version latestVersion, DateTime latestVersionTime, string versionSummary, string updateUrl, string downloadUrl, string name)
         {
             InitializeComponent();
 
@@ -28,6 +30,7 @@ namespace Steam_Authenticator.Forms
             this.latestVersionTime = latestVersionTime;
             this.versionSummary = versionSummary;
             this.updateUrl = updateUrl;
+            this.downloadUrl = downloadUrl;
             this.appName = name;
         }
 
@@ -41,7 +44,7 @@ namespace Steam_Authenticator.Forms
 
         private void giteeDownload_Click(object sender, EventArgs e)
         {
-
+            Clipboard.SetText(downloadUrl);
         }
 
         private void githubDownload_Click(object sender, EventArgs e)
@@ -62,13 +65,69 @@ namespace Steam_Authenticator.Forms
 
                 this.progress.Text = "0%";
                 downloadFileName = Path.Combine(Appsetting.Instance.DownloadDirectory, appName);
-
-                using (var client = new WebClient())
+                if (File.Exists(downloadFileName))
                 {
-                    client.DownloadFileCompleted += client_DownloadFileCompleted;
-                    client.DownloadProgressChanged += client_DownloadProgressChanged;
-                    downloadTask = client.DownloadFileTaskAsync(new Uri(updateUrl), downloadFileName);
+                    File.Delete(downloadFileName);
                 }
+
+                downloadCts = new CancellationTokenSource();
+                downloadTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (var client = new HttpClient(new HttpClientHandler()))
+                        {
+                            var httpResponseMessage = await client.GetAsync(updateUrl, HttpCompletionOption.ResponseHeadersRead, downloadCts.Token);
+                            var contentLength = httpResponseMessage.Content.Headers.ContentLength.Value;
+
+                            this.progressBar.Minimum = 0;
+                            this.progressBar.Maximum = 100;
+
+                            using (var stream = await httpResponseMessage.Content.ReadAsStreamAsync(downloadCts.Token))
+                            {
+                                long downloadSize = 0;
+                                var readLength = 1024000;
+                                byte[] bytes = new byte[readLength];
+                                int writeLength;
+                                while ((writeLength = await stream.ReadAsync(bytes, 0, readLength, downloadCts.Token)) > 0)
+                                {
+                                    if (downloadCts.IsCancellationRequested)
+                                    {
+                                        return;
+                                    }
+
+                                    using (FileStream fs = new FileStream(downloadFileName, FileMode.Append, FileAccess.Write))
+                                    {
+                                        await fs.WriteAsync(bytes, 0, writeLength, downloadCts.Token);
+                                    }
+                                    downloadSize += writeLength;
+
+                                    int progressPercentage = (int)Math.Floor(Math.Min(downloadSize * 100.00m / contentLength, 100.00m));
+                                    this.progressBar.Value = progressPercentage;
+                                    this.progress.Text = $"{progressPercentage}%";
+                                }
+
+                                if (contentLength >= downloadSize)
+                                {
+                                    downloadCompleted = true;
+                                    this.progress.Text = $"下载完成";
+                                    if (MessageBox.Show($"最新版程序已下载完成, 是否立即更新", "检查更新", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    {
+                                        StratInstall();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (TaskCanceledException)
+                    {
+
+                    }
+                    catch (Exception)
+                    {
+                        this.progress.Text = $"下载失败";
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -89,27 +148,23 @@ namespace Steam_Authenticator.Forms
                 $"4、将解压后的文件覆盖原安装目录下所有文件", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private async void ApplicationUpgrade_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.progress.Text = $"下载完成";
-
-            if (MessageBox.Show($"最新版程序已下载完成, 是否立即更新", "检查更新", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            try
             {
-                StratInstall();
+                downloadCts.Cancel();
+                await downloadTask;
+                this.Dispose();
+
+                if (!downloadCompleted && File.Exists(downloadFileName))
+                {
+                    File.Delete(downloadFileName);
+                }
             }
-        }
+            catch
+            {
 
-        private void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            this.progressBar.Minimum = 0;
-            this.progressBar.Maximum = (int)e.TotalBytesToReceive;
-            this.progressBar.Value = (int)e.BytesReceived;
-            this.progress.Text = $"{e.ProgressPercentage}%";
-        }
-
-        private void ApplicationUpgrade_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            this.Dispose();
+            }
         }
 
         private void StratInstall()
