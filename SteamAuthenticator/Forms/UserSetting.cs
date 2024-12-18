@@ -6,7 +6,6 @@ namespace Steam_Authenticator.Forms
     {
         private readonly User user;
         private bool fullyLoaded = false;
-        private bool autoAcceptGiveOffer_All_Click = false;
 
         public UserSetting(User user)
         {
@@ -54,32 +53,21 @@ namespace Steam_Authenticator.Forms
 
         private void autoAcceptGiveOffer_All_CheckedChanged(object sender, EventArgs e)
         {
-            autoAcceptGiveOffer_All_Click = true;
-
-            autoAcceptGiveOffer_Buff.Checked = autoAcceptGiveOffer_Other.Checked = autoAcceptGiveOffer.Checked;
-
-            autoAcceptGiveOffer_All_Click = false;
-        }
-
-        private void autoAcceptGiveOffer_CheckedChanged(object sender, EventArgs e)
-        {
-            if (autoAcceptGiveOffer_All_Click)
+            if (!fullyLoaded)
             {
                 return;
             }
 
-            CheckBox checkBox = sender as CheckBox;
-            if (!checkBox.Checked)
-            {
-                autoAcceptGiveOffer.Checked = false;
-                return;
-            }
-
-            autoAcceptGiveOffer.Checked = autoAcceptGiveOffer_Buff.Checked && autoAcceptGiveOffer_Other.Checked;
+            autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = autoAcceptGiveOffer_Custom.Enabled = !autoAcceptGiveOffer.Checked;
         }
 
         private void autoAcceptGiveOffer_Custom_CheckedChanged(object sender, EventArgs e)
         {
+            if (!fullyLoaded)
+            {
+                return;
+            }
+
             autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = !autoAcceptGiveOffer_Custom.Checked;
         }
 
@@ -115,9 +103,15 @@ namespace Steam_Authenticator.Forms
                 = autoAcceptGiveOffer_Custom.Enabled
                 = enabled;
 
+            if (autoAcceptGiveOffer.Checked)
+            {
+                autoAcceptGiveOffer_Custom.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
+                autoAcceptGiveOffer.Enabled = true;
+            }
             if (autoAcceptGiveOffer_Custom.Checked)
             {
                 autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
+                autoAcceptGiveOffer_Custom.Enabled = true;
             }
         }
 

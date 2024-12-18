@@ -266,8 +266,15 @@ namespace Steam_Authenticator
                         var webClient = client.Client;
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
-                        int offerCount = 0;
-                        int buffOfferCount = 0;
+
+                        bool acceptAll = user.Setting.AutoAcceptGiveOffer;
+                        bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
+                        bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
+
+                        List<Offer> tradeOffers = new List<Offer>();
+                        List<Offer> buffGiveOffers = new List<Offer>();
+                        List<Offer> otherGiveOffers = new List<Offer>();
+
                         try
                         {
                             if (!webClient.LoggedIn)
@@ -277,17 +284,15 @@ namespace Steam_Authenticator
 
                             var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
-                            var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
-                            offerCount = offers.Count;
-
-                            if (client.User.SteamId == currentClient?.User.SteamId)
+                            tradeOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                            if (!(tradeOffers?.Any() ?? false))
                             {
-                                OfferCountLabel.Text = $"{offerCount}";
-                                OfferCountLabel.Tag = offers;
+                                return;
                             }
 
-                            var receiveOffers = offers.Where(c => !(c.ItemsToGive?.Any() ?? false)).ToList();
-                            var giveOffers = offers.Where(c => c.ItemsToGive?.Any() ?? false).ToList();
+                            var receiveOffers = tradeOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
+                            var giveOffers = tradeOffers.Where(c => c.ItemsToGive?.Any() ?? false);
+                            otherGiveOffers = giveOffers.ToList();
 
                             if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
@@ -335,39 +340,43 @@ namespace Steam_Authenticator
 
                                 if (customOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid))
                                 {
-                                    HandleOffer(webClient, customOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                    var acceptOffers = customOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                    HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                                 }
 
                                 return;
                             }
 
-                            bool acceptAll = user.Setting.AutoAcceptGiveOffer;
-                            bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
-                            bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
-
-                            if (!acceptAll && giveOffers.Any() && buffClinet != null)
+                            if (giveOffers.Any() && buffClinet != null)
                             {
                                 var buffOffer = buffClinet.QuerySteamTrade().Result;
-                                if (!(buffOffer.Body?.IsSuccess ?? false))
+                                if (buffOffer.Body?.IsSuccess ?? false)
                                 {
-                                    return;
+                                    var buffOfferIds = buffOffer.Body.data?.Select(c => c.tradeofferid)?.ToList() ?? new List<string>();
+                                    buffGiveOffers = giveOffers.Where(c => buffOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => buffOfferIds.Contains(c.TradeOfferId));
                                 }
-
-                                var buffOfferIds = buffOffer.Body.data?.Select(c => c.tradeofferid)?.ToList() ?? new List<string>();
-                                var buffOffers = giveOffers.Where(c => buffOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
-                                buffOfferCount = buffOffers.Count;
-
-                                giveOffers.RemoveAll(c => buffOffers.Any(b => b.TradeOfferId == c.TradeOfferId));
-
-                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetBuff)
+                                else
                                 {
-                                    HandleOffer(webClient, buffOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                    otherGiveOffers = new List<Offer>();
                                 }
                             }
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetOther)
+                            if (acceptAll)
                             {
-                                HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                var acceptOffers = giveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                            }
+                            if (!acceptAll && accpetBuff)
+                            {
+                                var acceptOffers = buffGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                            }
+                            if (!acceptAll && accpetOther)
+                            {
+                                var acceptOffers = otherGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
                         }
                         catch
@@ -375,10 +384,16 @@ namespace Steam_Authenticator
                         }
                         finally
                         {
+                            if (user.SteamId == currentClient?.User.SteamId)
+                            {
+                                OfferCountLabel.Text = $"{tradeOffers.Count}";
+                                OfferCountLabel.Tag = tradeOffers;
+                            }
+
                             UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
                             if (userPanel != null)
                             {
-                                userPanel.SetOffer(offerCount);
+                                userPanel.SetOffer(tradeOffers.Count);
                             }
 
                             if (buffClinet != null)
@@ -386,7 +401,7 @@ namespace Steam_Authenticator
                                 BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
                                 if (buffUserPanel != null)
                                 {
-                                    buffUserPanel.SetOffer(buffOfferCount);
+                                    buffUserPanel.SetOffer(buffGiveOffers.Count);
                                 }
                             }
                         }

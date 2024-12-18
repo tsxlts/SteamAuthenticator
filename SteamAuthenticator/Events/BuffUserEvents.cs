@@ -206,6 +206,8 @@ namespace Steam_Authenticator
             };
 
             Appsetting.Instance.Manifest.SaveBuffUser(buffClient.User.UserId, buffClient.User);
+            Appsetting.Instance.BuffClients.RemoveAll(c => c.User.UserId == buffUser.UserId);
+            Appsetting.Instance.BuffClients.Add(buffClient);
 
             var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToList();
             var index = controlCollection.FindIndex(c => c.Client.User.UserId == buffUser.UserId);

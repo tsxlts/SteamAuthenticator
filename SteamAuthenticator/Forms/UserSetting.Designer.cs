@@ -37,6 +37,9 @@
             periodicChecking = new CheckBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            label4 = new Label();
+            label3 = new Label();
+            label2 = new Label();
             label1 = new Label();
             setAcceptGiveOfferRoleBtn = new LinkLabel();
             autoAcceptGiveOffer_Custom = new CheckBox();
@@ -51,7 +54,7 @@
             // autoAcceptGiveOffer
             // 
             autoAcceptGiveOffer.AutoSize = true;
-            autoAcceptGiveOffer.Location = new Point(6, 23);
+            autoAcceptGiveOffer.Location = new Point(6, 76);
             autoAcceptGiveOffer.Name = "autoAcceptGiveOffer";
             autoAcceptGiveOffer.Size = new Size(75, 21);
             autoAcceptGiveOffer.TabIndex = 14;
@@ -73,7 +76,7 @@
             // 
             saveBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(1, 339);
+            saveBtn.Location = new Point(1, 375);
             saveBtn.Name = "saveBtn";
             saveBtn.Size = new Size(489, 33);
             saveBtn.TabIndex = 12;
@@ -109,9 +112,9 @@
             periodicChecking.Font = new Font("Microsoft YaHei UI", 9F);
             periodicChecking.Location = new Point(18, 12);
             periodicChecking.Name = "periodicChecking";
-            periodicChecking.Size = new Size(147, 21);
+            periodicChecking.Size = new Size(160, 21);
             periodicChecking.TabIndex = 15;
-            periodicChecking.Text = "自动刷新报价确认信息";
+            periodicChecking.Text = "自动刷新 报价/确认 信息";
             periodicChecking.UseVisualStyleBackColor = true;
             periodicChecking.CheckedChanged += periodicChecking_CheckedChanged;
             // 
@@ -131,6 +134,9 @@
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(label4);
+            groupBox2.Controls.Add(label3);
+            groupBox2.Controls.Add(label2);
             groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(setAcceptGiveOfferRoleBtn);
             groupBox2.Controls.Add(autoAcceptGiveOffer_Custom);
@@ -139,26 +145,59 @@
             groupBox2.Controls.Add(autoAcceptGiveOffer);
             groupBox2.Location = new Point(12, 129);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(466, 106);
+            groupBox2.Size = new Size(466, 168);
             groupBox2.TabIndex = 17;
             groupBox2.TabStop = false;
             groupBox2.Text = "自动接受 索取 报价（发货 报价）";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label4.ForeColor = Color.Gray;
+            label4.Location = new Point(99, 50);
+            label4.Name = "label4";
+            label4.Size = new Size(296, 17);
+            label4.TabIndex = 22;
+            label4.Text = "除了以上报价以外, 通过其他平台/方式向你发起的报价";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label3.ForeColor = Color.Gray;
+            label3.Location = new Point(99, 23);
+            label3.Name = "label3";
+            label3.Size = new Size(289, 17);
+            label3.TabIndex = 21;
+            label3.Text = "BUFF平台向你发起的报价, 仅在登录BUFF帐号后生效";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label2.ForeColor = Color.Red;
+            label2.Location = new Point(99, 77);
+            label2.Name = "label2";
+            label2.Size = new Size(310, 17);
+            label2.TabIndex = 20;
+            label2.Text = "勾选后自动接受所有报价, 其余开关全部忽略, 请谨慎勾选";
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label1.ForeColor = Color.Gray;
-            label1.Location = new Point(161, 78);
+            label1.Location = new Point(161, 104);
             label1.Name = "label1";
             label1.Size = new Size(291, 17);
             label1.TabIndex = 19;
-            label1.Text = "勾选后仅自动接受满足规则的报价, 其余报价全部忽略";
+            label1.Text = "勾选后仅自动接受满足规则的报价, 其余开关全部忽略";
             // 
             // setAcceptGiveOfferRoleBtn
             // 
             setAcceptGiveOfferRoleBtn.AutoSize = true;
-            setAcceptGiveOfferRoleBtn.Location = new Point(99, 78);
+            setAcceptGiveOfferRoleBtn.Location = new Point(99, 104);
             setAcceptGiveOfferRoleBtn.Name = "setAcceptGiveOfferRoleBtn";
             setAcceptGiveOfferRoleBtn.Size = new Size(56, 17);
             setAcceptGiveOfferRoleBtn.TabIndex = 18;
@@ -169,7 +208,7 @@
             // autoAcceptGiveOffer_Custom
             // 
             autoAcceptGiveOffer_Custom.AutoSize = true;
-            autoAcceptGiveOffer_Custom.Location = new Point(6, 77);
+            autoAcceptGiveOffer_Custom.Location = new Point(6, 103);
             autoAcceptGiveOffer_Custom.Name = "autoAcceptGiveOffer_Custom";
             autoAcceptGiveOffer_Custom.Size = new Size(87, 21);
             autoAcceptGiveOffer_Custom.TabIndex = 17;
@@ -180,30 +219,28 @@
             // autoAcceptGiveOffer_Other
             // 
             autoAcceptGiveOffer_Other.AutoSize = true;
-            autoAcceptGiveOffer_Other.Location = new Point(92, 50);
+            autoAcceptGiveOffer_Other.Location = new Point(6, 49);
             autoAcceptGiveOffer_Other.Name = "autoAcceptGiveOffer_Other";
             autoAcceptGiveOffer_Other.Size = new Size(75, 21);
             autoAcceptGiveOffer_Other.TabIndex = 16;
             autoAcceptGiveOffer_Other.Text = "其他报价";
             autoAcceptGiveOffer_Other.UseVisualStyleBackColor = true;
-            autoAcceptGiveOffer_Other.CheckedChanged += autoAcceptGiveOffer_CheckedChanged;
             // 
             // autoAcceptGiveOffer_Buff
             // 
             autoAcceptGiveOffer_Buff.AutoSize = true;
-            autoAcceptGiveOffer_Buff.Location = new Point(6, 50);
+            autoAcceptGiveOffer_Buff.Location = new Point(6, 22);
             autoAcceptGiveOffer_Buff.Name = "autoAcceptGiveOffer_Buff";
             autoAcceptGiveOffer_Buff.Size = new Size(80, 21);
             autoAcceptGiveOffer_Buff.TabIndex = 15;
             autoAcceptGiveOffer_Buff.Text = "BUFF报价";
             autoAcceptGiveOffer_Buff.UseVisualStyleBackColor = true;
-            autoAcceptGiveOffer_Buff.CheckedChanged += autoAcceptGiveOffer_CheckedChanged;
             // 
             // groupBox3
             // 
             groupBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox3.Controls.Add(autoAcceptReceiveOffer);
-            groupBox3.Location = new Point(12, 241);
+            groupBox3.Location = new Point(12, 303);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(466, 66);
             groupBox3.TabIndex = 18;
@@ -214,7 +251,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(490, 373);
+            ClientSize = new Size(490, 409);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -254,5 +291,8 @@
         private CheckBox autoAcceptGiveOffer_Custom;
         private LinkLabel setAcceptGiveOfferRoleBtn;
         private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
     }
 }
