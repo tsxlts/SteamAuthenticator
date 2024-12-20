@@ -54,6 +54,9 @@ namespace Steam_Authenticator.Internal
 
         public bool SaveEntry<T>(string path, string name, string password, T entry) where T : IStreamSerializer
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path, "path");
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, "name");
+
             using (var stream = entry.Serialize())
             {
                 byte[] encrypted = new byte[stream.Length];
@@ -171,56 +174,56 @@ namespace Steam_Authenticator.Internal
 
         private bool Save()
         {
-            using (var fileStream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (MemoryStream stream = new MemoryStream())
             {
-                fileStream.SetLength(0);
+                stream.WriteBoolean(Encrypted);
 
-                using (MemoryStream stream = new MemoryStream())
+                stream.WriteInt32(IV.Length);
+                stream.WriteInt32(Salt.Length);
+
+                stream.Write(IV);
+                stream.Write(Salt);
+
+                stream.WriteInt32(Sign.Length);
+                stream.Write(Sign);
+
+                stream.Write(new byte[] { 0x0A });
+
+                using (var headerStream = new MemoryStream())
                 {
-                    stream.WriteBoolean(Encrypted);
+                    Serializer.Serialize(headerStream, Header);
+                    var headerBuffer = headerStream.ToArray();
+                    stream.WriteInt32(headerBuffer.Length);
+                    stream.Write(headerBuffer);
+                }
 
-                    stream.WriteInt32(IV.Length);
-                    stream.WriteInt32(Salt.Length);
+                stream.Write(new byte[] { 0x0A });
 
-                    stream.Write(IV);
-                    stream.Write(Salt);
+                byte[] pathBuffer;
+                byte[] nameBuffer;
+                byte[] dataBuffer;
+                foreach (ManifestEntry entry in Entries)
+                {
+                    pathBuffer = Encoding.UTF8.GetBytes(entry.Path);
+                    nameBuffer = Encoding.UTF8.GetBytes(entry.Name ?? "");
+                    dataBuffer = entry.Data;
 
-                    stream.WriteInt32(Sign.Length);
-                    stream.Write(Sign);
+                    stream.WriteInt32(pathBuffer.Length);
+                    stream.WriteInt32(nameBuffer.Length);
+                    stream.WriteInt32(dataBuffer.Length);
 
                     stream.Write(new byte[] { 0x0A });
-
-                    using (var headerStream = new MemoryStream())
-                    {
-                        Serializer.Serialize(headerStream, Header);
-                        var headerBuffer = headerStream.ToArray();
-                        stream.WriteInt32(headerBuffer.Length);
-                        stream.Write(headerBuffer);
-                    }
-
+                    stream.Write(pathBuffer);
                     stream.Write(new byte[] { 0x0A });
+                    stream.Write(nameBuffer);
+                    stream.Write(new byte[] { 0x0A });
+                    stream.Write(dataBuffer);
+                    stream.Write(new byte[] { 0x0A });
+                }
 
-                    byte[] pathBuffer;
-                    byte[] nameBuffer;
-                    byte[] dataBuffer;
-                    foreach (ManifestEntry entry in Entries)
-                    {
-                        pathBuffer = Encoding.UTF8.GetBytes(entry.Path);
-                        nameBuffer = Encoding.UTF8.GetBytes(entry.Name);
-                        dataBuffer = entry.Data;
-
-                        stream.WriteInt32(pathBuffer.Length);
-                        stream.WriteInt32(nameBuffer.Length);
-                        stream.WriteInt32(dataBuffer.Length);
-
-                        stream.Write(new byte[] { 0x0A });
-                        stream.Write(pathBuffer);
-                        stream.Write(new byte[] { 0x0A });
-                        stream.Write(nameBuffer);
-                        stream.Write(new byte[] { 0x0A });
-                        stream.Write(dataBuffer);
-                        stream.Write(new byte[] { 0x0A });
-                    }
+                using (var fileStream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    fileStream.SetLength(0);
 
                     stream.Seek(0, SeekOrigin.Begin);
                     stream.CopyTo(fileStream);

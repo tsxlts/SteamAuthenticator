@@ -88,19 +88,22 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public string Nickname { get; set; }
-
-        public BuffUserSetting Setting { get; set; } = new BuffUserSetting
-        {
-            AutoAcceptGiveOffer = false
-        };
     }
 
-    public class BuffUserSetting
+    public class EcoUser : JsonStreamSerializer<EcoUser>
     {
-        /// <summary>
-        /// 是否自动接收索取报价
-        /// 发货报价
-        /// </summary>
-        public bool AutoAcceptGiveOffer { get; set; }
+        public string ClientId { get; set; }
+
+        public string RefreshToken { get; set; }
+
+        public DateTime RefreshTokenExpireTime { get; set; }
+
+        public string UserId { get; set; }
+
+        public List<string> SteamIds { get; set; } = new List<string>();
+
+        public string Avatar { get; set; }
+
+        public string Nickname { get; set; }
     }
 }

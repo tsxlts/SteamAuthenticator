@@ -1,5 +1,4 @@
-﻿
-using Steam_Authenticator.Forms;
+﻿using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
@@ -762,6 +761,13 @@ namespace Steam_Authenticator
                     $"{Environment.NewLine}" +
                     $"导入失败{error.Count}个{Environment.NewLine}{(error.Any() ? string.Join(Environment.NewLine, error) : "")}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void exportAuthenticatorMenuItem_Click(object sender, EventArgs e)
+        {
+            string account = currentClient?.GetAccount();
+            ExportGuardOptions exportGuardOptions = new ExportGuardOptions(account);
+            exportGuardOptions.ShowDialog();
         }
 
         private async void importSecretAuthenticatorMenuItem_Click(object sender, EventArgs e)

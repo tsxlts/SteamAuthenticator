@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator
+﻿using Steam_Authenticator.Controls;
+
+namespace Steam_Authenticator
 {
     partial class MainForm
     {
@@ -45,7 +47,7 @@
             OfferCountLabel = new Label();
             label2 = new Label();
             label1 = new Label();
-            usersPanel = new Panel();
+            usersPanel = new SteamUserCollectionPanel();
             pictureBox1 = new PictureBox();
             label3 = new Label();
             label4 = new Label();
@@ -57,9 +59,14 @@
             tabControl = new TabControl();
             steamPage = new TabPage();
             buffPage = new TabPage();
-            buffUsersPanel = new Panel();
+            buffUsersPanel = new BuffUserCollectionPanel();
             pictureBox2 = new PictureBox();
+            ecoPage = new TabPage();
+            ecoUsersPanel = new EcoUserCollectionPanel();
+            pictureBox6 = new PictureBox();
             statusPanel = new Panel();
+            label10 = new Label();
+            pictureBox5 = new PictureBox();
             label9 = new Label();
             label8 = new Label();
             pictureBox4 = new PictureBox();
@@ -67,8 +74,7 @@
             SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
-            label10 = new Label();
-            pictureBox5 = new PictureBox();
+            exportAuthenticatorMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -79,10 +85,13 @@
             buffPage.SuspendLayout();
             buffUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ecoPage.SuspendLayout();
+            ecoUsersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             statusPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -138,7 +147,7 @@
             // 
             // authenticatorMenuItem
             // 
-            authenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
+            authenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, exportAuthenticatorMenuItem, removeAuthenticatorMenuItem });
             authenticatorMenuItem.Name = "authenticatorMenuItem";
             authenticatorMenuItem.Size = new Size(80, 21);
             authenticatorMenuItem.Text = "令牌验证器";
@@ -146,21 +155,21 @@
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(124, 22);
+            guardMenuItem.Size = new Size(180, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(124, 22);
+            addAuthenticatorMenuItem.Size = new Size(180, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(124, 22);
+            moveAuthenticatorMenuItem.Size = new Size(180, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -168,27 +177,27 @@
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(124, 22);
+            importAuthenticatorMenuItem.Size = new Size(180, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
             // 
             importFileAuthenticatorMenuItem.Name = "importFileAuthenticatorMenuItem";
-            importFileAuthenticatorMenuItem.Size = new Size(124, 22);
+            importFileAuthenticatorMenuItem.Size = new Size(180, 22);
             importFileAuthenticatorMenuItem.Text = "文件导入";
             importFileAuthenticatorMenuItem.Click += importFileAuthenticatorMenuItem_Click;
             // 
             // importSecretAuthenticatorMenuItem
             // 
             importSecretAuthenticatorMenuItem.Name = "importSecretAuthenticatorMenuItem";
-            importSecretAuthenticatorMenuItem.Size = new Size(124, 22);
+            importSecretAuthenticatorMenuItem.Size = new Size(180, 22);
             importSecretAuthenticatorMenuItem.Text = "秘钥导入";
             importSecretAuthenticatorMenuItem.Click += importSecretAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(124, 22);
+            removeAuthenticatorMenuItem.Size = new Size(180, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
@@ -341,10 +350,10 @@
             // 
             // usersPanel
             // 
-            usersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             usersPanel.AutoScroll = true;
             usersPanel.BackgroundImageLayout = ImageLayout.Zoom;
             usersPanel.Controls.Add(pictureBox1);
+            usersPanel.Dock = DockStyle.Fill;
             usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
             usersPanel.Size = new Size(730, 298);
@@ -353,8 +362,9 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.loading;
-            pictureBox1.Location = new Point(278, 87);
+            pictureBox1.Location = new Point(313, 87);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(100, 100);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -444,6 +454,7 @@
             tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl.Controls.Add(steamPage);
             tabControl.Controls.Add(buffPage);
+            tabControl.Controls.Add(ecoPage);
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -467,32 +478,66 @@
             buffPage.Location = new Point(4, 26);
             buffPage.Name = "buffPage";
             buffPage.Padding = new Padding(3);
-            buffPage.Size = new Size(662, 280);
+            buffPage.Size = new Size(736, 304);
             buffPage.TabIndex = 1;
             buffPage.Text = "BUFF 帐号";
             buffPage.UseVisualStyleBackColor = true;
             // 
             // buffUsersPanel
             // 
-            buffUsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             buffUsersPanel.AutoScroll = true;
             buffUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
             buffUsersPanel.Controls.Add(pictureBox2);
+            buffUsersPanel.Dock = DockStyle.Fill;
             buffUsersPanel.Location = new Point(3, 3);
             buffUsersPanel.Name = "buffUsersPanel";
-            buffUsersPanel.Size = new Size(656, 274);
+            buffUsersPanel.Size = new Size(730, 298);
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
             // pictureBox2
             // 
+            pictureBox2.Anchor = AnchorStyles.None;
             pictureBox2.Image = Properties.Resources.loading;
-            pictureBox2.Location = new Point(278, 87);
+            pictureBox2.Location = new Point(313, 87);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(100, 100);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 1;
             pictureBox2.TabStop = false;
+            // 
+            // ecoPage
+            // 
+            ecoPage.Controls.Add(ecoUsersPanel);
+            ecoPage.Location = new Point(4, 26);
+            ecoPage.Name = "ecoPage";
+            ecoPage.Padding = new Padding(3);
+            ecoPage.Size = new Size(736, 304);
+            ecoPage.TabIndex = 2;
+            ecoPage.Text = "ECO 帐号";
+            ecoPage.UseVisualStyleBackColor = true;
+            // 
+            // ecoUsersPanel
+            // 
+            ecoUsersPanel.AutoScroll = true;
+            ecoUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            ecoUsersPanel.Controls.Add(pictureBox6);
+            ecoUsersPanel.Dock = DockStyle.Fill;
+            ecoUsersPanel.Location = new Point(3, 3);
+            ecoUsersPanel.Name = "ecoUsersPanel";
+            ecoUsersPanel.Size = new Size(730, 298);
+            ecoUsersPanel.TabIndex = 8;
+            // 
+            // pictureBox6
+            // 
+            pictureBox6.Anchor = AnchorStyles.None;
+            pictureBox6.Image = Properties.Resources.loading;
+            pictureBox6.Location = new Point(313, 87);
+            pictureBox6.Name = "pictureBox6";
+            pictureBox6.Size = new Size(100, 100);
+            pictureBox6.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox6.TabIndex = 0;
+            pictureBox6.TabStop = false;
             // 
             // statusPanel
             // 
@@ -512,6 +557,27 @@
             statusPanel.Name = "statusPanel";
             statusPanel.Size = new Size(599, 30);
             statusPanel.TabIndex = 17;
+            // 
+            // label10
+            // 
+            label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label10.AutoSize = true;
+            label10.ForeColor = Color.FromArgb(57, 89, 220);
+            label10.Location = new Point(491, 7);
+            label10.Name = "label10";
+            label10.Size = new Size(56, 17);
+            label10.TabIndex = 20;
+            label10.Text = "自动收货";
+            // 
+            // pictureBox5
+            // 
+            pictureBox5.Image = Properties.Resources.auto_accept;
+            pictureBox5.Location = new Point(467, 5);
+            pictureBox5.Name = "pictureBox5";
+            pictureBox5.Size = new Size(21, 21);
+            pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox5.TabIndex = 19;
+            pictureBox5.TabStop = false;
             // 
             // label9
             // 
@@ -588,26 +654,12 @@
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 
-            // label10
+            // exportAuthenticatorMenuItem
             // 
-            label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            label10.AutoSize = true;
-            label10.ForeColor = Color.FromArgb(57, 89, 220);
-            label10.Location = new Point(491, 7);
-            label10.Name = "label10";
-            label10.Size = new Size(56, 17);
-            label10.TabIndex = 20;
-            label10.Text = "自动收货";
-            // 
-            // pictureBox5
-            // 
-            pictureBox5.Image = Properties.Resources.auto_accept;
-            pictureBox5.Location = new Point(467, 5);
-            pictureBox5.Name = "pictureBox5";
-            pictureBox5.Size = new Size(21, 21);
-            pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox5.TabIndex = 19;
-            pictureBox5.TabStop = false;
+            exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
+            exportAuthenticatorMenuItem.Size = new Size(180, 22);
+            exportAuthenticatorMenuItem.Text = "导出令牌";
+            exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
             // 
             // MainForm
             // 
@@ -645,11 +697,14 @@
             buffPage.ResumeLayout(false);
             buffUsersPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ecoPage.ResumeLayout(false);
+            ecoUsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -679,7 +734,7 @@
         private Label acceptOfferBtn;
         private Label declineOfferBtn;
         private Label confirmationBtn;
-        private Panel usersPanel;
+        private SteamUserCollectionPanel usersPanel;
         private ToolStripMenuItem checkVersionMenuItem;
         private ToolStripMenuItem quitMenuItem;
         private Label label3;
@@ -695,7 +750,7 @@
         private TabPage steamPage;
         private TabPage buffPage;
         private Panel statusPanel;
-        private Panel buffUsersPanel;
+        private BuffUserCollectionPanel buffUsersPanel;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private Label SteamId;
@@ -708,5 +763,9 @@
         private Label label9;
         private Label label10;
         private PictureBox pictureBox5;
+        private TabPage ecoPage;
+        private EcoUserCollectionPanel ecoUsersPanel;
+        private PictureBox pictureBox6;
+        private ToolStripMenuItem exportAuthenticatorMenuItem;
     }
 }

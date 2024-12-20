@@ -7,6 +7,7 @@ namespace Steam_Authenticator.Model
         private readonly string guardPath = "sda/guard";
         private readonly string userPath = "sda/user";
         private readonly string buffUserPath = "sda/buffUser";
+        private readonly string ecoUserPath = "sda/ecoUser";
         private readonly Manifest manifest;
 
         public AppManifest()
@@ -88,6 +89,31 @@ namespace Steam_Authenticator.Model
         public IEnumerable<string> GetBuffUser()
         {
             return manifest.GetEntries(buffUserPath);
+        }
+        #endregion
+
+        #region EcoUser
+        public void SaveEcoUser(string userId, EcoUser entry)
+        {
+            string password = GetPassword();
+            manifest.SaveEntry(ecoUserPath, userId, password, entry);
+        }
+
+        public bool RemoveEcoUser(string userId, out EcoUser entry)
+        {
+            string password = GetPassword();
+            return manifest.RemoveEntry(ecoUserPath, userId, password, out entry);
+        }
+
+        public EcoUser GetEcoUser(string userId)
+        {
+            string password = GetPassword();
+            return manifest.GetEntry<EcoUser>(ecoUserPath, userId, password)?.Value;
+        }
+
+        public IEnumerable<string> GetEcoUser()
+        {
+            return manifest.GetEntries(ecoUserPath);
         }
         #endregion
 

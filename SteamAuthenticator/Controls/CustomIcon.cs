@@ -7,6 +7,9 @@ namespace Steam_Authenticator.Controls
         private readonly Icon source;
         private readonly Options options;
 
+        private Icon grayscale = null;
+        private Icon purple = null;
+
         public CustomIcon(Icon icon, Options options)
         {
             source = icon;
@@ -15,11 +18,18 @@ namespace Steam_Authenticator.Controls
 
         public string Name { get; set; }
 
-        public Icon Icon => options.Convert(source);
+        public Icon Source => source;
 
-        public static Icon ConvertToGrayscale(Icon icon)
+        public Icon Icon => options.Convert(this);
+
+        public Icon ConvertToGrayscale()
         {
-            Bitmap original = icon.ToBitmap();
+            if (grayscale != null)
+            {
+                return grayscale;
+            }
+
+            Bitmap original = source.ToBitmap();
             Bitmap newBmp = new Bitmap(original.Width, original.Height);
             Graphics g = Graphics.FromImage(newBmp);
             ColorMatrix colorMatrix = new ColorMatrix(
@@ -36,12 +46,18 @@ namespace Steam_Authenticator.Controls
             g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, img);
             g.Dispose();
 
-            return Icon.FromHandle(newBmp.GetHicon());
+            grayscale = Icon.FromHandle(newBmp.GetHicon());
+            return grayscale;
         }
 
-        public static Icon ConvertToPurple(Icon icon)
+        public Icon ConvertToPurple()
         {
-            Bitmap original = icon.ToBitmap();
+            if (purple != null)
+            {
+                return purple;
+            }
+
+            Bitmap original = source.ToBitmap();
             Bitmap newBmp = new Bitmap(original.Width, original.Height);
             Graphics g = Graphics.FromImage(newBmp);
             ColorMatrix colorMatrix = new ColorMatrix(
@@ -58,12 +74,13 @@ namespace Steam_Authenticator.Controls
             g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height), 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, img);
             g.Dispose();
 
-            return Icon.FromHandle(newBmp.GetHicon());
+            purple = Icon.FromHandle(newBmp.GetHicon());
+            return purple;
         }
 
         public class Options
         {
-            public delegate Icon IconConvert(Icon icon);
+            public delegate Icon IconConvert(CustomIcon icon);
 
             public IconConvert Convert { get; set; }
         }

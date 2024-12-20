@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using QRCoder;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model.BUFF;
 using SteamKit;
 using SteamKit.Model;
@@ -93,7 +94,7 @@ namespace Steam_Authenticator.Forms
 
         private async Task QrCodeLoginOpen()
         {
-            var qrCodePollResult = await SteamApi.GetAsync<BuffResponse<JObject>>($"https://buff.163.com/account/api/qr_code_login_open", currentCookies: currentCookies);
+            var qrCodePollResult = await SteamApi.GetAsync<BuffResponse<JObject>>($"{BuffApi.Api}/account/api/qr_code_login_open", currentCookies: currentCookies);
             currentCookies.Add(qrCodePollResult.Cookies);
         }
 
@@ -101,7 +102,7 @@ namespace Steam_Authenticator.Forms
         {
             try
             {
-                var createQrCode = await SteamApi.PostAsync<BuffResponse<JObject>>("https://buff.163.com/account/api/qr_code_create", JsonContent.Create(new
+                var createQrCode = await SteamApi.PostAsync<BuffResponse<JObject>>($"{BuffApi.Api}/account/api/qr_code_create", JsonContent.Create(new
                 {
                     code_type = 1,
                     extra_param = "{}"
@@ -132,7 +133,7 @@ namespace Steam_Authenticator.Forms
 
         private async Task<IWebResponse<BuffResponse<JObject>>> QrCodePoll()
         {
-            var qrCodePollResult = await SteamApi.GetAsync<BuffResponse<JObject>>($"https://buff.163.com/account/api/qr_code_poll?item_id={Uri.EscapeDataString(codeId)}",
+            var qrCodePollResult = await SteamApi.GetAsync<BuffResponse<JObject>>($"{BuffApi.Api}/account/api/qr_code_poll?item_id={Uri.EscapeDataString(codeId)}",
                 currentCookies: currentCookies);
 
             currentCookies.Add(qrCodePollResult.Cookies);
@@ -152,7 +153,7 @@ namespace Steam_Authenticator.Forms
                 {"Accept","*/*" }
             };
 
-            var login = await SteamApi.PostAsync<BuffResponse<QrCodeLoginResponse>>("https://buff.163.com/account/api/qr_code_login", JsonContent.Create(new
+            var login = await SteamApi.PostAsync<BuffResponse<QrCodeLoginResponse>>($"{BuffApi.Api}/account/api/qr_code_login", JsonContent.Create(new
             {
                 item_id = codeId,
                 web_device_id = deviceId

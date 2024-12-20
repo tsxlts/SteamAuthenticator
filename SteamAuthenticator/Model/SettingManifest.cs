@@ -58,6 +58,11 @@ namespace Steam_Authenticator.Model
             /// <summary>
             /// 
             /// </summary>
+            public string InitialDirectory { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
             [JsonProperty("current_user")]
             public string CurrentUser { get; set; }
 

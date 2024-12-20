@@ -7,9 +7,11 @@ namespace Steam_Authenticator
 {
     public partial class MainForm
     {
+        private const double RefreshBuffUserInterval = 5 * 60;
+
         private void buffUserPanel_SizeChanged(object sender, EventArgs e)
         {
-            ResetBuffUserPanel();
+            buffUsersPanel.Reset();
         }
 
         private async void btnBuffUser_Click(object sender, MouseEventArgs e)
@@ -34,33 +36,6 @@ namespace Steam_Authenticator
         private void addBuffUserBtn_Click(object sender, EventArgs e)
         {
             BuffLogin("请扫码登录 BUFF 帐号");
-        }
-
-        private void buffOffersNumberBtn_Click(object sender, EventArgs e)
-        {
-            Control control = sender as Control;
-            BuffUserPanel panel = control.Parent as BuffUserPanel;
-            BuffClient buffClient = panel.Client;
-        }
-
-        private void buffSettingMenuItem_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
-            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
-
-            BuffUserPanel panel = menuStrip.SourceControl.Parent as BuffUserPanel;
-            BuffClient client = panel.Client;
-
-            BuffSetting buffSetting = new BuffSetting(client.User.Setting);
-            if (buffSetting.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
-
-            var setting = buffSetting.Setting;
-            client.User.Setting = setting;
-
-            Appsetting.Instance.Manifest.SaveBuffUser(client.User.UserId, client.User);
         }
 
         private async void buffReloginMenuItem_Click(object sender, EventArgs e)
@@ -91,7 +66,7 @@ namespace Steam_Authenticator
 
             await client.LogoutAsync();
 
-            ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10 * 60));
+            ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(RefreshBuffUserInterval));
         }
 
         private void removeBuffUserMenuItem_Click(object sender, EventArgs e)
@@ -104,70 +79,39 @@ namespace Steam_Authenticator
 
             Appsetting.Instance.Manifest.RemoveBuffUser(client.User.UserId, out var entry);
             Appsetting.Instance.BuffClients.Remove(client);
-            buffUsersPanel.Controls.Remove(panel);
 
-            ResetBuffUserPanel();
+            buffUsersPanel.RemoveClient(client);
         }
 
         private async Task LoadBuffUsers()
         {
             try
             {
-                buffUsersPanel.Controls.Clear();
+                buffUsersPanel.ClearItems();
 
-                int startX = GetBuffUserControlStartPointX(out int cells);
+                var accounts = Appsetting.Instance.Manifest.GetBuffUser().ToList();
 
-                Appsetting.Instance.BuffClients.RemoveAll(c => !c.LoggedIn);
-
-                IEnumerable<string> accounts = Appsetting.Instance.Manifest.GetBuffUser();
-                int index = 0;
                 foreach (string account in accounts)
                 {
                     BuffUser user = Appsetting.Instance.Manifest.GetBuffUser(account);
                     BuffClient client = new BuffClient(user);
 
-                    BuffUserPanel panel = CreateUserPanel(startX, cells, index, client);
-                    buffUsersPanel.Controls.Add(panel);
+                    AddUserPanel(client);
 
-                    index++;
-
-                    Appsetting.Instance.BuffClients.Add(panel.Client);
+                    Appsetting.Instance.BuffClients.Add(client);
                 }
 
                 {
-                    BuffUserPanel panel = new BuffUserPanel(false)
-                    {
-                        Size = new Size(80, 116),
-                        Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
-                        Client = BuffClient.None
-                    };
+                    BuffUserPanel panel = buffUsersPanel.AddItemPanel(false, BuffClient.None);
 
-                    PictureBox pictureBox = new PictureBox()
-                    {
-                        Width = 80,
-                        Height = 80,
-                        Location = new Point(0, 0),
-                        Cursor = Cursors.Hand,
-                        SizeMode = PictureBoxSizeMode.Zoom
-                    };
-                    pictureBox.Image = Properties.Resources.add;
-                    pictureBox.Click += addBuffUserBtn_Click;
-                    panel.Controls.Add(pictureBox);
+                    panel.ItemIcon.Image = Properties.Resources.add;
+                    panel.ItemIcon.Click += addBuffUserBtn_Click;
 
-                    Label nameLabel = new Label()
-                    {
-                        Text = $"添加帐号",
-                        AutoSize = false,
-                        AutoEllipsis = true,
-                        Cursor = Cursors.Hand,
-                        Size = new Size(80, 18),
-                        TextAlign = ContentAlignment.TopCenter,
-                        ForeColor = Color.FromArgb(244, 164, 96),
-                        Location = new Point(0, 80)
-                    };
-                    nameLabel.Click += addBuffUserBtn_Click;
-                    panel.Controls.Add(nameLabel);
-                    buffUsersPanel.Controls.Add(panel);
+                    panel.ItemName.Text = $"添加帐号";
+                    panel.ItemName.ForeColor = Color.FromArgb(244, 164, 96);
+                    panel.ItemName.Click += addBuffUserBtn_Click;
+
+                    panel.Offer.Hide();
                 }
 
                 var tasks = Appsetting.Instance.BuffClients.Select(c => c.RefreshAsync(true));
@@ -179,7 +123,7 @@ namespace Steam_Authenticator
             }
             finally
             {
-                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(10));
+                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(RefreshBuffUserInterval));
             }
         }
 
@@ -197,8 +141,7 @@ namespace Steam_Authenticator
                 SteamId = buffAuth.Result.Body.data.steamid,
                 Nickname = buffAuth.Result.Body.data.nickname,
                 Avatar = buffAuth.Result.Body.data.avatar,
-                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}")),
-                Setting = Appsetting.Instance.Manifest.GetBuffUser(buffAuth.Result.Body.data.id)?.Setting ?? new Model.BuffUserSetting()
+                BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"))
             };
             var buffClient = new BuffClient(buffUser)
             {
@@ -209,89 +152,20 @@ namespace Steam_Authenticator
             Appsetting.Instance.BuffClients.RemoveAll(c => c.User.UserId == buffUser.UserId);
             Appsetting.Instance.BuffClients.Add(buffClient);
 
-            var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToList();
-            var index = controlCollection.FindIndex(c => c.Client.User.UserId == buffUser.UserId);
-
-            if (index < 0)
-            {
-                index = controlCollection.Count - 1;
-            }
-            else
-            {
-                controlCollection.RemoveAt(index);
-            }
-
-            int startX = GetBuffUserControlStartPointX(out int cells);
-            BuffUserPanel panel = CreateUserPanel(startX, cells, index, buffClient);
-            controlCollection.Insert(index, panel);
-
-            buffUsersPanel.Controls.Clear();
-            buffUsersPanel.Controls.AddRange(controlCollection.ToArray());
-            ResetBuffUserPanel();
+            AddUserPanel(buffClient);
 
             return buffClient;
         }
 
-        private BuffUserPanel CreateUserPanel(int startX, int cells, int index, BuffClient buffClient)
+        private BuffUserPanel AddUserPanel(BuffClient buffClient)
         {
-            BuffUserPanel panel = new BuffUserPanel(true)
-            {
-                Name = buffClient.User.UserId,
-                Size = new Size(80, 116),
-                Location = new Point(startX * (index % cells) + 10, 126 * (index / cells) + 10),
-                Client = buffClient
-            };
+            BuffUserPanel panel = buffUsersPanel.AddItemPanel(true, buffClient);
 
-            PictureBox pictureBox = new PictureBox()
-            {
-                Name = "useravatar",
-                Width = 80,
-                Height = 80,
-                Location = new Point(0, 0),
-                Cursor = Cursors.Hand,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                InitialImage = Properties.Resources.loading,
-            };
-            string avatar = buffClient.User.Avatar;
-            pictureBox.Image = Properties.Resources.userimg;
-            if (!string.IsNullOrEmpty(avatar))
-            {
-                pictureBox.LoadAsync(avatar);
-            }
-            pictureBox.MouseClick += btnBuffUser_Click;
-            pictureBox.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.SetUserAvatarBox(pictureBox);
+            panel.ItemIcon.MouseClick += btnBuffUser_Click;
+            panel.ItemIcon.ContextMenuStrip = buffUserContextMenuStrip;
 
-            Label nameLabel = new Label()
-            {
-                Name = "username",
-                Text = $"{buffClient.User.Nickname}",
-                AutoSize = false,
-                AutoEllipsis = true,
-                Cursor = Cursors.Hand,
-                Size = new Size(80, 18),
-                TextAlign = ContentAlignment.TopCenter,
-                ForeColor = buffClient.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
-                Location = new Point(0, 80)
-            };
-            nameLabel.MouseClick += btnBuffUser_Click;
-            nameLabel.ContextMenuStrip = buffUserContextMenuStrip;
-            panel.SetUserNameBox(nameLabel);
-
-            Label offerLabel = new Label()
-            {
-                Name = "offer",
-                Text = $"---",
-                AutoSize = false,
-                AutoEllipsis = true,
-                Cursor = Cursors.Default,
-                Size = new Size(80, 18),
-                TextAlign = ContentAlignment.TopCenter,
-                ForeColor = Color.FromArgb(255, 128, 0),
-                Location = new Point(0, 98)
-            };
-            offerLabel.Click += buffOffersNumberBtn_Click;
-            panel.SetOfferBox(offerLabel);
+            panel.ItemName.MouseClick += btnBuffUser_Click;
+            panel.ItemName.ContextMenuStrip = buffUserContextMenuStrip;
 
             panel.Client
                 .WithStartLogin((relogin) =>
@@ -301,50 +175,14 @@ namespace Steam_Authenticator
                         return;
                     }
 
-                    nameLabel.ForeColor = Color.FromArgb(128, 128, 128);
+                    panel.ItemName.ForeColor = Color.FromArgb(128, 128, 128);
                 })
                 .WithEndLogin((relogin, loggined) =>
                 {
-                    nameLabel.ForeColor = loggined ? Color.Green : Color.Red;
+                    panel.ItemName.ForeColor = loggined ? Color.Green : Color.Red;
                 });
 
             return panel;
-        }
-
-        private void ResetBuffUserPanel()
-        {
-            try
-            {
-                var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToArray();
-
-                int x = GetBuffUserControlStartPointX(out int cells);
-
-                int index = 0;
-                foreach (Control control in controlCollection)
-                {
-                    control.Location = new Point(x * (index % cells) + 10, 126 * (index / cells) + 10);
-                    index++;
-                }
-
-                buffUsersPanel.Controls.Clear();
-                buffUsersPanel.Controls.AddRange(controlCollection);
-            }
-            catch
-            {
-
-            }
-        }
-
-        private int GetBuffUserControlStartPointX(out int cells)
-        {
-            cells = (buffUsersPanel.Size.Width - 30) / 80;
-            int size = (buffUsersPanel.Size.Width - 30 - cells * 80) / (cells - 1) + 80;
-            if (size < 85)
-            {
-                cells = cells - 1;
-                size = (buffUsersPanel.Size.Width - 30 - cells * 80) / (cells - 1) + 80;
-            }
-            return size;
         }
 
         private void RefreshBuffUser(object _)
@@ -353,10 +191,10 @@ namespace Steam_Authenticator
             {
                 using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
                 {
-                    var controlCollection = buffUsersPanel.Controls.Cast<BuffUserPanel>().ToArray();
+                    var controlCollection = buffUsersPanel.ItemPanels;
                     foreach (BuffUserPanel userPanel in controlCollection)
                     {
-                        if (string.IsNullOrWhiteSpace(userPanel.UserName))
+                        if (!userPanel.HasItem)
                         {
                             continue;
                         }
@@ -374,7 +212,7 @@ namespace Steam_Authenticator
             }
             finally
             {
-                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(10 * 60), TimeSpan.FromSeconds(10 * 60));
+                ResetRefreshBuffUserTimer(TimeSpan.FromSeconds(RefreshBuffUserInterval), TimeSpan.FromSeconds(RefreshBuffUserInterval * 1.5d));
             }
         }
     }
