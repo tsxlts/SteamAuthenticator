@@ -50,6 +50,7 @@
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="127.3.50" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="SteamKit" Version="2.0.0.23" />
+    <PackageReference Include="Vdaima.Utils.Core" Version="2.1.0.2" />
     <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.14" />
   </ItemGroup>
 

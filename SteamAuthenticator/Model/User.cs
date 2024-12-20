@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Steam_Authenticator.Model.ECO;
 
 namespace Steam_Authenticator.Model
 {
@@ -100,10 +101,38 @@ namespace Steam_Authenticator.Model
 
         public string UserId { get; set; }
 
-        public List<string> SteamIds { get; set; } = new List<string>();
+        public List<SteamUser> SteamUsers { get; set; } = new List<SteamUser>();
 
         public string Avatar { get; set; }
 
         public string Nickname { get; set; }
+
+        public List<AutoBuyGoods> BuyGoods { get; set; } = new List<AutoBuyGoods>();
+
+        public class SteamUser
+        {
+            public string SteamId { get; set; }
+
+            public string NickName { get; set; }
+        }
+
+        public class AutoBuyGoods
+        {
+            public string GameId { get; set; }
+
+            public string HashName { get; set; }
+
+            public decimal MaxPrice { get; set; }
+
+            public int BuySize { get; set; } = 1;
+
+            public string SteamId { get; set; }
+
+            public PayType PayType { get; set; }
+
+            public string NotifyAddress { get; set; }
+
+            public bool Enabled { get; set; }
+        }
     }
 }

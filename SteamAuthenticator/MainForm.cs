@@ -75,6 +75,7 @@ namespace Steam_Authenticator
             buffUserContextMenuStrip.Items.Add("ÒÆ³ýÕÊºÅ").Click += removeBuffUserMenuItem_Click;
 
             ecoUserContextMenuStrip = new ContextMenuStrip();
+            ecoUserContextMenuStrip.Items.Add("×Ô¶¯É¨»õ").Click += ecoAutoBuySettingMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += ecoReloginMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += ecoLogoutMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("ÒÆ³ýÕÊºÅ").Click += removeEcoUserMenuItem_Click;

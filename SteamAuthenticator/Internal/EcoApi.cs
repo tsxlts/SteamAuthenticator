@@ -46,6 +46,12 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
+        public static async Task<EcoResponse<QueryGoodsDetailResponse>> QueryGoodsDetailAsync(string gameId, string hashName, CancellationToken cancellationToken = default)
+        {
+            var response = await SteamApi.GetAsync<EcoResponse<QueryGoodsDetailResponse>>($"{Api}/Api/SteamGoods/GoodsDetailQuery?Id=&gameId={gameId}&hashName={hashName}&_={Extension.GetSystemMilliTimestamp()}", cancellationToken: cancellationToken);
+            return response.Body;
+        }
+
         public static async Task<EcoResponse<PagesModel<QuerySellGoodsResponse>>> QuerySellGoodsAsync(EcoClient client, string gameId, string hashName, decimal maxPrice, int count, CancellationToken cancellationToken = default)
         {
             var response = await PostAsync<PagesModel<QuerySellGoodsResponse>>(client, $"{Api}/Api/SteamGoods/SellGoodsQuery", new

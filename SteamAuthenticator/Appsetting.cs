@@ -316,7 +316,11 @@ namespace Steam_Authenticator
 
             User.Nickname = userData.UserName;
             User.Avatar = userData.UserHead;
-            User.SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
+            User.SteamUsers = steamUserData?.Select(c => new EcoUser.SteamUser
+            {
+                SteamId = c.SteamId,
+                NickName = c.NickName
+            }).ToList() ?? new List<EcoUser.SteamUser>();
 
             Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
         }
