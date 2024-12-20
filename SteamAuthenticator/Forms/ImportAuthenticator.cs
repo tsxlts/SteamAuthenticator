@@ -15,7 +15,7 @@
         {
             if (string.IsNullOrWhiteSpace(SharedSecret) && string.IsNullOrWhiteSpace(IdentitySecret))
             {
-                MessageBox.Show("登录秘钥和是否秘钥至少有一项不能为空");
+                MessageBox.Show("登录秘钥和身份秘钥至少有一项不能为空");
 
                 return;
             }
