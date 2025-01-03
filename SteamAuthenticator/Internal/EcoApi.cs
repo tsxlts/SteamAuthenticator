@@ -46,6 +46,12 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
+        public static async Task<EcoResponse<List<KeyWordSearchResponse>>> KeyWordSearchAsync(EcoClient client, string gameId, string key, CancellationToken cancellationToken = default)
+        {
+            var response = await GetAsync<List<KeyWordSearchResponse>>(client, $"{Api}/Api/Goods/KeyWordSearch?GameId={gameId}&SearchValue={Uri.EscapeDataString(key)}&SearchType=1", cancellationToken);
+            return response;
+        }
+
         public static async Task<EcoResponse<QueryGoodsDetailResponse>> QueryGoodsDetailAsync(string gameId, string hashName, CancellationToken cancellationToken = default)
         {
             var response = await SteamApi.GetAsync<EcoResponse<QueryGoodsDetailResponse>>($"{Api}/Api/SteamGoods/GoodsDetailQuery?Id=&gameId={gameId}&hashName={hashName}&_={Extension.GetSystemMilliTimestamp()}", cancellationToken: cancellationToken);
@@ -81,6 +87,42 @@ namespace Steam_Authenticator.Internal
                 IsBatchBuy = true,
             }, cancellationToken);
             return response;
+        }
+
+        public static async Task<EcoResponse<PagesModel<QueryOrdersResponse>>> QueryWaitPayOrdersAsync(EcoClient client, string gameId, CancellationToken cancellationToken = default)
+        {
+            var response = await PostAsync<PagesModel<QueryOrdersResponse>>(client, $"{Api}/Api/Order/GetMyOrdersList", new
+            {
+                PageIndex = 1,
+                PageSize = 100,
+                UserType = 0,
+                GameId = gameId,
+                State = OrderState.待付款,
+                DetailsState = OrderDetailState.待付款,
+                TradeType = new[] { OrderType.购买 }
+            }, cancellationToken);
+            return response;
+        }
+
+        public static async Task<EcoResponse<PayOrdersResponse>> PayOrdersAsync(EcoClient client, IEnumerable<string> orderNums, PayType payType, CancellationToken cancellationToken = default)
+        {
+            var response = await PostAsync<PayOrdersResponse>(client, $"{Api}/Api/Order/PayOrders", new
+            {
+                OrderIds = orderNums.ToList(),
+                PayType = payType,
+                PayScene = PayScene.H5,
+            }, cancellationToken);
+            return response;
+        }
+
+        public static async Task<EcoResponse<List<QueryAssetResponse>>> QueryAssetAsync(string gameId, IEnumerable<string> assetIds, CancellationToken cancellationToken = default)
+        {
+            var response = await SteamApi.PostAsync<EcoResponse<List<QueryAssetResponse>>>($"{Api}/Api/SteamGoods/QueryPreviewAssets", JsonContent.Create(new
+            {
+                SteamGameId = gameId,
+                AssetIds = assetIds.ToList()
+            }), cancellationToken: cancellationToken);
+            return response.Body;
         }
 
         private static async Task<EcoResponse<TResponse>> GetAsync<TResponse>(EcoClient client, string url, CancellationToken cancellationToken = default)

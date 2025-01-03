@@ -76,6 +76,7 @@ namespace Steam_Authenticator
 
             ecoUserContextMenuStrip = new ContextMenuStrip();
             ecoUserContextMenuStrip.Items.Add("自动扫货").Click += ecoAutoBuySettingMenuItem_Click;
+            ecoUserContextMenuStrip.Items.Add("订单支付").Click += ecoOrdersMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("重新登录").Click += ecoReloginMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("退出登录").Click += ecoLogoutMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("移除帐号").Click += removeEcoUserMenuItem_Click;

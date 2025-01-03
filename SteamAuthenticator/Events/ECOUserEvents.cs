@@ -4,6 +4,7 @@ using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.ECO;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 using Vdaima.Utils.Email;
@@ -48,6 +49,18 @@ namespace Steam_Authenticator
 
             EcoAutoBuySetting ecoAutoBuySetting = new EcoAutoBuySetting(client);
             ecoAutoBuySetting.ShowDialog();
+        }
+
+        private void ecoOrdersMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            EcoUserPanel panel = menuStrip.SourceControl.Parent as EcoUserPanel;
+            EcoClient client = panel.Client;
+
+            EcoOrders ecoOrders = new EcoOrders(client);
+            ecoOrders.ShowDialog();
         }
 
         private async void ecoReloginMenuItem_Click(object sender, EventArgs e)
@@ -171,7 +184,7 @@ namespace Steam_Authenticator
                 RefreshToken = authResponse.RefreshToken,
                 RefreshTokenExpireTime = authResponse.RefreshTokenExpireDate,
 
-                BuyGoods = localUser.BuyGoods ?? new List<EcoUser.AutoBuyGoods>()
+                BuyGoods = localUser?.BuyGoods ?? new List<EcoUser.AutoBuyGoods>()
             };
             var client = new EcoClient(user)
             {
@@ -261,117 +274,214 @@ namespace Steam_Authenticator
                 };
                 EmailSender emailSender = new EmailSender(emailSetting);
 
+                ConcurrentDictionary<string, Task> tasks = new ConcurrentDictionary<string, Task>();
                 TaskFactory taskFactory = new TaskFactory();
-                Stopwatch stopwatch;
                 while (true)
                 {
-                    long interval = 500;
-                    stopwatch = Stopwatch.StartNew();
                     try
                     {
-                        List<Task> tasks = new List<Task>();
+                        var enumerator = tasks.GetEnumerator();
+                        while (enumerator.MoveNext())
+                        {
+                            if (enumerator.Current.Value.IsCompleted)
+                            {
+                                tasks.TryRemove(enumerator.Current.Key, out var _);
+                            }
+                        }
 
                         var clients = Appsetting.Instance.EcoClients;
                         foreach (var item in clients)
                         {
                             foreach (var itemGoods in item.User.BuyGoods.Where(c => c.Enabled))
                             {
+                                string key = $"{item.Key}.{itemGoods.GameId}.{itemGoods.HashName}";
+                                if (tasks.TryGetValue(key, out var runningTask) && !runningTask.IsCompleted)
+                                {
+                                    continue;
+                                }
+
                                 var task = taskFactory.StartNew((obj) =>
                                 {
                                     try
                                     {
+                                        Stopwatch stopwatch;
                                         var @params = ((EcoClient Client, EcoUser.AutoBuyGoods Goods))obj;
                                         var client = @params.Client;
                                         var goods = @params.Goods;
 
-                                        var goodsDetailResponse = EcoApi.QueryGoodsDetailAsync(goods.GameId, goods.HashName).GetAwaiter().GetResult();
-                                        var goodsDetail = goodsDetailResponse?.StatusData?.ResultData;
-                                        if (goodsDetail == null || goodsDetail.BottomPrice > goods.MaxPrice)
+                                        while (true)
                                         {
-                                            return;
-                                        }
+                                            stopwatch = Stopwatch.StartNew();
+                                            client = Appsetting.Instance.EcoClients.Find(c => c.Key == client.Key);
+                                            if (client == null)
+                                            {
+                                                break;
+                                            }
+                                            goods = client.User.BuyGoods.Find(c => c.GameId == goods.GameId && c.HashName == goods.HashName);
+                                            if (goods == null || !goods.Enabled)
+                                            {
+                                                break;
+                                            }
+                                            if (!goods.IsRunTime(DateTime.Now))
+                                            {
+                                                break;
+                                            }
 
-                                        decimal ecoPrice = goodsDetail.BottomPrice;
+                                            long interval = goods.Interval;
 
-                                        AutoBuy(client, gameId: goods.GameId, hashName: goods.HashName,
-                                          maxPrice: goods.MaxPrice, queryCount: 20,
-                                          buySize: goods.BuySize,
-                                          steamId: goods.SteamId,
-                                          payType: goods.PayType).ContinueWith(results =>
-                                          {
-                                              var createOrders = results.Result;
-                                              List<string> orders = new List<string>();
-                                              List<string> payUrls = new List<string>();
-                                              var goodsCount = createOrders.GoodsCount;
-                                              StringBuilder msgBuilder = new StringBuilder();
+                                            try
+                                            {
+                                                var goodsDetailResponse = EcoApi.QueryGoodsDetailAsync(goods.GameId, goods.HashName).GetAwaiter().GetResult();
+                                                var goodsDetail = goodsDetailResponse?.StatusData?.ResultData;
+                                                if (goodsDetail == null)
+                                                {
+                                                    continue;
+                                                }
 
-                                              foreach (var orderResponse in createOrders.OrderResponses)
-                                              {
-                                                  var orderCount = orderResponse.StatusData?.ResultData?.OrderNum?.Count;
+                                                decimal ecoPrice = goodsDetail.BottomPrice;
+                                                goods.SetCurrentPrice(DateTime.Now, ecoPrice);
 
-                                                  var msg = orderResponse.StatusMsg;
-                                                  if (!string.IsNullOrWhiteSpace(orderResponse.StatusData?.ResultMsg))
+                                                if (ecoPrice > goods.MaxPrice)
+                                                {
+                                                    continue;
+                                                }
+
+                                                var buyTask = AutoBuy(client, gameId: goods.GameId, hashName: goods.HashName,
+                                                  maxPrice: goods.MaxPrice, queryCount: 20,
+                                                  buySize: goods.BuySize,
+                                                  steamId: goods.SteamId,
+                                                  payType: goods.PayType).ContinueWith(results =>
                                                   {
-                                                      msg = orderResponse.StatusData?.ResultMsg;
-                                                  }
+                                                      var createOrders = results.Result;
+                                                      List<string> orders = new List<string>();
+                                                      List<string> payUrls = new List<string>();
+                                                      var queryGoodsError = createOrders.QueryGoodsError;
+                                                      var goodsCount = createOrders.GoodsCount;
+                                                      StringBuilder msgBuilder = new StringBuilder();
 
-                                                  string payurl = orderResponse.StatusData?.ResultData?.Action;
-                                                  if (payurl?.StartsWith("data:image/png;base64,") ?? false)
-                                                  {
-                                                      payurl = payurl.Replace("data:image/png;base64,", "");
-                                                      var buffer = Convert.FromBase64String(payurl);
-                                                      using (var skiaImage = SKBitmap.Decode(buffer))
+                                                      foreach (var orderResponse in createOrders.OrderResponses)
                                                       {
-                                                          var skiaReader = new ZXing.SkiaSharp.BarcodeReader();
-                                                          var skiaResult = skiaReader.Decode(skiaImage);
-                                                          payurl = skiaResult?.Text;
+                                                          var orderCount = orderResponse.StatusData?.ResultData?.OrderNum?.Count;
+
+                                                          var msg = orderResponse.StatusMsg;
+                                                          if (!string.IsNullOrWhiteSpace(orderResponse.StatusData?.ResultMsg))
+                                                          {
+                                                              msg = orderResponse.StatusData?.ResultMsg;
+                                                          }
+
+                                                          string ordersPayurl = orderResponse.StatusData?.ResultData?.Action;
+                                                          if (ordersPayurl?.StartsWith("data:image/png;base64,") ?? false)
+                                                          {
+                                                              ordersPayurl = ordersPayurl.Replace("data:image/png;base64,", "");
+                                                              var buffer = Convert.FromBase64String(ordersPayurl);
+                                                              using (var skiaImage = SKBitmap.Decode(buffer))
+                                                              {
+                                                                  var skiaReader = new ZXing.SkiaSharp.BarcodeReader();
+                                                                  var skiaResult = skiaReader.Decode(skiaImage);
+                                                                  ordersPayurl = skiaResult?.Text;
+                                                              }
+                                                          }
+
+                                                          orders.AddRange(orderResponse.StatusData?.ResultData?.OrderNum ?? new List<string>());
+                                                          msgBuilder.AppendLine($"[{msg}]");
+
+                                                          if (!string.IsNullOrWhiteSpace(ordersPayurl))
+                                                          {
+                                                              payUrls.Add(ordersPayurl);
+                                                          }
                                                       }
-                                                  }
 
-                                                  orders.AddRange(orderResponse.StatusData?.ResultData?.OrderNum ?? new List<string>());
-                                                  payUrls.Add(payurl);
-                                                  msgBuilder.AppendLine($"[{msg}]");
-                                              }
+                                                      if (goodsCount <= 0 && !queryGoodsError)
+                                                      {
+                                                          return;
+                                                      }
 
-                                              if (string.IsNullOrWhiteSpace(goods.NotifyAddress))
-                                              {
-                                                  return;
-                                              }
+                                                      if (string.IsNullOrWhiteSpace(goods.NotifyAddress))
+                                                      {
+                                                          return;
+                                                      }
 
-                                              StringBuilder payBuilder = new StringBuilder();
-                                              foreach (var item in payUrls)
-                                              {
-                                                  payBuilder.Append($"<p>支付地址：{item}</p>");
-                                              }
+                                                      var payurl = payUrls.FirstOrDefault();
+                                                      if (payUrls.Count > 1)
+                                                      {
+                                                          payurl = EcoApi.PayOrdersAsync(client, orders, goods.PayType).GetAwaiter().GetResult()?.StatusData?.ResultData?.Action;
+                                                          if (payurl?.StartsWith("data:image/png;base64,") ?? false)
+                                                          {
+                                                              payurl = payurl.Replace("data:image/png;base64,", "");
+                                                              var buffer = Convert.FromBase64String(payurl);
+                                                              using (var skiaImage = SKBitmap.Decode(buffer))
+                                                              {
+                                                                  var skiaReader = new ZXing.SkiaSharp.BarcodeReader();
+                                                                  var skiaResult = skiaReader.Decode(skiaImage);
+                                                                  payurl = skiaResult?.Text;
+                                                              }
+                                                          }
+                                                      }
 
-                                              emailSender.SendEmailAsync(goods.NotifyAddress,
-                                                  $"市场价格通知",
-                                                  $"<div>" +
-                                                  $"<p style='font-weight: bold;'>ECO市场价格通知</p>" +
-                                                  $"</div>" +
-                                                  $"<div>" +
-                                                  $"<p>饰品名称：{goods.HashName}</p>" +
-                                                  $"<p>监控价格：{goods.MaxPrice}</p>" +
-                                                  $"<p>市场价格：{ecoPrice}</p>" +
-                                                  $"<p>商品数量：{goodsCount}</p>" +
-                                                  $"<p>下单数量：{orders.Count}</p>" +
-                                                  $"<p>下单返回：{msgBuilder}</p>" +
-                                                  $"</div>" +
-                                                  $"<div>{payBuilder}</div>",
-                                                  MimeKit.Text.TextFormat.Html);
-                                          });
+                                                      string title = "ECO 市场价格 通知";
+                                                      if (!string.IsNullOrWhiteSpace(payurl))
+                                                      {
+                                                          title = "ECO 订单支付 通知";
+                                                      }
+                                                      else if (orders.Count > 0)
+                                                      {
+                                                          title = "ECO 下单成功 通知";
+                                                      }
+                                                      else if (queryGoodsError)
+                                                      {
+                                                          title = "ECO 市场低价查询失败 通知";
+                                                      }
+
+                                                      emailSender.SendEmailAsync(goods.NotifyAddress,
+                                                          title,
+                                                          $"<div>" +
+                                                          $"<p style='font-weight: bold;'>{title}</p>" +
+                                                          $"</div>" +
+                                                          $"<div>" +
+                                                          $"<p>饰品名称：{goodsDetail.GoodsName}</p>" +
+                                                          $"<p>监控价格：{goods.MaxPrice}</p>" +
+                                                          $"<p>市场价格：{ecoPrice}</p>" +
+                                                          $"<p>商品数量：{goodsCount}</p>" +
+                                                          $"<p>下单数量：{orders.Count}</p>" +
+                                                          $"<p>下单返回：{msgBuilder}</p>" +
+                                                          $"</div>" +
+                                                          $"<div>" +
+                                                          $"<p>支付方式：{goods.PayType}</p>" +
+                                                          $"{(!string.IsNullOrWhiteSpace(payurl) ? $"<p><a href='{payurl}'>立即支付</a></p>" : "")}" +
+                                                          $"</div>",
+                                                          MimeKit.Text.TextFormat.Html);
+                                                  });
+
+                                                buyTask.GetAwaiter().GetResult();
+                                            }
+                                            catch
+                                            {
+
+                                            }
+                                            finally
+                                            {
+                                                interval = interval - stopwatch.ElapsedMilliseconds;
+
+                                                if (interval > 0)
+                                                {
+                                                    Thread.Sleep((int)interval);
+                                                }
+                                            }
+                                        }
                                     }
                                     catch
                                     {
 
                                     }
+                                    finally
+                                    {
+                                        tasks.TryRemove(key, out var _);
+                                    }
                                 }, (item, itemGoods));
 
-                                tasks.Add(task);
+                                tasks.AddOrUpdate(key, task, (k, v) => task);
                             };
                         }
-
-                        Task.WaitAll(tasks.ToArray());
                     }
                     catch
                     {
@@ -379,26 +489,24 @@ namespace Steam_Authenticator
                     }
                     finally
                     {
-                        interval = interval - stopwatch.ElapsedMilliseconds;
-
-                        if (interval > 0)
-                        {
-                            Thread.Sleep((int)interval);
-                        }
+                        Thread.Sleep(1000);
                     }
                 }
             });
         }
 
-        private async Task<(IEnumerable<EcoResponse<CreateOrderResponse>> OrderResponses, int GoodsCount)> AutoBuy(EcoClient client, string gameId, string hashName, decimal maxPrice, int queryCount, int buySize, string steamId, PayType payType)
+        private async Task<(bool QueryGoodsError, IEnumerable<EcoResponse<CreateOrderResponse>> OrderResponses, int GoodsCount)> AutoBuy(EcoClient client, string gameId, string hashName, decimal maxPrice, int queryCount, int buySize, string steamId, PayType payType)
         {
             try
             {
                 var goodsResponse = await EcoApi.QuerySellGoodsAsync(client, gameId: gameId, hashName: hashName, maxPrice: maxPrice, count: queryCount);
                 var goods = goodsResponse?.StatusData?.ResultData?.PageResult;
+                var goodsCount = goods?.Count ?? 0;
                 if (!(goods?.Any() ?? false))
                 {
-                    return (new[]{new EcoResponse<CreateOrderResponse>
+                    var queryGoodsError = goodsResponse?.StatusCode != "0" || goodsResponse?.StatusData?.ResultCode != "0";
+
+                    return (queryGoodsError, new[]{new EcoResponse<CreateOrderResponse>
                     {
                         StatusCode = goodsResponse?.StatusCode ?? "9999",
                         StatusMsg = goodsResponse?.StatusMsg,
@@ -433,11 +541,11 @@ namespace Steam_Authenticator
                 } while (goods.Any());
 
                 var result = await Task.WhenAll(tasks);
-                return (result, goods.Count);
+                return (false, result, goodsCount);
             }
             catch (Exception ex)
             {
-                return (new[]{new EcoResponse<CreateOrderResponse>
+                return (true, new[]{new EcoResponse<CreateOrderResponse>
                 {
                     StatusCode = "-1",
                     StatusMsg = ex.Message,

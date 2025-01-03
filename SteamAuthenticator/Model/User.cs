@@ -118,13 +118,19 @@ namespace Steam_Authenticator.Model
 
         public class AutoBuyGoods
         {
+            private (DateTime Time, decimal Price)? currentPrice;
+
             public string GameId { get; set; }
 
             public string HashName { get; set; }
 
+            public string Name { get; set; }
+
             public decimal MaxPrice { get; set; }
 
             public int BuySize { get; set; } = 1;
+
+            public int Interval { get; set; } = 500;
 
             public string SteamId { get; set; }
 
@@ -133,6 +139,58 @@ namespace Steam_Authenticator.Model
             public string NotifyAddress { get; set; }
 
             public bool Enabled { get; set; }
+
+            public List<TimeRange> RunTimes { get; set; } = new List<TimeRange>();
+
+            public bool IsRunTime(DateTime currentTime)
+            {
+                if (!(RunTimes?.Any() ?? false))
+                {
+                    return true;
+                }
+                if (RunTimes.Any(c => c.Start == c.End))
+                {
+                    return true;
+                }
+
+                var currentTimeOnly = new TimeOnly(currentTime.Hour, currentTime.Minute, currentTime.Second);
+                foreach (var item in RunTimes)
+                {
+                    if (item.Start < item.End)
+                    {
+                        if (item.Start <= currentTimeOnly && currentTimeOnly <= item.End)
+                        {
+                            return true;
+                        }
+
+                        continue;
+                    }
+
+                    if (!(item.Start <= currentTimeOnly && currentTimeOnly <= item.End))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public (DateTime Time, decimal Price)? GetCurrentPrice()
+            {
+                return currentPrice;
+            }
+
+            public void SetCurrentPrice(DateTime time, decimal price)
+            {
+                currentPrice = (time, price);
+            }
+        }
+
+        public class TimeRange
+        {
+            public TimeOnly Start { get; set; }
+
+            public TimeOnly End { get; set; }
         }
     }
 }

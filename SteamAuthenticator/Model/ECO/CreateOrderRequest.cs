@@ -1,5 +1,4 @@
-﻿
-namespace Steam_Authenticator.Model.ECO
+﻿namespace Steam_Authenticator.Model.ECO
 {
     public class CreateOrderRequest
     {
@@ -68,7 +67,126 @@ namespace Steam_Authenticator.Model.ECO
         /// <summary>
         /// 租赁
         /// </summary>
-        租赁 = 5
+        租赁 = 5,
+
+        /// <summary>
+        /// 预售
+        /// </summary>
+        预售 = 6,
+
+        /// <summary>
+        /// 转卖
+        /// </summary>
+        转卖 = 7,
+
+        /// <summary>
+        /// 预售转卖
+        /// </summary>
+        预售转卖 = 8,
+
+        /// <summary>
+        /// 炉主参与合炉，从市场购买材料给自己收货账号
+        /// </summary>
+        合炉购买 = 9,
+
+        /// <summary>
+        /// 用户参与合炉，从市场购买材料赠送给炉主收货账号
+        /// </summary>
+        合炉赠送 = 10
+    }
+
+    /// <summary>
+    /// 订单状态
+    /// </summary>
+    public enum OrderState
+    {
+        /// <summary>
+        /// 待付款
+        /// </summary>
+        待付款 = 7,
+
+        /// <summary>
+        /// 等待发货
+        /// 未发送报价
+        /// </summary>
+        等待发货 = 1,
+
+        /// <summary>
+        /// 发货中
+        /// 已发送报价等待令牌确认
+        /// </summary>
+        发货中 = 8,
+
+        /// <summary>
+        /// 等待对方确认报价
+        /// 卖家发送报价后等待买家确认收货
+        /// 买家发送报价后等待卖家接收报价
+        /// </summary>
+        等待对方确认 = 2,
+
+        /// <summary>
+        /// 交易取消
+        /// </summary>
+        交易取消 = 3,
+
+        /// <summary>
+        ///交易成功 
+        /// </summary>
+        交易成功 = 6,
+
+        /// <summary>
+        /// 交易暂挂
+        /// </summary>
+        /// 
+        交易暂挂 = 9,
+
+        /// <summary>
+        /// 待支付尾款
+        /// </summary>
+        待支付尾款 = 20
+    }
+
+    /// <summary>
+    /// 订单状态
+    /// </summary>
+    public enum OrderDetailState
+    {
+        /// <summary>
+        /// 交易取消
+        /// </summary>
+        交易取消 = 3,
+
+        /// <summary>
+        ///交易成功 
+        /// </summary>
+        /// 
+        交易成功 = 6,
+
+        /// <summary>
+        /// 待付款
+        /// </summary>
+        待付款 = 7,
+
+        /// <summary>
+        /// 卖家发货中
+        /// </summary>
+        发货中 = 8,
+
+        /// <summary>
+        /// 待支付尾款
+        /// </summary>
+        /// 
+        待支付尾款 = 9,
+
+        /// <summary>
+        /// 交易异常
+        /// </summary>
+        交易异常 = 10,
+
+        /// <summary>
+        /// 转卖成功
+        /// </summary>
+        转卖成功 = 11,
     }
 
     /// <summary>
@@ -80,6 +198,8 @@ namespace Steam_Authenticator.Model.ECO
         /// 余额支付
         /// </summary>
         余额 = -1,
+
+        None = 0,
 
         /// <summary>
         /// 支付宝支付

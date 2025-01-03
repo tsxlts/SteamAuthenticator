@@ -32,14 +32,19 @@
             panel1 = new Panel();
             autoBuyList = new DataGridView();
             GameId = new DataGridViewComboBoxColumn();
-            HashName = new DataGridViewTextBoxColumn();
+            HashName = new DataGridViewComboBoxColumn();
             MaxPrice = new DataGridViewTextBoxColumn();
-            BuySize = new DataGridViewTextBoxColumn();
-            SteamId = new DataGridViewComboBoxColumn();
+            CurrentPrice = new DataGridViewTextBoxColumn();
             PayType = new DataGridViewComboBoxColumn();
+            SteamId = new DataGridViewComboBoxColumn();
+            BuySize = new DataGridViewTextBoxColumn();
+            Interval = new DataGridViewTextBoxColumn();
             NotifyAddress = new DataGridViewTextBoxColumn();
+            RunTimes = new DataGridViewTextBoxColumn();
             GoodsEnabled = new DataGridViewCheckBoxColumn();
             panel2 = new Panel();
+            msgBox = new Label();
+            selectAllBtn = new Label();
             reloadBtn = new Label();
             addGoodsBtn = new Label();
             saveBtn = new Label();
@@ -54,7 +59,7 @@
             panel1.Controls.Add(autoBuyList);
             panel1.Location = new Point(12, 51);
             panel1.Name = "panel1";
-            panel1.Size = new Size(917, 474);
+            panel1.Size = new Size(1385, 540);
             panel1.TabIndex = 0;
             // 
             // autoBuyList
@@ -67,15 +72,17 @@
             autoBuyList.BorderStyle = BorderStyle.None;
             autoBuyList.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             autoBuyList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            autoBuyList.Columns.AddRange(new DataGridViewColumn[] { GameId, HashName, MaxPrice, BuySize, SteamId, PayType, NotifyAddress, GoodsEnabled });
+            autoBuyList.Columns.AddRange(new DataGridViewColumn[] { GameId, HashName, MaxPrice, CurrentPrice, PayType, SteamId, BuySize, Interval, NotifyAddress, RunTimes, GoodsEnabled });
             autoBuyList.Dock = DockStyle.Fill;
             autoBuyList.EditMode = DataGridViewEditMode.EditOnEnter;
             autoBuyList.Location = new Point(0, 0);
             autoBuyList.Name = "autoBuyList";
             autoBuyList.RowHeadersVisible = false;
-            autoBuyList.Size = new Size(917, 474);
+            autoBuyList.Size = new Size(1385, 540);
             autoBuyList.TabIndex = 0;
-            autoBuyList.CellMouseDown += autoBuyList_CellMouseDown;
+            autoBuyList.CellMouseUp += autoBuyList_CellMouseUp;
+            autoBuyList.DataError += autoBuyList_DataError;
+            autoBuyList.SortCompare += autoBuyList_SortCompare;
             autoBuyList.Leave += autoBuyList_Leave;
             // 
             // GameId
@@ -83,107 +90,170 @@
             GameId.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
             GameId.HeaderText = "游戏";
             GameId.Name = "GameId";
+            GameId.Resizable = DataGridViewTriState.False;
+            GameId.SortMode = DataGridViewColumnSortMode.Automatic;
             // 
             // HashName
             // 
-            HashName.HeaderText = "物品名称 (HashName)";
+            HashName.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
+            HashName.HeaderText = "物品名称";
             HashName.Name = "HashName";
+            HashName.Resizable = DataGridViewTriState.False;
+            HashName.SortMode = DataGridViewColumnSortMode.Automatic;
             HashName.Width = 200;
             // 
             // MaxPrice
             // 
             MaxPrice.HeaderText = "购买价格";
             MaxPrice.Name = "MaxPrice";
+            MaxPrice.Resizable = DataGridViewTriState.False;
             // 
-            // BuySize
+            // CurrentPrice
             // 
-            BuySize.HeaderText = "单次下单数量";
-            BuySize.Name = "BuySize";
-            BuySize.Width = 105;
-            // 
-            // SteamId
-            // 
-            SteamId.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
-            SteamId.HeaderText = "收货帐号";
-            SteamId.Name = "SteamId";
+            CurrentPrice.HeaderText = "当前价格";
+            CurrentPrice.Name = "CurrentPrice";
+            CurrentPrice.ReadOnly = true;
+            CurrentPrice.Resizable = DataGridViewTriState.False;
+            CurrentPrice.Width = 140;
             // 
             // PayType
             // 
             PayType.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
             PayType.HeaderText = "支付方式";
             PayType.Name = "PayType";
+            PayType.Resizable = DataGridViewTriState.False;
+            PayType.SortMode = DataGridViewColumnSortMode.Automatic;
             PayType.Width = 80;
+            // 
+            // SteamId
+            // 
+            SteamId.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
+            SteamId.HeaderText = "收货帐号";
+            SteamId.Name = "SteamId";
+            SteamId.Resizable = DataGridViewTriState.False;
+            SteamId.SortMode = DataGridViewColumnSortMode.Automatic;
+            SteamId.Width = 80;
+            // 
+            // BuySize
+            // 
+            BuySize.HeaderText = "单次下单数量";
+            BuySize.Name = "BuySize";
+            BuySize.Resizable = DataGridViewTriState.False;
+            BuySize.Width = 105;
+            // 
+            // Interval
+            // 
+            Interval.HeaderText = "扫货频率 (毫秒/每次)";
+            Interval.Name = "Interval";
+            Interval.Resizable = DataGridViewTriState.False;
+            Interval.Width = 150;
             // 
             // NotifyAddress
             // 
             NotifyAddress.HeaderText = "通知邮箱";
             NotifyAddress.Name = "NotifyAddress";
-            NotifyAddress.Resizable = DataGridViewTriState.True;
-            NotifyAddress.SortMode = DataGridViewColumnSortMode.NotSortable;
-            NotifyAddress.Width = 150;
+            NotifyAddress.Resizable = DataGridViewTriState.False;
+            NotifyAddress.Width = 130;
+            // 
+            // RunTimes
+            // 
+            RunTimes.HeaderText = "运行时间";
+            RunTimes.Name = "RunTimes";
+            RunTimes.ReadOnly = true;
+            RunTimes.Resizable = DataGridViewTriState.False;
+            RunTimes.Width = 200;
             // 
             // GoodsEnabled
             // 
             GoodsEnabled.HeaderText = "是否可用";
             GoodsEnabled.Name = "GoodsEnabled";
+            GoodsEnabled.Resizable = DataGridViewTriState.False;
+            GoodsEnabled.SortMode = DataGridViewColumnSortMode.Automatic;
             GoodsEnabled.Width = 80;
             // 
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel2.BackColor = Color.FromArgb(255, 248, 220);
+            panel2.Controls.Add(msgBox);
+            panel2.Controls.Add(selectAllBtn);
             panel2.Controls.Add(reloadBtn);
             panel2.Controls.Add(addGoodsBtn);
             panel2.Controls.Add(saveBtn);
             panel2.Location = new Point(12, 5);
             panel2.Name = "panel2";
-            panel2.Size = new Size(917, 40);
+            panel2.Size = new Size(1385, 40);
             panel2.TabIndex = 1;
+            // 
+            // msgBox
+            // 
+            msgBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            msgBox.AutoEllipsis = true;
+            msgBox.Cursor = Cursors.Hand;
+            msgBox.ForeColor = Color.Gray;
+            msgBox.Location = new Point(3, 12);
+            msgBox.Name = "msgBox";
+            msgBox.Size = new Size(1165, 17);
+            msgBox.TabIndex = 15;
+            msgBox.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // selectAllBtn
+            // 
+            selectAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            selectAllBtn.Cursor = Cursors.Hand;
+            selectAllBtn.ForeColor = Color.Green;
+            selectAllBtn.Location = new Point(1262, 13);
+            selectAllBtn.Name = "selectAllBtn";
+            selectAllBtn.Size = new Size(38, 17);
+            selectAllBtn.TabIndex = 14;
+            selectAllBtn.Text = "全选";
+            selectAllBtn.TextAlign = ContentAlignment.MiddleCenter;
+            selectAllBtn.Click += selectAllBtn_Click;
             // 
             // reloadBtn
             // 
             reloadBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            reloadBtn.AutoSize = true;
             reloadBtn.Cursor = Cursors.Hand;
             reloadBtn.ForeColor = Color.Green;
-            reloadBtn.Location = new Point(794, 12);
+            reloadBtn.Location = new Point(1306, 13);
             reloadBtn.Name = "reloadBtn";
             reloadBtn.Size = new Size(56, 17);
             reloadBtn.TabIndex = 13;
             reloadBtn.Text = "重新加载";
+            reloadBtn.TextAlign = ContentAlignment.MiddleCenter;
             reloadBtn.Click += reloadBtn_Click;
             // 
             // addGoodsBtn
             // 
             addGoodsBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            addGoodsBtn.AutoSize = true;
             addGoodsBtn.Cursor = Cursors.Hand;
             addGoodsBtn.ForeColor = Color.Green;
-            addGoodsBtn.Location = new Point(732, 12);
+            addGoodsBtn.Location = new Point(1174, 13);
             addGoodsBtn.Name = "addGoodsBtn";
-            addGoodsBtn.Size = new Size(56, 17);
+            addGoodsBtn.Size = new Size(38, 17);
             addGoodsBtn.TabIndex = 12;
-            addGoodsBtn.Text = "添加商品";
+            addGoodsBtn.Text = "添加";
+            addGoodsBtn.TextAlign = ContentAlignment.MiddleCenter;
             addGoodsBtn.Click += addGoodsBtn_Click;
             // 
             // saveBtn
             // 
             saveBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            saveBtn.AutoSize = true;
             saveBtn.Cursor = Cursors.Hand;
             saveBtn.ForeColor = Color.Green;
-            saveBtn.Location = new Point(856, 12);
+            saveBtn.Location = new Point(1218, 13);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(56, 17);
+            saveBtn.Size = new Size(38, 17);
             saveBtn.TabIndex = 10;
-            saveBtn.Text = "保存配置";
+            saveBtn.Text = "保存";
+            saveBtn.TextAlign = ContentAlignment.MiddleCenter;
             saveBtn.Click += saveBtn_Click;
             // 
             // EcoAutoBuySetting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(941, 537);
+            ClientSize = new Size(1409, 603);
             Controls.Add(panel2);
             Controls.Add(panel1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -197,7 +267,6 @@
             panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)autoBuyList).EndInit();
             panel2.ResumeLayout(false);
-            panel2.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -210,12 +279,17 @@
         private Label addGoodsBtn;
         private Label reloadBtn;
         private DataGridViewComboBoxColumn GameId;
-        private DataGridViewTextBoxColumn HashName;
+        private DataGridViewComboBoxColumn HashName;
         private DataGridViewTextBoxColumn MaxPrice;
-        private DataGridViewTextBoxColumn BuySize;
-        private DataGridViewComboBoxColumn SteamId;
+        private DataGridViewTextBoxColumn CurrentPrice;
         private DataGridViewComboBoxColumn PayType;
+        private DataGridViewComboBoxColumn SteamId;
+        private DataGridViewTextBoxColumn BuySize;
+        private DataGridViewTextBoxColumn Interval;
         private DataGridViewTextBoxColumn NotifyAddress;
+        private DataGridViewTextBoxColumn RunTimes;
         private DataGridViewCheckBoxColumn GoodsEnabled;
+        private Label selectAllBtn;
+        private Label msgBox;
     }
 }
