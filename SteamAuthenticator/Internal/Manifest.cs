@@ -6,6 +6,8 @@ namespace Steam_Authenticator.Internal
 {
     internal class Manifest
     {
+        private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
+
         public static Manifest FromFile(string file) => new Manifest(file);
 
         private Manifest(string file)
@@ -174,6 +176,11 @@ namespace Steam_Authenticator.Internal
 
         private bool Save()
         {
+            if (!locker.Wait(3000))
+            {
+                return false;
+            }
+
             using (MemoryStream stream = new MemoryStream())
             {
                 stream.WriteBoolean(Encrypted);
