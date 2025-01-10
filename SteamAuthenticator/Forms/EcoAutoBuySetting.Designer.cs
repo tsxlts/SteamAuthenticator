@@ -31,23 +31,24 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EcoAutoBuySetting));
             panel1 = new Panel();
             autoBuyList = new DataGridView();
-            GameId = new DataGridViewComboBoxColumn();
-            HashName = new DataGridViewComboBoxColumn();
-            MaxPrice = new DataGridViewTextBoxColumn();
-            CurrentPrice = new DataGridViewTextBoxColumn();
-            PayType = new DataGridViewComboBoxColumn();
-            SteamId = new DataGridViewComboBoxColumn();
-            BuySize = new DataGridViewTextBoxColumn();
-            Interval = new DataGridViewTextBoxColumn();
-            NotifyAddress = new DataGridViewTextBoxColumn();
-            RunTimes = new DataGridViewTextBoxColumn();
-            GoodsEnabled = new DataGridViewCheckBoxColumn();
             panel2 = new Panel();
             msgBox = new Label();
             selectAllBtn = new Label();
             reloadBtn = new Label();
             addGoodsBtn = new Label();
             saveBtn = new Label();
+            GameId = new DataGridViewComboBoxColumn();
+            HashName = new DataGridViewComboBoxColumn();
+            MaxPrice = new DataGridViewTextBoxColumn();
+            CurrentPrice = new DataGridViewTextBoxColumn();
+            PayType = new DataGridViewComboBoxColumn();
+            SteamId = new DataGridViewComboBoxColumn();
+            QuerySize = new DataGridViewTextBoxColumn();
+            BuySize = new DataGridViewTextBoxColumn();
+            Interval = new DataGridViewTextBoxColumn();
+            NotifyAddress = new DataGridViewTextBoxColumn();
+            RunTimes = new DataGridViewTextBoxColumn();
+            GoodsEnabled = new DataGridViewCheckBoxColumn();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)autoBuyList).BeginInit();
             panel2.SuspendLayout();
@@ -59,7 +60,7 @@
             panel1.Controls.Add(autoBuyList);
             panel1.Location = new Point(12, 51);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1385, 540);
+            panel1.Size = new Size(1398, 643);
             panel1.TabIndex = 0;
             // 
             // autoBuyList
@@ -72,18 +73,96 @@
             autoBuyList.BorderStyle = BorderStyle.None;
             autoBuyList.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             autoBuyList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            autoBuyList.Columns.AddRange(new DataGridViewColumn[] { GameId, HashName, MaxPrice, CurrentPrice, PayType, SteamId, BuySize, Interval, NotifyAddress, RunTimes, GoodsEnabled });
+            autoBuyList.Columns.AddRange(new DataGridViewColumn[] { GameId, HashName, MaxPrice, CurrentPrice, PayType, SteamId, QuerySize, BuySize, Interval, NotifyAddress, RunTimes, GoodsEnabled });
             autoBuyList.Dock = DockStyle.Fill;
             autoBuyList.EditMode = DataGridViewEditMode.EditOnEnter;
             autoBuyList.Location = new Point(0, 0);
             autoBuyList.Name = "autoBuyList";
             autoBuyList.RowHeadersVisible = false;
-            autoBuyList.Size = new Size(1385, 540);
+            autoBuyList.Size = new Size(1398, 643);
             autoBuyList.TabIndex = 0;
             autoBuyList.CellMouseUp += autoBuyList_CellMouseUp;
             autoBuyList.DataError += autoBuyList_DataError;
             autoBuyList.SortCompare += autoBuyList_SortCompare;
             autoBuyList.Leave += autoBuyList_Leave;
+            // 
+            // panel2
+            // 
+            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel2.BackColor = Color.FromArgb(255, 248, 220);
+            panel2.Controls.Add(msgBox);
+            panel2.Controls.Add(selectAllBtn);
+            panel2.Controls.Add(reloadBtn);
+            panel2.Controls.Add(addGoodsBtn);
+            panel2.Controls.Add(saveBtn);
+            panel2.Location = new Point(12, 5);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(1398, 40);
+            panel2.TabIndex = 1;
+            // 
+            // msgBox
+            // 
+            msgBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            msgBox.AutoEllipsis = true;
+            msgBox.Cursor = Cursors.Hand;
+            msgBox.ForeColor = Color.Gray;
+            msgBox.Location = new Point(16, 12);
+            msgBox.Name = "msgBox";
+            msgBox.Size = new Size(1165, 17);
+            msgBox.TabIndex = 15;
+            msgBox.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // selectAllBtn
+            // 
+            selectAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            selectAllBtn.Cursor = Cursors.Hand;
+            selectAllBtn.ForeColor = Color.Green;
+            selectAllBtn.Location = new Point(1275, 13);
+            selectAllBtn.Name = "selectAllBtn";
+            selectAllBtn.Size = new Size(38, 17);
+            selectAllBtn.TabIndex = 14;
+            selectAllBtn.Text = "全选";
+            selectAllBtn.TextAlign = ContentAlignment.MiddleCenter;
+            selectAllBtn.Click += selectAllBtn_Click;
+            // 
+            // reloadBtn
+            // 
+            reloadBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            reloadBtn.Cursor = Cursors.Hand;
+            reloadBtn.ForeColor = Color.Green;
+            reloadBtn.Location = new Point(1319, 13);
+            reloadBtn.Name = "reloadBtn";
+            reloadBtn.Size = new Size(56, 17);
+            reloadBtn.TabIndex = 13;
+            reloadBtn.Text = "重新加载";
+            reloadBtn.TextAlign = ContentAlignment.MiddleCenter;
+            reloadBtn.Click += reloadBtn_Click;
+            // 
+            // addGoodsBtn
+            // 
+            addGoodsBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            addGoodsBtn.Cursor = Cursors.Hand;
+            addGoodsBtn.ForeColor = Color.Green;
+            addGoodsBtn.Location = new Point(1187, 13);
+            addGoodsBtn.Name = "addGoodsBtn";
+            addGoodsBtn.Size = new Size(38, 17);
+            addGoodsBtn.TabIndex = 12;
+            addGoodsBtn.Text = "添加";
+            addGoodsBtn.TextAlign = ContentAlignment.MiddleCenter;
+            addGoodsBtn.Click += addGoodsBtn_Click;
+            // 
+            // saveBtn
+            // 
+            saveBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            saveBtn.Cursor = Cursors.Hand;
+            saveBtn.ForeColor = Color.Green;
+            saveBtn.Location = new Point(1231, 13);
+            saveBtn.Name = "saveBtn";
+            saveBtn.Size = new Size(38, 17);
+            saveBtn.TabIndex = 10;
+            saveBtn.Text = "保存";
+            saveBtn.TextAlign = ContentAlignment.MiddleCenter;
+            saveBtn.Click += saveBtn_Click;
             // 
             // GameId
             // 
@@ -92,6 +171,7 @@
             GameId.Name = "GameId";
             GameId.Resizable = DataGridViewTriState.False;
             GameId.SortMode = DataGridViewColumnSortMode.Automatic;
+            GameId.Width = 80;
             // 
             // HashName
             // 
@@ -107,6 +187,7 @@
             MaxPrice.HeaderText = "购买价格";
             MaxPrice.Name = "MaxPrice";
             MaxPrice.Resizable = DataGridViewTriState.False;
+            MaxPrice.Width = 80;
             // 
             // CurrentPrice
             // 
@@ -133,6 +214,12 @@
             SteamId.Resizable = DataGridViewTriState.False;
             SteamId.SortMode = DataGridViewColumnSortMode.Automatic;
             SteamId.Width = 80;
+            // 
+            // QuerySize
+            // 
+            QuerySize.HeaderText = "单次查询数量";
+            QuerySize.Name = "QuerySize";
+            QuerySize.Width = 105;
             // 
             // BuySize
             // 
@@ -161,7 +248,7 @@
             RunTimes.Name = "RunTimes";
             RunTimes.ReadOnly = true;
             RunTimes.Resizable = DataGridViewTriState.False;
-            RunTimes.Width = 200;
+            RunTimes.Width = 150;
             // 
             // GoodsEnabled
             // 
@@ -171,89 +258,11 @@
             GoodsEnabled.SortMode = DataGridViewColumnSortMode.Automatic;
             GoodsEnabled.Width = 80;
             // 
-            // panel2
-            // 
-            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel2.BackColor = Color.FromArgb(255, 248, 220);
-            panel2.Controls.Add(msgBox);
-            panel2.Controls.Add(selectAllBtn);
-            panel2.Controls.Add(reloadBtn);
-            panel2.Controls.Add(addGoodsBtn);
-            panel2.Controls.Add(saveBtn);
-            panel2.Location = new Point(12, 5);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(1385, 40);
-            panel2.TabIndex = 1;
-            // 
-            // msgBox
-            // 
-            msgBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            msgBox.AutoEllipsis = true;
-            msgBox.Cursor = Cursors.Hand;
-            msgBox.ForeColor = Color.Gray;
-            msgBox.Location = new Point(3, 12);
-            msgBox.Name = "msgBox";
-            msgBox.Size = new Size(1165, 17);
-            msgBox.TabIndex = 15;
-            msgBox.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // selectAllBtn
-            // 
-            selectAllBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            selectAllBtn.Cursor = Cursors.Hand;
-            selectAllBtn.ForeColor = Color.Green;
-            selectAllBtn.Location = new Point(1262, 13);
-            selectAllBtn.Name = "selectAllBtn";
-            selectAllBtn.Size = new Size(38, 17);
-            selectAllBtn.TabIndex = 14;
-            selectAllBtn.Text = "全选";
-            selectAllBtn.TextAlign = ContentAlignment.MiddleCenter;
-            selectAllBtn.Click += selectAllBtn_Click;
-            // 
-            // reloadBtn
-            // 
-            reloadBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            reloadBtn.Cursor = Cursors.Hand;
-            reloadBtn.ForeColor = Color.Green;
-            reloadBtn.Location = new Point(1306, 13);
-            reloadBtn.Name = "reloadBtn";
-            reloadBtn.Size = new Size(56, 17);
-            reloadBtn.TabIndex = 13;
-            reloadBtn.Text = "重新加载";
-            reloadBtn.TextAlign = ContentAlignment.MiddleCenter;
-            reloadBtn.Click += reloadBtn_Click;
-            // 
-            // addGoodsBtn
-            // 
-            addGoodsBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            addGoodsBtn.Cursor = Cursors.Hand;
-            addGoodsBtn.ForeColor = Color.Green;
-            addGoodsBtn.Location = new Point(1174, 13);
-            addGoodsBtn.Name = "addGoodsBtn";
-            addGoodsBtn.Size = new Size(38, 17);
-            addGoodsBtn.TabIndex = 12;
-            addGoodsBtn.Text = "添加";
-            addGoodsBtn.TextAlign = ContentAlignment.MiddleCenter;
-            addGoodsBtn.Click += addGoodsBtn_Click;
-            // 
-            // saveBtn
-            // 
-            saveBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            saveBtn.Cursor = Cursors.Hand;
-            saveBtn.ForeColor = Color.Green;
-            saveBtn.Location = new Point(1218, 13);
-            saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(38, 17);
-            saveBtn.TabIndex = 10;
-            saveBtn.Text = "保存";
-            saveBtn.TextAlign = ContentAlignment.MiddleCenter;
-            saveBtn.Click += saveBtn_Click;
-            // 
             // EcoAutoBuySetting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1409, 603);
+            ClientSize = new Size(1422, 706);
             Controls.Add(panel2);
             Controls.Add(panel1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -278,18 +287,19 @@
         private Label saveBtn;
         private Label addGoodsBtn;
         private Label reloadBtn;
+        private Label selectAllBtn;
+        private Label msgBox;
         private DataGridViewComboBoxColumn GameId;
         private DataGridViewComboBoxColumn HashName;
         private DataGridViewTextBoxColumn MaxPrice;
         private DataGridViewTextBoxColumn CurrentPrice;
         private DataGridViewComboBoxColumn PayType;
         private DataGridViewComboBoxColumn SteamId;
+        private DataGridViewTextBoxColumn QuerySize;
         private DataGridViewTextBoxColumn BuySize;
         private DataGridViewTextBoxColumn Interval;
         private DataGridViewTextBoxColumn NotifyAddress;
         private DataGridViewTextBoxColumn RunTimes;
         private DataGridViewCheckBoxColumn GoodsEnabled;
-        private Label selectAllBtn;
-        private Label msgBox;
     }
 }

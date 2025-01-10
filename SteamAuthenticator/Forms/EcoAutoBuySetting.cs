@@ -51,6 +51,7 @@ namespace Steam_Authenticator.Forms
             SteamId.DisplayMember = nameof(SelectItem.Name);
 
             MaxPrice.ValueType = typeof(decimal);
+            QuerySize.ValueType = typeof(int);
             BuySize.ValueType = typeof(int);
             Interval.ValueType = typeof(int);
 
@@ -285,6 +286,11 @@ namespace Steam_Authenticator.Forms
                         MessageBox.Show("请输入正确的价格", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    if (!int.TryParse(row.Cells[nameof(QuerySize)].Value?.ToString(), out int querySize))
+                    {
+                        MessageBox.Show("请输入正确单次查询数量", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                     if (!int.TryParse(row.Cells[nameof(BuySize)].Value?.ToString(), out int buySize))
                     {
                         MessageBox.Show("请输入正确单次下单数量", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -306,6 +312,7 @@ namespace Steam_Authenticator.Forms
                         SteamId = row.Cells[nameof(SteamId)].Value?.ToString(),
 
                         MaxPrice = maxPrice,
+                        QuerySize= querySize,
                         BuySize = buySize,
 
                         Interval = interval,
@@ -415,6 +422,7 @@ namespace Steam_Authenticator.Forms
                 row.Cells[nameof(GameId)].Value = goods.GameId;
                 row.Cells[nameof(HashName)].Value = goods.HashName;
                 row.Cells[nameof(MaxPrice)].Value = goods.MaxPrice.ToString();
+                row.Cells[nameof(QuerySize)].Value = goods.QuerySize.ToString();
                 row.Cells[nameof(BuySize)].Value = goods.BuySize.ToString();
                 row.Cells[nameof(Interval)].Value = goods.Interval.ToString();
                 row.Cells[nameof(PayType)].Value = goods.PayType;

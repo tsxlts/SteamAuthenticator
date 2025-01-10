@@ -128,6 +128,8 @@ namespace Steam_Authenticator.Model
 
             public decimal MaxPrice { get; set; }
 
+            public int QuerySize { get; set; } = 20;
+
             public int BuySize { get; set; } = 1;
 
             public int Interval { get; set; } = 500;

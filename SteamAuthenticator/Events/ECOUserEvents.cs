@@ -347,7 +347,7 @@ namespace Steam_Authenticator
                                                 }
 
                                                 var buyTask = AutoBuy(client, gameId: goods.GameId, hashName: goods.HashName,
-                                                  maxPrice: goods.MaxPrice, queryCount: 20,
+                                                  maxPrice: goods.MaxPrice, queryCount: goods.QuerySize,
                                                   buySize: goods.BuySize,
                                                   steamId: goods.SteamId,
                                                   payType: goods.PayType).ContinueWith(results =>
@@ -357,7 +357,7 @@ namespace Steam_Authenticator
                                                       List<string> payUrls = new List<string>();
                                                       var queryGoodsError = createOrders.QueryGoodsError;
                                                       var goodsCount = createOrders.GoodsCount;
-                                                      StringBuilder msgBuilder = new StringBuilder();
+                                                      List<string> msgBuilder = new List<string>();
 
                                                       foreach (var orderResponse in createOrders.OrderResponses)
                                                       {
@@ -383,7 +383,7 @@ namespace Steam_Authenticator
                                                           }
 
                                                           orders.AddRange(orderResponse.StatusData?.ResultData?.OrderNum ?? new List<string>());
-                                                          msgBuilder.AppendLine($"[{msg}]");
+                                                          msgBuilder.Add($"{msg}");
 
                                                           if (!string.IsNullOrWhiteSpace(ordersPayurl))
                                                           {
@@ -443,7 +443,7 @@ namespace Steam_Authenticator
                                                           $"<p>市场价格：{ecoPrice}</p>" +
                                                           $"<p>商品数量：{goodsCount}</p>" +
                                                           $"<p>下单数量：{orders.Count}</p>" +
-                                                          $"<p>下单返回：{msgBuilder}</p>" +
+                                                          $"<p>下单返回：<br />{string.Join("<br />", msgBuilder.Distinct())}</p>" +
                                                           $"</div>" +
                                                           $"<div>" +
                                                           $"<p>支付方式：{goods.PayType}</p>" +
