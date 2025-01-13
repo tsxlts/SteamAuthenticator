@@ -49,6 +49,11 @@ namespace Steam_Authenticator.Internal
 
         public static async Task<bool> HandleConfirmation(SteamCommunityClient webClient, Guard guard, IEnumerable<Confirmation> confirmations, bool accept, CancellationToken cancellationToken)
         {
+            if (confirmations == null || !confirmations.Any())
+            {
+                return true;
+            }
+
             bool success = false;
             while (true)
             {

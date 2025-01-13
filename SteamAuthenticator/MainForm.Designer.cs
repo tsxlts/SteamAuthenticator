@@ -33,6 +33,7 @@ namespace Steam_Authenticator
             importAuthenticatorMenuItem = new ToolStripMenuItem();
             importFileAuthenticatorMenuItem = new ToolStripMenuItem();
             importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
+            exportAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
             submitRequirementsMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
@@ -74,7 +75,6 @@ namespace Steam_Authenticator
             SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
-            exportAuthenticatorMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -155,21 +155,21 @@ namespace Steam_Authenticator
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(180, 22);
+            guardMenuItem.Size = new Size(124, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(180, 22);
+            addAuthenticatorMenuItem.Size = new Size(124, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(180, 22);
+            moveAuthenticatorMenuItem.Size = new Size(124, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -177,27 +177,34 @@ namespace Steam_Authenticator
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(180, 22);
+            importAuthenticatorMenuItem.Size = new Size(124, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
             // 
             importFileAuthenticatorMenuItem.Name = "importFileAuthenticatorMenuItem";
-            importFileAuthenticatorMenuItem.Size = new Size(180, 22);
+            importFileAuthenticatorMenuItem.Size = new Size(124, 22);
             importFileAuthenticatorMenuItem.Text = "文件导入";
             importFileAuthenticatorMenuItem.Click += importFileAuthenticatorMenuItem_Click;
             // 
             // importSecretAuthenticatorMenuItem
             // 
             importSecretAuthenticatorMenuItem.Name = "importSecretAuthenticatorMenuItem";
-            importSecretAuthenticatorMenuItem.Size = new Size(180, 22);
+            importSecretAuthenticatorMenuItem.Size = new Size(124, 22);
             importSecretAuthenticatorMenuItem.Text = "秘钥导入";
             importSecretAuthenticatorMenuItem.Click += importSecretAuthenticatorMenuItem_Click;
+            // 
+            // exportAuthenticatorMenuItem
+            // 
+            exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
+            exportAuthenticatorMenuItem.Size = new Size(124, 22);
+            exportAuthenticatorMenuItem.Text = "导出令牌";
+            exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(180, 22);
+            removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
@@ -224,7 +231,7 @@ namespace Steam_Authenticator
             UserName.AutoEllipsis = true;
             UserName.Location = new Point(118, 40);
             UserName.Name = "UserName";
-            UserName.Size = new Size(200, 23);
+            UserName.Size = new Size(139, 23);
             UserName.TabIndex = 2;
             UserName.Text = "---";
             UserName.TextAlign = ContentAlignment.MiddleLeft;
@@ -628,7 +635,7 @@ namespace Steam_Authenticator
             SteamId.ForeColor = Color.FromArgb(0, 0, 238);
             SteamId.Location = new Point(118, 67);
             SteamId.Name = "SteamId";
-            SteamId.Size = new Size(200, 18);
+            SteamId.Size = new Size(139, 18);
             SteamId.TabIndex = 18;
             SteamId.Text = "---";
             SteamId.TextAlign = ContentAlignment.MiddleLeft;
@@ -653,13 +660,6 @@ namespace Steam_Authenticator
             mainNotifyIcon.Text = "Steam验证器";
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
-            // 
-            // exportAuthenticatorMenuItem
-            // 
-            exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
-            exportAuthenticatorMenuItem.Size = new Size(180, 22);
-            exportAuthenticatorMenuItem.Text = "导出令牌";
-            exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
             // 
             // MainForm
             // 

@@ -26,12 +26,6 @@ namespace Steam_Authenticator.Model
         public bool PeriodicCheckingConfirmation { get; set; }
 
         /// <summary>
-        /// 是否自动确认报价
-        /// </summary>
-        [JsonProperty("auto_confirm_trade")]
-        public bool AutoConfirmTrade { get; set; }
-
-        /// <summary>
         /// 是否自动确认市场上架
         /// </summary>
         [JsonProperty("auto_confirm_market")]
@@ -44,6 +38,7 @@ namespace Steam_Authenticator.Model
         [JsonProperty("auto_accept_receive_offer")]
         public bool AutoAcceptReceiveOffer { get; set; }
 
+        #region 全部报价
         /// <summary>
         /// 是否自动接受 全部 索取报价
         /// 别人索取我的
@@ -52,12 +47,28 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptGiveOffer { get; set; }
 
         /// <summary>
+        /// 是否自动确认 全部 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade")]
+        public bool AutoConfirmTrade { get; set; }
+        #endregion
+
+        #region BUFF报价
+        /// <summary>
         /// 是否自动接受 BUFF 索取报价
         /// 别人索取我的
         /// </summary>
         [JsonProperty("auto_accept_give_offer_buff")]
         public bool AutoAcceptGiveOffer_Buff { get; set; }
 
+        /// <summary>
+        /// 是否自动确认 BUFF 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_buff")]
+        public bool AutoConfirmTrade_Buff { get; set; }
+        #endregion
+
+        #region 其他报价
         /// <summary>
         /// 是否自动接受 其他 索取报价
         /// 别人索取我的
@@ -66,10 +77,26 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptGiveOffer_Other { get; set; }
 
         /// <summary>
+        /// 是否自动确认 其他 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_other")]
+        public bool AutoConfirmTrade_Other { get; set; }
+        #endregion
+
+        #region 自定义报价
+        /// <summary>
         /// 是否自动接受 自定义 索取报价
         /// 别人索取我的
         /// </summary>
+        [JsonProperty("auto_accept_give_offer_cstom")]
         public bool AutoAcceptGiveOffer_Custom { get; set; }
+
+        /// <summary>
+        /// 是否自动确认 自定义 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_cstom")]
+        public bool AutoConfirmTrade_Custom { get; set; }
+        #endregion
 
         /// <summary>
         /// 自动接受索取报价 自定义 规则

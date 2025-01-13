@@ -83,6 +83,8 @@ namespace Steam_Authenticator
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
 
+        private List<Confirmation> confirmations = new List<Confirmation>();
+        private List<Offer> autoConfirmOffers = new List<Offer>();
         private Action startLogin = null;
         private Action<bool> endLogin = null;
 
@@ -98,6 +100,8 @@ namespace Steam_Authenticator
 
         public string Key => User?.SteamId;
 
+        public List<Offer> AutoConfirmOffers => autoConfirmOffers ?? new List<Offer>();
+
         public UserClient WithStartLogin(Action action)
         {
             startLogin = action;
@@ -108,6 +112,11 @@ namespace Steam_Authenticator
         {
             endLogin = action;
             return this;
+        }
+
+        public void SetAutoConfirmOffers(List<Offer> offers)
+        {
+            autoConfirmOffers = offers;
         }
 
         /// <summary>

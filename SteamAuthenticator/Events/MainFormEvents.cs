@@ -20,6 +20,7 @@ namespace Steam_Authenticator
                 return;
             }
 
+            Clipboard.SetText(webClient.SteamId);
             Process.Start(new ProcessStartInfo($"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}") { UseShellExecute = true });
         }
 
