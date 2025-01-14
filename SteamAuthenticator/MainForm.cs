@@ -277,12 +277,15 @@ namespace Steam_Authenticator
                         bool acceptAll = user.Setting.AutoAcceptGiveOffer;
                         bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
                         bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
+                        bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
 
                         bool confirmAll = user.Setting.AutoConfirmTrade;
                         bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
+                        bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
                         List<Offer> tradeOffers = new List<Offer>();
+                        List<Offer> customGiveOffers;
                         List<Offer> buffGiveOffers = null;
                         List<Offer> otherGiveOffers = null;
 
@@ -307,7 +310,12 @@ namespace Steam_Authenticator
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
 
-                            if (user.Setting.AutoAcceptGiveOffer_Custom)
+                            customGiveOffers = new List<Offer>();
+                            buffGiveOffers = new List<Offer>();
+                            otherGiveOffers = giveOffers.ToList();
+
+                            #region 自定义报价
+                            if (giveOffers.Any())
                             {
                                 var rules = new[]
                                 {
@@ -315,12 +323,11 @@ namespace Steam_Authenticator
                                     user.Setting.AutoAcceptGiveOfferRule.AssetName
                                 }.Where(c => c.Enabled);
 
-                                List<Offer> customOffers = new List<Offer>();
                                 foreach (var offer in giveOffers)
                                 {
                                     foreach (var rule in rules)
                                     {
-                                        if (customOffers.Any(c => c.TradeOfferId == offer.TradeOfferId))
+                                        if (customGiveOffers.Any(c => c.TradeOfferId == offer.TradeOfferId))
                                         {
                                             break;
                                         }
@@ -331,7 +338,7 @@ namespace Steam_Authenticator
                                                 string message = offer.Message ?? "";
                                                 if (rule.Check(message))
                                                 {
-                                                    customOffers.Add(offer);
+                                                    customGiveOffers.Add(offer);
                                                 }
                                                 break;
 
@@ -339,27 +346,18 @@ namespace Steam_Authenticator
                                                 var itemDescriptions = descriptions.Where(c => offer.ItemsToGive.Any(a => c.ClassId == a.ClassId && c.InstanceId == a.InstanceId)).ToList();
                                                 if (itemDescriptions.Count > 0 && itemDescriptions.All(d => rule.Check(d.MarketName) || rule.Check(d.MarketHashName)))
                                                 {
-                                                    customOffers.Add(offer);
+                                                    customGiveOffers.Add(offer);
                                                 }
                                                 break;
                                         }
                                     }
                                 }
 
-                                if (customOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid))
-                                {
-                                    var acceptOffers = customOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                    HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
-                                }
-
-                                //AutoConfirmOffer(client, customOffers, cancellationToken);
-                                client.SetAutoConfirmOffers(customOffers);
-                                return;
+                                otherGiveOffers.RemoveAll(o => customGiveOffers.Any(c => c.TradeOfferId == o.TradeOfferId));
                             }
+                            #endregion
 
-                            buffGiveOffers = new List<Offer>();
-                            otherGiveOffers = giveOffers.ToList();
-
+                            #region BUFF 报价
                             if (giveOffers.Any() && buffClinet != null)
                             {
                                 var buffOffer = buffClinet.QuerySteamTrade().Result;
@@ -375,39 +373,51 @@ namespace Steam_Authenticator
                                     otherGiveOffers = new List<Offer>();
                                 }
                             }
+                            #endregion
 
-
+                            List<Offer> acceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
-                                var acceptOffers = giveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
-
-                                if (confirmAll)
-                                {
-                                    autoConfirmOffers.AddRange(giveOffers);
-                                }
+                                var acceptItemOffers = giveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && acceptCustom)
+                            {
+                                var acceptItemOffers = customGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetBuff)
                             {
-                                var acceptOffers = buffGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
-
-                                if (confirmBuff)
-                                {
-                                    autoConfirmOffers.AddRange(buffGiveOffers);
-                                }
+                                var acceptItemOffers = buffGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
                             {
-                                var acceptOffers = otherGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
-
-                                if (confirmOther)
-                                {
-                                    autoConfirmOffers.AddRange(otherGiveOffers);
-                                }
+                                var acceptItemOffers = otherGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
                             }
 
+                            acceptOffers = acceptOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
+                            HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+
+                            if (confirmAll)
+                            {
+                                autoConfirmOffers.AddRange(giveOffers);
+                            }
+                            if (!confirmAll && confirmCustom)
+                            {
+                                autoConfirmOffers.AddRange(customGiveOffers);
+                            }
+                            if (!confirmAll && confirmBuff)
+                            {
+                                autoConfirmOffers.AddRange(buffGiveOffers);
+                            }
+                            if (!confirmAll && confirmOther)
+                            {
+                                autoConfirmOffers.AddRange(otherGiveOffers);
+                            }
+
+                            autoConfirmOffers = autoConfirmOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
                         }
                         catch
                         {

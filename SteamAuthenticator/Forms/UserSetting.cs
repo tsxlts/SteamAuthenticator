@@ -63,18 +63,11 @@ namespace Steam_Authenticator.Forms
             }
 
             autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = autoAcceptGiveOffer_Custom.Enabled = !(autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked);
-            autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = autoConfirmTrade_Custom.Enabled = !(autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked); ;
         }
 
-        private void autoAcceptGiveOffer_Custom_CheckedChanged(object sender, EventArgs e)
+        private void autoConfirmTrade_CheckedChanged(object sender, EventArgs e)
         {
-            if (!fullyLoaded)
-            {
-                return;
-            }
-
-            autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = !(autoAcceptGiveOffer_Custom.Checked || autoConfirmTrade_Custom.Checked);
-            autoConfirmTrade.Enabled = autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = !(autoAcceptGiveOffer_Custom.Checked || autoConfirmTrade_Custom.Checked);
+            autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = autoConfirmTrade_Custom.Enabled = !(autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked); ;
         }
 
         private void setAcceptGiveOfferRoleBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -129,21 +122,15 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            if (autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked)
+            if (autoAcceptGiveOffer.Checked)
             {
                 autoAcceptGiveOffer_Custom.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
-                autoConfirmTrade_Custom.Enabled = autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = false;
-
                 autoAcceptGiveOffer.Enabled = true;
-                autoConfirmTrade.Enabled = true;
             }
-            if (autoAcceptGiveOffer_Custom.Checked || autoConfirmTrade_Custom.Checked)
+            if (autoConfirmTrade.Checked)
             {
-                autoAcceptGiveOffer.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
-                autoConfirmTrade.Enabled = autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = false;
-
-                autoAcceptGiveOffer_Custom.Enabled = true;
-                autoConfirmTrade_Custom.Enabled = true;
+                autoConfirmTrade_Custom.Enabled = autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = false;
+                autoConfirmTrade.Enabled = true;
             }
         }
 
