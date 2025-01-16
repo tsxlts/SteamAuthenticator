@@ -27,7 +27,6 @@ namespace Steam_Authenticator
         private readonly ContextMenuStrip ecoUserContextMenuStrip;
 
         private bool showBalloonTip = true;
-        private string initialDirectory = null;
         private UserClient currentClient = null;
 
         public MainForm()

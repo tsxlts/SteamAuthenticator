@@ -31,104 +31,123 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportGuardOptions));
             exportAll = new RadioButton();
             exportCurrent = new RadioButton();
-            radioGroup = new Panel();
             currentName = new Label();
-            passwordBox = new TextBox();
-            label1 = new Label();
-            label2 = new Label();
             saveBtn = new Button();
-            radioGroup.SuspendLayout();
+            maFile = new RadioButton();
+            saFile = new RadioButton();
+            groupBox1 = new GroupBox();
+            groupBox2 = new GroupBox();
+            panel1 = new Panel();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // exportAll
             // 
             exportAll.AutoSize = true;
-            exportAll.Location = new Point(3, 8);
+            exportAll.Location = new Point(6, 22);
             exportAll.Name = "exportAll";
-            exportAll.Size = new Size(122, 21);
+            exportAll.Size = new Size(98, 21);
             exportAll.TabIndex = 0;
             exportAll.TabStop = true;
-            exportAll.Text = "导出所有帐号令牌";
+            exportAll.Text = "所有帐号令牌";
             exportAll.UseVisualStyleBackColor = true;
             // 
             // exportCurrent
             // 
             exportCurrent.AutoSize = true;
-            exportCurrent.Location = new Point(3, 46);
+            exportCurrent.Location = new Point(6, 49);
             exportCurrent.Name = "exportCurrent";
-            exportCurrent.Size = new Size(122, 21);
+            exportCurrent.Size = new Size(98, 21);
             exportCurrent.TabIndex = 1;
             exportCurrent.TabStop = true;
-            exportCurrent.Text = "导出当前帐号令牌";
+            exportCurrent.Text = "当前帐号令牌";
             exportCurrent.UseVisualStyleBackColor = true;
-            // 
-            // radioGroup
-            // 
-            radioGroup.Controls.Add(currentName);
-            radioGroup.Controls.Add(exportAll);
-            radioGroup.Controls.Add(exportCurrent);
-            radioGroup.Location = new Point(12, 12);
-            radioGroup.Name = "radioGroup";
-            radioGroup.Size = new Size(243, 84);
-            radioGroup.TabIndex = 2;
             // 
             // currentName
             // 
             currentName.AutoEllipsis = true;
             currentName.ForeColor = Color.Green;
-            currentName.Location = new Point(131, 48);
+            currentName.Location = new Point(110, 51);
             currentName.Name = "currentName";
             currentName.Size = new Size(100, 17);
             currentName.TabIndex = 2;
             currentName.Text = "            ";
             // 
-            // passwordBox
-            // 
-            passwordBox.Location = new Point(72, 102);
-            passwordBox.Name = "passwordBox";
-            passwordBox.PasswordChar = '*';
-            passwordBox.Size = new Size(85, 23);
-            passwordBox.TabIndex = 3;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(10, 104);
-            label1.Name = "label1";
-            label1.Size = new Size(56, 17);
-            label1.TabIndex = 4;
-            label1.Text = "设置密码";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.ForeColor = Color.Gray;
-            label2.Location = new Point(163, 105);
-            label2.Name = "label2";
-            label2.Size = new Size(92, 17);
-            label2.TabIndex = 5;
-            label2.Text = "留空不设置密码";
-            // 
             // saveBtn
             // 
-            saveBtn.Location = new Point(12, 157);
+            saveBtn.Dock = DockStyle.Fill;
+            saveBtn.Location = new Point(0, 0);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(243, 30);
+            saveBtn.Size = new Size(221, 33);
             saveBtn.TabIndex = 6;
             saveBtn.Text = "导出令牌";
             saveBtn.UseVisualStyleBackColor = true;
             saveBtn.Click += saveBtn_Click;
             // 
+            // maFile
+            // 
+            maFile.AutoSize = true;
+            maFile.Location = new Point(6, 49);
+            maFile.Name = "maFile";
+            maFile.Size = new Size(183, 21);
+            maFile.TabIndex = 2;
+            maFile.TabStop = true;
+            maFile.Text = "导出maFile文件（SDA文件）";
+            maFile.UseVisualStyleBackColor = true;
+            // 
+            // saFile
+            // 
+            saFile.AutoSize = true;
+            saFile.Checked = true;
+            saFile.Location = new Point(6, 22);
+            saFile.Name = "saFile";
+            saFile.Size = new Size(89, 21);
+            saFile.TabIndex = 1;
+            saFile.TabStop = true;
+            saFile.Text = "导出SA文件";
+            saFile.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(currentName);
+            groupBox1.Controls.Add(exportAll);
+            groupBox1.Controls.Add(exportCurrent);
+            groupBox1.Location = new Point(12, 10);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(221, 82);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "选择帐号";
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(maFile);
+            groupBox2.Controls.Add(saFile);
+            groupBox2.Location = new Point(12, 99);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(221, 84);
+            groupBox2.TabIndex = 9;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "文件选格式";
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(saveBtn);
+            panel1.Location = new Point(12, 189);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(221, 33);
+            panel1.TabIndex = 10;
+            // 
             // ExportGuardOptions
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(269, 192);
-            Controls.Add(saveBtn);
-            Controls.Add(label2);
-            Controls.Add(label1);
-            Controls.Add(passwordBox);
-            Controls.Add(radioGroup);
+            ClientSize = new Size(243, 227);
+            Controls.Add(panel1);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -136,21 +155,24 @@
             Name = "ExportGuardOptions";
             StartPosition = FormStartPosition.CenterParent;
             Text = "导出令牌";
-            radioGroup.ResumeLayout(false);
-            radioGroup.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private RadioButton exportAll;
         private RadioButton exportCurrent;
-        private Panel radioGroup;
         private Label currentName;
-        private TextBox passwordBox;
-        private Label label1;
-        private Label label2;
         private Button saveBtn;
+        private RadioButton maFile;
+        private RadioButton saFile;
+        private GroupBox groupBox1;
+        private GroupBox groupBox2;
+        private Panel panel1;
     }
 }
