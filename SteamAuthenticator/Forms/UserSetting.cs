@@ -7,12 +7,24 @@ namespace Steam_Authenticator.Forms
         private readonly User user;
         private bool fullyLoaded = false;
 
+        public readonly List<CheckBox> autoAcceptGiveOfferBoxs = new List<CheckBox>();
+        public readonly List<CheckBox> autoConfirmOfferBoxs = new List<CheckBox>();
+
         public UserSetting(User user)
         {
             InitializeComponent();
 
             this.Text = $"用户设置 {user.Account}";
             this.user = user;
+
+            autoAcceptGiveOfferBoxs = new List<CheckBox>
+            {
+                autoAcceptGiveOffer,autoAcceptGiveOffer_Buff,autoAcceptGiveOffer_Eco,autoAcceptGiveOffer_Other,autoAcceptGiveOffer_Custom
+            };
+            autoConfirmOfferBoxs = new List<CheckBox>
+            {
+                autoConfirmTrade,autoConfirmTrade_Buff,autoConfirmTrade_Eco,autoConfirmTrade_Other,autoConfirmTrade_Custom
+            };
         }
 
         private void UserSetting_Load(object sender, EventArgs e)
@@ -26,6 +38,9 @@ namespace Steam_Authenticator.Forms
 
             autoAcceptGiveOffer_Buff.Checked = user.Setting.AutoAcceptGiveOffer_Buff;
             autoConfirmTrade_Buff.Checked = user.Setting.AutoConfirmTrade_Buff;
+
+            autoAcceptGiveOffer_Eco.Checked = user.Setting.AutoAcceptGiveOffer_Eco;
+            autoConfirmTrade_Eco.Checked = user.Setting.AutoConfirmTrade_Eco;
 
             autoAcceptGiveOffer_Other.Checked = user.Setting.AutoAcceptGiveOffer_Other;
             autoConfirmTrade_Other.Checked = user.Setting.AutoConfirmTrade_Other;
@@ -62,12 +77,33 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = autoAcceptGiveOffer_Custom.Enabled = !(autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked);
+            foreach (var item in autoAcceptGiveOfferBoxs)
+            {
+                if (item == autoAcceptGiveOffer)
+                {
+                    continue;
+                }
+
+                item.Enabled = !autoAcceptGiveOffer.Checked;
+            }
         }
 
         private void autoConfirmTrade_CheckedChanged(object sender, EventArgs e)
         {
-            autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = autoConfirmTrade_Custom.Enabled = !(autoAcceptGiveOffer.Checked || autoConfirmTrade.Checked); ;
+            if (!fullyLoaded)
+            {
+                return;
+            }
+
+            foreach (var item in autoConfirmOfferBoxs)
+            {
+                if (item == autoConfirmTrade)
+                {
+                    continue;
+                }
+
+                item.Enabled = !autoConfirmTrade.Checked;
+            }
         }
 
         private void setAcceptGiveOfferRoleBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -87,6 +123,9 @@ namespace Steam_Authenticator.Forms
             user.Setting.AutoAcceptGiveOffer_Buff = autoAcceptGiveOffer_Buff.Checked;
             user.Setting.AutoConfirmTrade_Buff = autoConfirmTrade_Buff.Checked;
 
+            user.Setting.AutoAcceptGiveOffer_Eco = autoAcceptGiveOffer_Eco.Checked;
+            user.Setting.AutoConfirmTrade_Eco = autoConfirmTrade_Eco.Checked;
+
             user.Setting.AutoAcceptGiveOffer_Other = autoAcceptGiveOffer_Other.Checked;
             user.Setting.AutoConfirmTrade_Other = autoConfirmTrade_Other.Checked;
 
@@ -102,20 +141,9 @@ namespace Steam_Authenticator.Forms
 
         private void SetControlsEnabledState(bool enabled)
         {
-            autoConfirmMarket.Enabled = autoAcceptReceiveOffer.Enabled
-                = autoAcceptGiveOffer.Enabled
-                = autoConfirmTrade.Enabled
-
-                = autoAcceptGiveOffer_Buff.Enabled
-                = autoConfirmTrade_Buff.Enabled
-
-                = autoAcceptGiveOffer_Other.Enabled
-                = autoConfirmTrade_Other.Enabled
-
-                = autoAcceptGiveOffer_Custom.Enabled
-                = autoConfirmTrade_Custom.Enabled
-
-                = enabled;
+            autoConfirmMarket.Enabled = autoAcceptReceiveOffer.Enabled = enabled;
+            autoAcceptGiveOfferBoxs.ForEach(x => x.Enabled = enabled);
+            autoConfirmOfferBoxs.ForEach(x => x.Enabled = enabled);
 
             if (!enabled)
             {
@@ -124,13 +152,27 @@ namespace Steam_Authenticator.Forms
 
             if (autoAcceptGiveOffer.Checked)
             {
-                autoAcceptGiveOffer_Custom.Enabled = autoAcceptGiveOffer_Buff.Enabled = autoAcceptGiveOffer_Other.Enabled = false;
-                autoAcceptGiveOffer.Enabled = true;
+                foreach (var item in autoAcceptGiveOfferBoxs)
+                {
+                    if (item == autoAcceptGiveOffer)
+                    {
+                        continue;
+                    }
+
+                    item.Enabled = !autoAcceptGiveOffer.Checked;
+                }
             }
             if (autoConfirmTrade.Checked)
             {
-                autoConfirmTrade_Custom.Enabled = autoConfirmTrade_Buff.Enabled = autoConfirmTrade_Other.Enabled = false;
-                autoConfirmTrade.Enabled = true;
+                foreach (var item in autoConfirmOfferBoxs)
+                {
+                    if (item == autoConfirmTrade)
+                    {
+                        continue;
+                    }
+
+                    item.Enabled = !autoConfirmTrade.Checked;
+                }
             }
         }
 

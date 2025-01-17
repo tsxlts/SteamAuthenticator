@@ -2,7 +2,7 @@
 {
     internal class EcoUserCollectionPanel : ItemCollectionPanel<EcoUserPanel, EcoClient>
     {
-        public EcoUserPanel SetOffer(BuffClient client, int? offerCount)
+        public EcoUserPanel SetOffer(EcoClient client, int? offerCount)
         {
             var panel = ItemPanels.Find(c => c.Client?.Key?.Equals(client.Key) ?? false);
             panel?.SetOffer(offerCount);

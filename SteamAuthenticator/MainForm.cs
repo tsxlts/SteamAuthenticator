@@ -269,6 +269,7 @@ namespace Steam_Authenticator
                 List<Task> tasks = new List<Task>();
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
                 var buffClients = Appsetting.Instance.BuffClients;
+                var ecoClients = Appsetting.Instance.EcoClients;
                 foreach (var client in checkClients)
                 {
                     if (client == null)
@@ -281,20 +282,24 @@ namespace Steam_Authenticator
                         var webClient = client.Client;
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
+                        var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
 
                         bool acceptAll = user.Setting.AutoAcceptGiveOffer;
                         bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
+                        bool accectEco = acceptAll || user.Setting.AutoAcceptGiveOffer_Eco;
                         bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
                         bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
 
                         bool confirmAll = user.Setting.AutoConfirmTrade;
                         bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
+                        bool confirmEco = confirmAll || user.Setting.AutoConfirmTrade_Eco;
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
                         List<Offer> tradeOffers = new List<Offer>();
                         List<Offer> customGiveOffers;
                         List<Offer> buffGiveOffers = null;
+                        List<Offer> ecoGiveOffers = null;
                         List<Offer> otherGiveOffers = null;
 
                         List<Offer> autoConfirmOffers = new List<Offer>();
@@ -320,6 +325,7 @@ namespace Steam_Authenticator
 
                             customGiveOffers = new List<Offer>();
                             buffGiveOffers = new List<Offer>();
+                            ecoGiveOffers = new List<Offer>();
                             otherGiveOffers = giveOffers.ToList();
 
                             #region 自定义报价
@@ -383,6 +389,26 @@ namespace Steam_Authenticator
                             }
                             #endregion
 
+                            #region ECO 报价
+                            if (giveOffers.Any() && ecoClient != null)
+                            {
+                                var ecoOffer = ecoClient.QueryOffers().Result;
+                                if (ecoOffer?.IsSuccess ?? false)
+                                {
+                                    var ecoOfferIds = ecoOffer.StatusData?.ResultData
+                                    ?.Where(c => c.CurrentSteamId == user.SteamId && !string.IsNullOrWhiteSpace(c.OfferId))
+                                    ?.Select(c => c.OfferId)?.ToList() ?? new List<string>();
+                                    ecoGiveOffers = giveOffers.Where(c => ecoOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => ecoOfferIds.Contains(c.TradeOfferId));
+                                }
+                                else
+                                {
+                                    otherGiveOffers = new List<Offer>();
+                                }
+                            }
+                            #endregion
+
                             List<Offer> acceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
@@ -397,6 +423,11 @@ namespace Steam_Authenticator
                             if (!acceptAll && accpetBuff)
                             {
                                 var acceptItemOffers = buffGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accectEco)
+                            {
+                                var acceptItemOffers = ecoGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
@@ -419,6 +450,10 @@ namespace Steam_Authenticator
                             if (!confirmAll && confirmBuff)
                             {
                                 autoConfirmOffers.AddRange(buffGiveOffers);
+                            }
+                            if (!confirmAll && confirmEco)
+                            {
+                                autoConfirmOffers.AddRange(ecoGiveOffers);
                             }
                             if (!confirmAll && confirmOther)
                             {
@@ -445,6 +480,10 @@ namespace Steam_Authenticator
                             if (buffClinet != null)
                             {
                                 buffUsersPanel.SetOffer(buffClinet, buffGiveOffers?.Count);
+                            }
+                            if (ecoClient != null)
+                            {
+                                ecoUsersPanel.SetOffer(ecoClient, ecoGiveOffers?.Count);
                             }
                         }
                     });
@@ -473,6 +512,12 @@ namespace Steam_Authenticator
                         if (buffClinet != null)
                         {
                             buffUsersPanel.SetOffer(buffClinet, null);
+                        }
+
+                        var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(client.User.SteamId) ?? false);
+                        if (ecoClient != null)
+                        {
+                            ecoUsersPanel.SetOffer(ecoClient, null);
                         }
                     }
                 }));

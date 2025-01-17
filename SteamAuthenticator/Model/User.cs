@@ -68,6 +68,21 @@ namespace Steam_Authenticator.Model
         public bool AutoConfirmTrade_Buff { get; set; }
         #endregion
 
+        #region ECO报价
+        /// <summary>
+        /// 是否自动接受 ECO 索取报价
+        /// 别人索取我的
+        /// </summary>
+        [JsonProperty("auto_accept_give_offer_eco")]
+        public bool AutoAcceptGiveOffer_Eco { get; set; }
+
+        /// <summary>
+        /// 是否自动确认 ECO 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_eco")]
+        public bool AutoConfirmTrade_Eco { get; set; }
+        #endregion
+
         #region 其他报价
         /// <summary>
         /// 是否自动接受 其他 索取报价
@@ -109,7 +124,11 @@ namespace Steam_Authenticator.Model
         /// <returns></returns>
         public bool AutoConfirmOffer()
         {
-            return AutoConfirmTrade || AutoConfirmTrade_Buff || AutoConfirmTrade_Other || AutoConfirmTrade_Custom;
+            return AutoConfirmTrade
+                || AutoConfirmTrade_Buff
+                || AutoConfirmTrade_Eco
+                || AutoConfirmTrade_Other
+                || AutoConfirmTrade_Custom;
         }
 
         /// <summary>
@@ -118,7 +137,11 @@ namespace Steam_Authenticator.Model
         /// <returns></returns>
         public bool AutoAcceptGive()
         {
-            return AutoAcceptGiveOffer || AutoAcceptGiveOffer_Buff || AutoAcceptGiveOffer_Other || AutoAcceptGiveOffer_Custom;
+            return AutoAcceptGiveOffer
+                || AutoAcceptGiveOffer_Buff
+                || AutoAcceptGiveOffer_Eco
+                || AutoAcceptGiveOffer_Other
+                || AutoAcceptGiveOffer_Custom;
         }
 
         /// <summary>

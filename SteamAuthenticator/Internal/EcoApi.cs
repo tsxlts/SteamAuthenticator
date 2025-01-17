@@ -77,6 +77,12 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
+        public static async Task<EcoResponse<List<QueryOffersResponse>>> QueryOffers(EcoClient client, string gameId, CancellationToken cancellationToken = default)
+        {
+            var response = await GetAsync<List<QueryOffersResponse>>(client, $"{Api}/Api/OneClickOffers/OneClickOffersList?gameId={gameId}", cancellationToken);
+            return response;
+        }
+
         private static async Task<EcoResponse<TResponse>> GetAsync<TResponse>(EcoClient client, string url, CancellationToken cancellationToken = default)
         {
             var response = await SteamApi.GetAsync<EcoResponse<JToken>>(url, headers: InitHeaders(null, client.Token), cancellationToken: cancellationToken);

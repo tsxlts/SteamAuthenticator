@@ -2,6 +2,7 @@
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
+using Steam_Authenticator.Model.ECO;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
@@ -328,6 +329,11 @@ namespace Steam_Authenticator
             User.SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
 
             Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+        }
+
+        public async Task<EcoResponse<List<QueryOffersResponse>>> QueryOffers(string gameId = "730", CancellationToken cancellationToken = default)
+        {
+            return await EcoApi.QueryOffers(this, gameId, cancellationToken);
         }
 
         public Task LogoutAsync()

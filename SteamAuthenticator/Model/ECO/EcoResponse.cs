@@ -8,6 +8,8 @@ namespace Steam_Authenticator.Model.ECO
         public string StatusMsg { get; set; }
 
         public Statusdata<T> StatusData { get; set; }
+
+        public bool IsSuccess => StatusCode == "0" && StatusData?.ResultCode == "0";
     }
 
     public class Statusdata<T>
