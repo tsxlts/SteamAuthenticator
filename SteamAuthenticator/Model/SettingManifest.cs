@@ -14,7 +14,17 @@ namespace Steam_Authenticator.Model
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string file = Path.Combine(commonAppDataPath, "SA", "Manifest", "sda.setting.manifest");
             manifest = Manifest.FromFile(file);
-            setting = manifest.GetEntry<Setting>(path, "setting", null)?.Value ?? new Setting();
+            setting = manifest.GetEntry<Setting>(path, "setting", null) ?? new Setting();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changed"></param>
+        /// <returns></returns>
+        public void WithChanged(Action<object, ManifestChangedEventArgs> changed)
+        {
+            manifest.ManifestChanged += new ManifestChangedEventHandler(changed);
         }
 
         public Setting Entry => setting;
@@ -29,7 +39,7 @@ namespace Steam_Authenticator.Model
         /// <summary>
         /// 
         /// </summary>
-        public class Setting : JsonStreamSerializer<Setting>
+        public class Setting : JsonStreamSerializer
         {
             public Setting()
             {

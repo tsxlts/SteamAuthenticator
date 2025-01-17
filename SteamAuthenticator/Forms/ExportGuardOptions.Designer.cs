@@ -68,7 +68,7 @@
             // currentName
             // 
             currentName.AutoEllipsis = true;
-            currentName.ForeColor = Color.Green;
+            currentName.ForeColor = Color.FromArgb(102, 162, 183);
             currentName.Location = new Point(110, 51);
             currentName.Name = "currentName";
             currentName.Size = new Size(100, 17);

@@ -35,6 +35,15 @@ namespace Steam_Authenticator
 
             CheckForIllegalCrossThreadCalls = false;
 
+            Appsetting.Instance.AppSetting.WithChanged((s, e) =>
+            {
+                usersPanel.RefreshClients();
+            });
+            Appsetting.Instance.Manifest.WithChanged((s, e) =>
+            {
+                usersPanel.RefreshClients();
+            });
+
             var match = Regex.Match(Application.ProductVersion, @"^[\d.]+");
             currentVersion = new Version(match.Value);
             versionLabel.Text = $"v{currentVersion}";

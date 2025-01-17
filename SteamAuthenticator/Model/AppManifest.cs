@@ -17,6 +17,16 @@ namespace Steam_Authenticator.Model
             manifest = Manifest.FromFile(file);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changed"></param>
+        /// <returns></returns>
+        public void WithChanged(Action<object, ManifestChangedEventArgs> changed)
+        {
+            manifest.ManifestChanged += new ManifestChangedEventHandler(changed);
+        }
+
         #region Guard
         public void AddGuard(string accountName, Guard entry)
         {
@@ -33,7 +43,7 @@ namespace Steam_Authenticator.Model
         public Guard GetGuard(string accountName)
         {
             string password = GetPassword();
-            return manifest.GetEntry<Guard>(guardPath, accountName, password)?.Value;
+            return manifest.GetEntry<Guard>(guardPath, accountName, password);
         }
 
         public IEnumerable<string> GetGuards()
@@ -58,7 +68,7 @@ namespace Steam_Authenticator.Model
         public User GetSteamUser(string steamId)
         {
             string password = GetPassword();
-            return manifest.GetEntry<User>(userPath, steamId, password)?.Value;
+            return manifest.GetEntry<User>(userPath, steamId, password);
         }
 
         public IEnumerable<string> GetSteamUsers()
@@ -83,7 +93,7 @@ namespace Steam_Authenticator.Model
         public BuffUser GetBuffUser(string userId)
         {
             string password = GetPassword();
-            return manifest.GetEntry<BuffUser>(buffUserPath, userId, password)?.Value;
+            return manifest.GetEntry<BuffUser>(buffUserPath, userId, password);
         }
 
         public IEnumerable<string> GetBuffUser()
@@ -108,7 +118,7 @@ namespace Steam_Authenticator.Model
         public EcoUser GetEcoUser(string userId)
         {
             string password = GetPassword();
-            return manifest.GetEntry<EcoUser>(ecoUserPath, userId, password)?.Value;
+            return manifest.GetEntry<EcoUser>(ecoUserPath, userId, password);
         }
 
         public IEnumerable<string> GetEcoUser()

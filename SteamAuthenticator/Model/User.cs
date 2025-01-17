@@ -2,7 +2,7 @@
 
 namespace Steam_Authenticator.Model
 {
-    public class User : JsonStreamSerializer<User>
+    public class User : JsonStreamSerializer
     {
         public string Account { get; set; }
 
@@ -102,9 +102,36 @@ namespace Steam_Authenticator.Model
         /// 自动接受索取报价 自定义 规则
         /// </summary>
         public AcceptOfferRuleSetting AutoAcceptGiveOfferRule { get; set; } = new AcceptOfferRuleSetting();
+
+        /// <summary>
+        /// 是否自动确认报价
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoConfirmOffer()
+        {
+            return AutoConfirmTrade || AutoConfirmTrade_Buff || AutoConfirmTrade_Other || AutoConfirmTrade_Custom;
+        }
+
+        /// <summary>
+        /// 是否自动接受索取报价 别人索取我的
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoAcceptGive()
+        {
+            return AutoAcceptGiveOffer || AutoAcceptGiveOffer_Buff || AutoAcceptGiveOffer_Other || AutoAcceptGiveOffer_Custom;
+        }
+
+        /// <summary>
+        /// 是否自动接受赠送报价 别人赠送给我的
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoAcceptReceive()
+        {
+            return AutoAcceptReceiveOffer;
+        }
     }
 
-    public class BuffUser : JsonStreamSerializer<BuffUser>
+    public class BuffUser : JsonStreamSerializer
     {
         public string BuffCookies { get; set; }
 
@@ -117,7 +144,7 @@ namespace Steam_Authenticator.Model
         public string Nickname { get; set; }
     }
 
-    public class EcoUser : JsonStreamSerializer<EcoUser>
+    public class EcoUser : JsonStreamSerializer
     {
         public string ClientId { get; set; }
 

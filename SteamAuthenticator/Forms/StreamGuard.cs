@@ -96,7 +96,7 @@ namespace Steam_Authenticator.Forms
             }
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void CopyRevocationCode_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(RevocationCode.Text);
         }

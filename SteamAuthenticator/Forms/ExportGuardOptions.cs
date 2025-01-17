@@ -17,6 +17,7 @@ namespace Steam_Authenticator.Forms
             currentName.Text = current;
             this.current = current;
 
+            exportCurrent.Checked = true;
             if (Appsetting.Instance.Manifest.GetGuard(current) == null)
             {
                 exportCurrent.Enabled = false;
@@ -82,9 +83,9 @@ namespace Steam_Authenticator.Forms
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
                     Title = "导出令牌",
-                    Filter = "SA文件 (*.entry)|*.entry",
-                    DefaultExt = ".entry",
-                    FileName = $"{guards[0].AccountName}.entry",
+                    Filter = "SA文件 (*.saEntry)|*.saEntry",
+                    DefaultExt = ".saEntry",
+                    FileName = $"{guards[0].AccountName}.saEntry",
                     InitialDirectory = Appsetting.Instance.AppSetting.Entry.InitialDirectory ?? AppContext.BaseDirectory,
                     CheckPathExists = true
                 };

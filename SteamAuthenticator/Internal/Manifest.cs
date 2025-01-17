@@ -237,7 +237,7 @@ namespace Steam_Authenticator.Internal
                         stream.CopyTo(fileStream);
                     }
                 }
-
+                OnChanged();
                 return true;
             }
             finally
@@ -304,6 +304,11 @@ namespace Steam_Authenticator.Internal
             }
         }
 
+        private void OnChanged()
+        {
+            ManifestChanged?.Invoke(this, new ManifestChangedEventArgs(FileName));
+        }
+
         public bool Encrypted { get; set; }
 
         public byte[] IV { get; set; } = new byte[0];
@@ -320,6 +325,8 @@ namespace Steam_Authenticator.Internal
         };
 
         public List<ManifestEntry> Entries { get; private set; } = new List<ManifestEntry>();
+
+        public event ManifestChangedEventHandler ManifestChanged;
 
         public class ManifestEntry
         {

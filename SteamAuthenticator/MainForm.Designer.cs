@@ -66,6 +66,8 @@ namespace Steam_Authenticator
             ecoUsersPanel = new EcoUserCollectionPanel();
             pictureBox6 = new PictureBox();
             statusPanel = new Panel();
+            label11 = new Label();
+            pictureBox7 = new PictureBox();
             label10 = new Label();
             pictureBox5 = new PictureBox();
             label9 = new Label();
@@ -89,6 +91,7 @@ namespace Steam_Authenticator
             ecoUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             statusPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
@@ -99,7 +102,7 @@ namespace Steam_Authenticator
             menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, submitRequirementsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(764, 25);
+            menuStrip1.Size = new Size(819, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -258,7 +261,7 @@ namespace Steam_Authenticator
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(544, 38);
+            panel1.Location = new Point(599, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
@@ -363,7 +366,7 @@ namespace Steam_Authenticator
             usersPanel.Dock = DockStyle.Fill;
             usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
-            usersPanel.Size = new Size(730, 298);
+            usersPanel.Size = new Size(785, 298);
             usersPanel.TabIndex = 7;
             usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
@@ -371,7 +374,7 @@ namespace Steam_Authenticator
             // 
             pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.loading;
-            pictureBox1.Location = new Point(313, 87);
+            pictureBox1.Location = new Point(340, 87);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(100, 100);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -414,7 +417,7 @@ namespace Steam_Authenticator
             // versionLabel
             // 
             versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            versionLabel.Location = new Point(692, 481);
+            versionLabel.Location = new Point(747, 481);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(60, 23);
             versionLabel.TabIndex = 12;
@@ -465,7 +468,7 @@ namespace Steam_Authenticator
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(744, 334);
+            tabControl.Size = new Size(799, 334);
             tabControl.TabIndex = 16;
             // 
             // steamPage
@@ -474,7 +477,7 @@ namespace Steam_Authenticator
             steamPage.Location = new Point(4, 26);
             steamPage.Name = "steamPage";
             steamPage.Padding = new Padding(3);
-            steamPage.Size = new Size(736, 304);
+            steamPage.Size = new Size(791, 304);
             steamPage.TabIndex = 0;
             steamPage.Text = "Steam 帐号";
             steamPage.UseVisualStyleBackColor = true;
@@ -485,7 +488,7 @@ namespace Steam_Authenticator
             buffPage.Location = new Point(4, 26);
             buffPage.Name = "buffPage";
             buffPage.Padding = new Padding(3);
-            buffPage.Size = new Size(736, 304);
+            buffPage.Size = new Size(791, 319);
             buffPage.TabIndex = 1;
             buffPage.Text = "BUFF 帐号";
             buffPage.UseVisualStyleBackColor = true;
@@ -498,7 +501,7 @@ namespace Steam_Authenticator
             buffUsersPanel.Dock = DockStyle.Fill;
             buffUsersPanel.Location = new Point(3, 3);
             buffUsersPanel.Name = "buffUsersPanel";
-            buffUsersPanel.Size = new Size(730, 298);
+            buffUsersPanel.Size = new Size(785, 313);
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
@@ -506,7 +509,7 @@ namespace Steam_Authenticator
             // 
             pictureBox2.Anchor = AnchorStyles.None;
             pictureBox2.Image = Properties.Resources.loading;
-            pictureBox2.Location = new Point(313, 87);
+            pictureBox2.Location = new Point(340, 94);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(100, 100);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
@@ -519,7 +522,7 @@ namespace Steam_Authenticator
             ecoPage.Location = new Point(4, 26);
             ecoPage.Name = "ecoPage";
             ecoPage.Padding = new Padding(3);
-            ecoPage.Size = new Size(736, 304);
+            ecoPage.Size = new Size(791, 319);
             ecoPage.TabIndex = 2;
             ecoPage.Text = "ECO 帐号";
             ecoPage.UseVisualStyleBackColor = true;
@@ -532,14 +535,14 @@ namespace Steam_Authenticator
             ecoUsersPanel.Dock = DockStyle.Fill;
             ecoUsersPanel.Location = new Point(3, 3);
             ecoUsersPanel.Name = "ecoUsersPanel";
-            ecoUsersPanel.Size = new Size(730, 298);
+            ecoUsersPanel.Size = new Size(785, 313);
             ecoUsersPanel.TabIndex = 8;
             // 
             // pictureBox6
             // 
             pictureBox6.Anchor = AnchorStyles.None;
             pictureBox6.Image = Properties.Resources.loading;
-            pictureBox6.Location = new Point(313, 87);
+            pictureBox6.Location = new Point(340, 94);
             pictureBox6.Name = "pictureBox6";
             pictureBox6.Size = new Size(100, 100);
             pictureBox6.SizeMode = PictureBoxSizeMode.Zoom;
@@ -549,6 +552,8 @@ namespace Steam_Authenticator
             // statusPanel
             // 
             statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            statusPanel.Controls.Add(label11);
+            statusPanel.Controls.Add(pictureBox7);
             statusPanel.Controls.Add(label10);
             statusPanel.Controls.Add(pictureBox5);
             statusPanel.Controls.Add(label9);
@@ -562,15 +567,36 @@ namespace Steam_Authenticator
             statusPanel.Controls.Add(label5);
             statusPanel.Location = new Point(12, 477);
             statusPanel.Name = "statusPanel";
-            statusPanel.Size = new Size(599, 30);
+            statusPanel.Size = new Size(654, 30);
             statusPanel.TabIndex = 17;
+            // 
+            // label11
+            // 
+            label11.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label11.AutoSize = true;
+            label11.ForeColor = Color.FromArgb(102, 162, 183);
+            label11.Location = new Point(322, 7);
+            label11.Name = "label11";
+            label11.Size = new Size(56, 17);
+            label11.TabIndex = 22;
+            label11.Text = "绑定令牌";
+            // 
+            // pictureBox7
+            // 
+            pictureBox7.Image = (Image)resources.GetObject("pictureBox7.Image");
+            pictureBox7.Location = new Point(298, 5);
+            pictureBox7.Name = "pictureBox7";
+            pictureBox7.Size = new Size(21, 21);
+            pictureBox7.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox7.TabIndex = 21;
+            pictureBox7.TabStop = false;
             // 
             // label10
             // 
             label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label10.AutoSize = true;
             label10.ForeColor = Color.FromArgb(57, 89, 220);
-            label10.Location = new Point(491, 7);
+            label10.Location = new Point(578, 7);
             label10.Name = "label10";
             label10.Size = new Size(56, 17);
             label10.TabIndex = 20;
@@ -579,7 +605,7 @@ namespace Steam_Authenticator
             // pictureBox5
             // 
             pictureBox5.Image = Properties.Resources.auto_accept;
-            pictureBox5.Location = new Point(467, 5);
+            pictureBox5.Location = new Point(554, 5);
             pictureBox5.Name = "pictureBox5";
             pictureBox5.Size = new Size(21, 21);
             pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
@@ -591,7 +617,7 @@ namespace Steam_Authenticator
             label9.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label9.AutoSize = true;
             label9.ForeColor = Color.FromArgb(121, 193, 38);
-            label9.Location = new Point(405, 7);
+            label9.Location = new Point(492, 7);
             label9.Name = "label9";
             label9.Size = new Size(56, 17);
             label9.TabIndex = 18;
@@ -602,7 +628,7 @@ namespace Steam_Authenticator
             label8.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label8.AutoSize = true;
             label8.ForeColor = Color.FromArgb(93, 151, 255);
-            label8.Location = new Point(320, 7);
+            label8.Location = new Point(407, 7);
             label8.Name = "label8";
             label8.Size = new Size(56, 17);
             label8.TabIndex = 17;
@@ -611,7 +637,7 @@ namespace Steam_Authenticator
             // pictureBox4
             // 
             pictureBox4.Image = Properties.Resources.auto_deliver;
-            pictureBox4.Location = new Point(296, 5);
+            pictureBox4.Location = new Point(383, 5);
             pictureBox4.Name = "pictureBox4";
             pictureBox4.Size = new Size(21, 21);
             pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
@@ -621,7 +647,7 @@ namespace Steam_Authenticator
             // pictureBox3
             // 
             pictureBox3.Image = Properties.Resources.auto_confirm;
-            pictureBox3.Location = new Point(381, 5);
+            pictureBox3.Location = new Point(468, 5);
             pictureBox3.Name = "pictureBox3";
             pictureBox3.Size = new Size(21, 21);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
@@ -645,7 +671,7 @@ namespace Steam_Authenticator
             // 
             submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             submitRequirementsLabel.LinkColor = Color.FromArgb(192, 0, 192);
-            submitRequirementsLabel.Location = new Point(626, 481);
+            submitRequirementsLabel.Location = new Point(681, 481);
             submitRequirementsLabel.Name = "submitRequirementsLabel";
             submitRequirementsLabel.Size = new Size(60, 23);
             submitRequirementsLabel.TabIndex = 19;
@@ -665,7 +691,7 @@ namespace Steam_Authenticator
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(764, 511);
+            ClientSize = new Size(819, 511);
             Controls.Add(submitRequirementsLabel);
             Controls.Add(SteamId);
             Controls.Add(statusPanel);
@@ -679,7 +705,7 @@ namespace Steam_Authenticator
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
-            MinimumSize = new Size(780, 550);
+            MinimumSize = new Size(835, 550);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Steam验证器";
@@ -702,6 +728,7 @@ namespace Steam_Authenticator
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
@@ -767,5 +794,7 @@ namespace Steam_Authenticator
         private EcoUserCollectionPanel ecoUsersPanel;
         private PictureBox pictureBox6;
         private ToolStripMenuItem exportAuthenticatorMenuItem;
+        private Label label11;
+        private PictureBox pictureBox7;
     }
 }

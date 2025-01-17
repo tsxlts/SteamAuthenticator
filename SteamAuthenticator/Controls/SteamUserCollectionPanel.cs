@@ -1,4 +1,6 @@
 ﻿
+using Steam_Authenticator.Model;
+
 namespace Steam_Authenticator.Controls
 {
     internal class SteamUserCollectionPanel : ItemCollectionPanel<SteamUserPanel, UserClient>
@@ -24,6 +26,14 @@ namespace Steam_Authenticator.Controls
             return panel;
         }
 
+        public void RefreshClients()
+        {
+            foreach (var client in ItemPanels)
+            {
+                client.RefreshIcon();
+            }
+        }
+
         protected override Size ItemSize => new Size(80, 136);
 
         protected override SteamUserPanel CreateUserPanel(bool hasUser, UserClient client)
@@ -38,28 +48,24 @@ namespace Steam_Authenticator.Controls
                 Client = client
             };
 
+            var guard = new CustomIcon(Properties.Resources.steam32, new CustomIcon.Options
+            {
+                Convert = (icon) =>
+                {
+                    Guard guard = Appsetting.Instance.Manifest.GetGuard(client.GetAccount());
+                    if (guard != null)
+                    {
+                        return icon.Source;
+                    }
+
+                    return icon.ConvertToGrayscale();
+                }
+            });
             var auto_deliver = new CustomIcon(Properties.Resources.auto_deliver_32, new CustomIcon.Options
             {
                 Convert = (icon) =>
                 {
-                    if (!client.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return icon.ConvertToPurple();
-                    }
-
-                    if (client.User.Setting.AutoAcceptGiveOffer)
-                    {
-                        return icon.Source;
-                    }
-                    if (client.User.Setting.AutoAcceptGiveOffer_Buff)
-                    {
-                        return icon.Source;
-                    }
-                    if (client.User.Setting.AutoAcceptGiveOffer_Other)
-                    {
-                        return icon.Source;
-                    }
-                    if (client.User.Setting.AutoAcceptGiveOffer_Custom)
+                    if (client.User.Setting.PeriodicCheckingConfirmation && client.User.Setting.AutoAcceptGive())
                     {
                         return icon.Source;
                     }
@@ -71,16 +77,7 @@ namespace Steam_Authenticator.Controls
             {
                 Convert = (icon) =>
                 {
-                    if (!client.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return icon.ConvertToPurple();
-                    }
-
-                    if (client.User.Setting.AutoConfirmTrade)
-                    {
-                        return icon.Source;
-                    }
-                    if (client.User.Setting.AutoConfirmMarket)
+                    if (client.User.Setting.PeriodicCheckingConfirmation && client.User.Setting.AutoConfirmOffer())
                     {
                         return icon.Source;
                     }
@@ -92,12 +89,7 @@ namespace Steam_Authenticator.Controls
             {
                 Convert = (icon) =>
                 {
-                    if (!client.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return icon.ConvertToPurple();
-                    }
-
-                    if (client.User.Setting.AutoAcceptReceiveOffer)
+                    if (client.User.Setting.PeriodicCheckingConfirmation && client.User.Setting.AutoAcceptReceive())
                     {
                         return icon.Source;
                     }
@@ -105,7 +97,7 @@ namespace Steam_Authenticator.Controls
                     return icon.ConvertToGrayscale();
                 }
             });
-            var icons = new CustomIcon[] { auto_deliver, auto_confirm, auto_accept };
+            var icons = new CustomIcon[] { guard, auto_deliver, auto_confirm, auto_accept };
 
             PictureBox pictureBox = new PictureBox()
             {

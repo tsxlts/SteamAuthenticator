@@ -109,7 +109,6 @@ namespace Steam_Authenticator
 
             var userSetting = new Forms.UserSetting(userClient.User);
             userSetting.ShowDialog();
-            panel.RefreshIcon();
         }
 
         private async void reloginMenuItem_Click(object sender, EventArgs e)

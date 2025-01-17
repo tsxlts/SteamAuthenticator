@@ -93,13 +93,15 @@ namespace Steam_Authenticator
                 }
             }
 
+            Appsetting.Instance.AppSetting.Password = newPassword;
             if (!Appsetting.Instance.Manifest.ChangePassword(olaPassword, newPassword))
             {
+                Appsetting.Instance.AppSetting.Password = olaPassword;
+
                 MessageBox.Show("设置密码失败", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Appsetting.Instance.AppSetting.Password = newPassword;
             MessageBox.Show(Appsetting.Instance.Manifest.Encrypted ? "密码设置成功" : "已移除访问密码", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -682,14 +684,14 @@ namespace Steam_Authenticator
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Title = "导入令牌",
-                Filter = $"令牌文件 (*.entry;*.maFile)|*.entry;*.maFile" +
-                $"|SA文件 (*.entry)|*.entry" +
+                Filter = $"令牌文件 (*.entry;*.saEntry;*.maFile)|*.entry;*.saEntry;*.maFile" +
+                $"|SA文件 (*.entry;*.saEntry;)|*.entry;*.saEntry" +
                 $"|maFile文件 (*.maFile)|*.maFile",
                 InitialDirectory = Appsetting.Instance.AppSetting.Entry.InitialDirectory ?? AppContext.BaseDirectory,
-                Multiselect = true
+                Multiselect = false
             };
 
-            if (openFileDialog.ShowDialog() != DialogResult.OK)
+            if (openFileDialog.ShowDialog() != DialogResult.OK || string.IsNullOrWhiteSpace(openFileDialog.FileName))
             {
                 return;
             }
@@ -697,129 +699,116 @@ namespace Steam_Authenticator
             Appsetting.Instance.AppSetting.Entry.InitialDirectory = Path.GetDirectoryName(openFileDialog.FileName);
             Appsetting.Instance.AppSetting.Save();
 
-            if (!openFileDialog.FileNames.Any())
+            FileInfo fileInfo = new FileInfo(openFileDialog.FileName);
+            try
             {
-                return;
-            }
-            string tips = "请输入访问密码";
-            Input input;
+                List<string> success = new List<string>();
 
-            List<string> error = new List<string>();
-            List<string> success = new List<string>();
-            foreach (var item in openFileDialog.FileNames)
-            {
-                FileInfo fileInfo = new FileInfo(item);
-                try
+                bool isSAFile = fileInfo.Extension.Equals(".saEntry", StringComparison.OrdinalIgnoreCase);
+                isSAFile = isSAFile || fileInfo.Extension.Equals(".entry", StringComparison.OrdinalIgnoreCase);
+
+                bool isMaFile = !isSAFile && fileInfo.Extension.Equals(".maFile", StringComparison.OrdinalIgnoreCase);
+
+                if (isSAFile)
                 {
-                    if (fileInfo.Extension.Equals(".entry", StringComparison.OrdinalIgnoreCase))
+                    using (FileStream stream = fileInfo.OpenRead())
                     {
-                        using (FileStream stream = fileInfo.OpenRead())
-                        {
-                            bool encrypt = stream.ReadBoolean();
-                            byte[] dataBuffer = new byte[0];
+                        bool encrypt = stream.ReadBoolean();
+                        byte[] dataBuffer = new byte[0];
 
-                            string password = null;
-                            byte[] iv = [];
-                            byte[] salt = [];
+                        string password = null;
+                        byte[] iv = [];
+                        byte[] salt = [];
+                        if (encrypt)
+                        {
+                            string tips = $"请输入解密密码" +
+                                $"{Environment.NewLine}" +
+                                $"{fileInfo.Name}";
+
+                            Input input = new Input($"导出令牌[{fileInfo.Name}]", tips, password: true, required: true, errorMsg: "请输入密码");
+                            input.ShowDialog();
+                            password = input.InputValue;
+
+                            iv = new byte[stream.ReadInt32()];
+                            stream.Read(iv);
+
+                            salt = new byte[stream.ReadInt32()];
+                            stream.Read(salt);
+                        }
+
+                        while (stream.Position != stream.Length)
+                        {
+                            dataBuffer = new byte[stream.ReadInt32()];
+                            stream.Read(dataBuffer);
                             if (encrypt)
                             {
-                                tips = $"请输入解密密码" +
-                                    $"{Environment.NewLine}" +
-                                    $"{fileInfo.Name}";
-
-                                input = new Input($"导出令牌[{fileInfo.Name}]", tips, password: true, required: true, errorMsg: "请输入密码");
-                                input.ShowDialog();
-                                password = input.InputValue;
-
-                                iv = new byte[stream.ReadInt32()];
-                                stream.Read(iv);
-
-                                salt = new byte[stream.ReadInt32()];
-                                stream.Read(salt);
+                                dataBuffer = FileEncryptor.DecryptData(password, salt, iv, dataBuffer);
                             }
 
-                            while (stream.Position != stream.Length)
-                            {
-                                dataBuffer = new byte[stream.ReadInt32()];
-                                stream.Read(dataBuffer);
-                                if (encrypt)
-                                {
-                                    dataBuffer = FileEncryptor.DecryptData(password, salt, iv, dataBuffer);
-                                }
+                            Guard guard = new Guard();
+                            guard.Deserialize(new MemoryStream(dataBuffer));
+                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
 
-                                Guard guard = new Guard();
-                                guard.Deserialize(new MemoryStream(dataBuffer));
-                                guard = guard.Value;
-
-                                Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
-
-                                success.Add($"{fileInfo.Name}[{guard.AccountName}]");
-                            }
+                            success.Add(guard.AccountName);
                         }
-                        continue;
-                    }
-
-                    if (fileInfo.Extension.Equals(".maFile", StringComparison.OrdinalIgnoreCase))
-                    {
-                        using (FileStream stream = fileInfo.OpenRead())
-                        {
-                            using (StreamReader reader = new StreamReader(stream))
-                            {
-                                string json = reader.ReadToEnd();
-                                MaFile maFile = JsonConvert.DeserializeObject<MaFile>(json);
-                                if (string.IsNullOrWhiteSpace(maFile.account_name))
-                                {
-                                    throw new FileFormatException("account_name missing");
-                                }
-                                if (string.IsNullOrWhiteSpace(maFile.device_id))
-                                {
-                                    throw new FileFormatException("device_id missing");
-                                }
-                                if (string.IsNullOrWhiteSpace(maFile.shared_secret))
-                                {
-                                    throw new FileFormatException("shared_secret missing");
-                                }
-                                if (string.IsNullOrWhiteSpace(maFile.identity_secret))
-                                {
-                                    throw new FileFormatException("identity_secret missing");
-                                }
-
-                                Guard guard = new Guard
-                                {
-                                    AccountName = maFile.account_name,
-                                    DeviceId = maFile.device_id,
-                                    SharedSecret = maFile.shared_secret,
-                                    IdentitySecret = maFile.identity_secret,
-                                    Secret1 = maFile.secret1,
-                                    RevocationCode = maFile.revocation_code,
-                                    GuardScheme = SteamGuardScheme.Device,
-                                    SerialNumber = maFile.serial_number,
-                                    TokenGID = maFile.token_gid,
-                                    URI = maFile.uri,
-                                };
-                                Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
-
-                                success.Add($"{fileInfo.Name}[{guard.AccountName}]");
-                            }
-                        }
-                        continue;
                     }
                 }
-                catch (Exception ex)
+
+                if (isMaFile)
                 {
-                    MessageBox.Show($"{fileInfo.FullName}" +
-                        $"{Environment.NewLine}" +
-                        $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    error.Add(fileInfo.Name);
+                    using (FileStream stream = fileInfo.OpenRead())
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            string json = reader.ReadToEnd();
+                            MaFile maFile = JsonConvert.DeserializeObject<MaFile>(json);
+                            if (string.IsNullOrWhiteSpace(maFile.account_name))
+                            {
+                                throw new FileFormatException("account_name missing");
+                            }
+                            if (string.IsNullOrWhiteSpace(maFile.device_id))
+                            {
+                                throw new FileFormatException("device_id missing");
+                            }
+                            if (string.IsNullOrWhiteSpace(maFile.shared_secret))
+                            {
+                                throw new FileFormatException("shared_secret missing");
+                            }
+                            if (string.IsNullOrWhiteSpace(maFile.identity_secret))
+                            {
+                                throw new FileFormatException("identity_secret missing");
+                            }
+
+                            Guard guard = new Guard
+                            {
+                                AccountName = maFile.account_name,
+                                DeviceId = maFile.device_id,
+                                SharedSecret = maFile.shared_secret,
+                                IdentitySecret = maFile.identity_secret,
+                                Secret1 = maFile.secret1,
+                                RevocationCode = maFile.revocation_code,
+                                GuardScheme = SteamGuardScheme.Device,
+                                SerialNumber = maFile.serial_number,
+                                TokenGID = maFile.token_gid,
+                                URI = maFile.uri,
+                            };
+                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
+
+                            success.Add(guard.AccountName);
+                        }
+                    }
                 }
+
+                MessageBox.Show($"令牌导入结果" +
+                    $"{Environment.NewLine}" +
+                    $"成功导入令牌 {success.Count} 个", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show($"令牌导入结果" +
-                $"{Environment.NewLine}" +
-                $"导入成功 {success.Count} 个" +
-                $"{Environment.NewLine}" +
-                $"导入失败 {error.Count} 个", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{fileInfo.FullName}" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void exportAuthenticatorMenuItem_Click(object sender, EventArgs e)
