@@ -296,7 +296,7 @@ namespace Steam_Authenticator
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
-                        List<Offer> tradeOffers = new List<Offer>();
+                        List<Offer> giveOffers = new List<Offer>();
                         List<Offer> customGiveOffers;
                         List<Offer> buffGiveOffers = null;
                         List<Offer> ecoGiveOffers = null;
@@ -311,17 +311,22 @@ namespace Steam_Authenticator
                                 return;
                             }
 
-                            var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
+                            var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
-                            tradeOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                            var receivedOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                            var sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
 
-                            var receiveOffers = tradeOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
-                            var giveOffers = tradeOffers.Where(c => c.ItemsToGive?.Any() ?? false);
-
+                            var receiveOffers = receivedOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
                             if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
+
+                            var reveiceGiveOffers = receivedOffers.Where(c => c.ItemsToGive?.Any() ?? false);
+                            var sentGiveOffers = sentOffer.Where(c => c.ItemsToGive?.Any() ?? false);
+
+                            giveOffers.AddRange(reveiceGiveOffers);
+                            giveOffers.AddRange(sentGiveOffers);
 
                             customGiveOffers = new List<Offer>();
                             buffGiveOffers = new List<Offer>();
@@ -331,11 +336,11 @@ namespace Steam_Authenticator
                             #region 自定义报价
                             if (giveOffers.Any())
                             {
-                                var rules = new[]
+                                var rules = (new[]
                                 {
                                     user.Setting.AutoAcceptGiveOfferRule.OfferMessage,
                                     user.Setting.AutoAcceptGiveOfferRule.AssetName
-                                }.Where(c => c.Enabled);
+                                }).Where(c => c.Enabled);
 
                                 foreach (var offer in giveOffers)
                                 {
@@ -412,27 +417,27 @@ namespace Steam_Authenticator
                             List<Offer> acceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
-                                var acceptItemOffers = giveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                var acceptItemOffers = giveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && acceptCustom)
                             {
-                                var acceptItemOffers = customGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                var acceptItemOffers = customGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetBuff)
                             {
-                                var acceptItemOffers = buffGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                var acceptItemOffers = buffGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accectEco)
                             {
-                                var acceptItemOffers = ecoGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                var acceptItemOffers = ecoGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
                             {
-                                var acceptItemOffers = otherGiveOffers.Where(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                var acceptItemOffers = otherGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
 
@@ -468,14 +473,14 @@ namespace Steam_Authenticator
                         finally
                         {
                             client.SetAutoConfirmOffers(autoConfirmOffers);
+                            client.SetGiveOffers(giveOffers);
 
                             if (user.SteamId == currentClient?.User.SteamId)
                             {
-                                OfferCountLabel.Text = $"{tradeOffers.Count}";
-                                OfferCountLabel.Tag = tradeOffers;
+                                OfferCountLabel.Text = $"{giveOffers.Count}";
                             }
 
-                            usersPanel.SetOffer(client, tradeOffers.Count);
+                            usersPanel.SetOffer(client, giveOffers.Count);
 
                             if (buffClinet != null)
                             {
@@ -503,7 +508,6 @@ namespace Steam_Authenticator
                         if (client.User.SteamId == currentClient?.User.SteamId)
                         {
                             OfferCountLabel.Text = $"---";
-                            OfferCountLabel.Tag = new List<Offer>();
                         }
 
                         usersPanel.SetOffer(client, null);

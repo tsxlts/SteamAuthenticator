@@ -74,7 +74,7 @@ namespace Steam_Authenticator.Forms
                     MessageBox.Show("请先登录Steam帐号");
                     return;
                 }
-                if (thisOffers == null || !thisOffers.Any())
+                if (thisOffers == null || !thisOffers.Any(c => !c.IsOurOffer))
                 {
                     return;
                 }
@@ -84,7 +84,7 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                await HandleOffer(webClient, thisOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+                await HandleOffer(webClient, thisOffers.Where(c => !c.IsOurOffer), true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
 
                 await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
             }
@@ -110,7 +110,7 @@ namespace Steam_Authenticator.Forms
                     MessageBox.Show("请先登录Steam帐号");
                     return;
                 }
-                if (thisOffers == null || !thisOffers.Any())
+                if (thisOffers == null || !thisOffers.Any(c => !c.IsOurOffer))
                 {
                     return;
                 }
@@ -120,7 +120,7 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                await HandleOffer(webClient, thisOffers, false, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+                await HandleOffer(webClient, thisOffers.Where(c => !c.IsOurOffer), false, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
 
                 await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
             }
@@ -231,11 +231,12 @@ namespace Steam_Authenticator.Forms
                 refreshBtn.Text = "正在刷新";
                 refreshBtn.Enabled = false;
 
-                var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true,
+                var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true,
                     cancellationToken: cancellationToken);
 
                 var descriptions = queryOffers.Descriptions ?? new List<BaseDescription>();
                 var offers = queryOffers?.TradeOffersReceived?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>();
+                offers.AddRange(queryOffers?.TradeOffersSent?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>());
                 thisOffers = offers;
 
                 offersPanel.Controls.Clear();
@@ -299,7 +300,7 @@ namespace Steam_Authenticator.Forms
 
                     stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine($"{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(offer.TimeCreated).ToLocalTime():yyyy/MM/dd HH:mm:ss}" +
-                        $"\n你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价");
+                        $"\n{(offer.IsOurOffer ? $"你向 {player?.SteamName ?? offer.AccountIdOther.ToString()} 发起报价" : $"你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价")}");
 
                     if (giveDescription?.Any() ?? false)
                     {
@@ -392,7 +393,8 @@ namespace Steam_Authenticator.Forms
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
-                        Offer = offer
+                        Offer = offer,
+                        Visible = !offer.IsOurOffer
                     };
                     acceptButton.Click += btnAccept_Click;
                     panel.Controls.Add(acceptButton);
@@ -407,7 +409,8 @@ namespace Steam_Authenticator.Forms
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
-                        Offer = offer
+                        Offer = offer,
+                        Visible = !offer.IsOurOffer
                     };
                     cancelButton.Click += btnDecline_Click;
                     panel.Controls.Add(cancelButton);
@@ -422,7 +425,8 @@ namespace Steam_Authenticator.Forms
                         ForeColor = Color.Snow,
                         AutoSize = true,
                         AutoSizeMode = AutoSizeMode.GrowOnly,
-                        Offer = offer
+                        Offer = offer,
+                        Visible = !offer.IsOurOffer
                     };
                     detailButton.Click += btnDetail_Click;
                     panel.Controls.Add(detailButton);

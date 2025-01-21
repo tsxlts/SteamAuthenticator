@@ -971,8 +971,8 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
-                if (offers == null || !offers.Any())
+                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;
                 }
@@ -982,7 +982,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                await HandleOffer(webClient, offers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+                await HandleOffer(webClient, offers.Where(c => !c.IsOurOffer), true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
             }
             catch (Exception ex)
             {
@@ -1007,8 +1007,8 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = OfferCountLabel.Tag as IEnumerable<Offer>;
-                if (offers == null || !offers.Any())
+                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;
                 }
@@ -1018,7 +1018,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                await HandleOffer(webClient, offers, false, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
+                await HandleOffer(webClient, offers.Where(c => !c.IsOurOffer), false, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token);
             }
             catch (Exception ex)
             {

@@ -37,6 +37,11 @@
             periodicChecking = new CheckBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            label12 = new Label();
+            autoConfirmTrade_Eco = new CheckBox();
+            label10 = new Label();
+            label11 = new Label();
+            autoAcceptGiveOffer_Eco = new CheckBox();
             autoConfirmTrade_Custom = new CheckBox();
             autoConfirmTrade_Other = new CheckBox();
             autoConfirmTrade_Buff = new CheckBox();
@@ -54,10 +59,6 @@
             autoAcceptGiveOffer_Buff = new CheckBox();
             groupBox3 = new GroupBox();
             label9 = new Label();
-            autoConfirmTrade_Eco = new CheckBox();
-            label10 = new Label();
-            label11 = new Label();
-            autoAcceptGiveOffer_Eco = new CheckBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -66,7 +67,7 @@
             // autoAcceptGiveOffer
             // 
             autoAcceptGiveOffer.AutoSize = true;
-            autoAcceptGiveOffer.Location = new Point(86, 23);
+            autoAcceptGiveOffer.Location = new Point(86, 50);
             autoAcceptGiveOffer.Name = "autoAcceptGiveOffer";
             autoAcceptGiveOffer.Size = new Size(75, 21);
             autoAcceptGiveOffer.TabIndex = 14;
@@ -88,9 +89,9 @@
             // 
             saveBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(1, 400);
+            saveBtn.Location = new Point(1, 402);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(641, 33);
+            saveBtn.Size = new Size(595, 33);
             saveBtn.TabIndex = 12;
             saveBtn.Text = "保存设置";
             saveBtn.UseVisualStyleBackColor = true;
@@ -111,7 +112,7 @@
             // 
             autoConfirmTrade.AutoSize = true;
             autoConfirmTrade.ForeColor = Color.Red;
-            autoConfirmTrade.Location = new Point(167, 23);
+            autoConfirmTrade.Location = new Point(167, 50);
             autoConfirmTrade.Name = "autoConfirmTrade";
             autoConfirmTrade.Size = new Size(75, 21);
             autoConfirmTrade.TabIndex = 10;
@@ -139,7 +140,7 @@
             groupBox1.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             groupBox1.Location = new Point(12, 39);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(618, 84);
+            groupBox1.Size = new Size(572, 66);
             groupBox1.TabIndex = 16;
             groupBox1.TabStop = false;
             groupBox1.Text = "自动令牌确认";
@@ -147,6 +148,7 @@
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(label12);
             groupBox2.Controls.Add(autoConfirmTrade_Eco);
             groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(label11);
@@ -168,18 +170,71 @@
             groupBox2.Controls.Add(autoAcceptGiveOffer_Other);
             groupBox2.Controls.Add(autoAcceptGiveOffer_Buff);
             groupBox2.Controls.Add(autoAcceptGiveOffer);
-            groupBox2.Location = new Point(12, 129);
+            groupBox2.Location = new Point(12, 111);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(618, 168);
+            groupBox2.Size = new Size(572, 203);
             groupBox2.TabIndex = 17;
             groupBox2.TabStop = false;
-            groupBox2.Text = "自动处理 收到的 索取 报价（收到的 发货 报价）";
+            groupBox2.Text = "自动发货 设置（发送的/收到的 发货报价）";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label12.ForeColor = Color.FromArgb(57, 89, 220);
+            label12.Location = new Point(6, 25);
+            label12.Name = "label12";
+            label12.Size = new Size(359, 17);
+            label12.TabIndex = 35;
+            label12.Text = "自动接收 对收到的报价生效, 自动确认 对发送的和收到的报价生效\r\n";
+            // 
+            // autoConfirmTrade_Eco
+            // 
+            autoConfirmTrade_Eco.AutoSize = true;
+            autoConfirmTrade_Eco.ForeColor = Color.Red;
+            autoConfirmTrade_Eco.Location = new Point(167, 131);
+            autoConfirmTrade_Eco.Name = "autoConfirmTrade_Eco";
+            autoConfirmTrade_Eco.Size = new Size(75, 21);
+            autoConfirmTrade_Eco.TabIndex = 34;
+            autoConfirmTrade_Eco.Text = "自动确认";
+            autoConfirmTrade_Eco.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
+            label10.Location = new Point(6, 132);
+            label10.Name = "label10";
+            label10.Size = new Size(61, 17);
+            label10.TabIndex = 33;
+            label10.Text = "ECO 报价";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label11.ForeColor = Color.Gray;
+            label11.Location = new Point(249, 132);
+            label11.Name = "label11";
+            label11.Size = new Size(257, 17);
+            label11.TabIndex = 32;
+            label11.Text = "ECO平台产生的报价, 仅在登录ECO帐号后生效";
+            // 
+            // autoAcceptGiveOffer_Eco
+            // 
+            autoAcceptGiveOffer_Eco.AutoSize = true;
+            autoAcceptGiveOffer_Eco.Location = new Point(86, 131);
+            autoAcceptGiveOffer_Eco.Name = "autoAcceptGiveOffer_Eco";
+            autoAcceptGiveOffer_Eco.Size = new Size(75, 21);
+            autoAcceptGiveOffer_Eco.TabIndex = 31;
+            autoAcceptGiveOffer_Eco.Text = "自动接受";
+            autoAcceptGiveOffer_Eco.UseVisualStyleBackColor = true;
             // 
             // autoConfirmTrade_Custom
             // 
             autoConfirmTrade_Custom.AutoSize = true;
             autoConfirmTrade_Custom.ForeColor = Color.Red;
-            autoConfirmTrade_Custom.Location = new Point(167, 50);
+            autoConfirmTrade_Custom.Location = new Point(167, 77);
             autoConfirmTrade_Custom.Name = "autoConfirmTrade_Custom";
             autoConfirmTrade_Custom.Size = new Size(75, 21);
             autoConfirmTrade_Custom.TabIndex = 30;
@@ -190,7 +245,7 @@
             // 
             autoConfirmTrade_Other.AutoSize = true;
             autoConfirmTrade_Other.ForeColor = Color.Red;
-            autoConfirmTrade_Other.Location = new Point(167, 131);
+            autoConfirmTrade_Other.Location = new Point(167, 158);
             autoConfirmTrade_Other.Name = "autoConfirmTrade_Other";
             autoConfirmTrade_Other.Size = new Size(75, 21);
             autoConfirmTrade_Other.TabIndex = 29;
@@ -201,7 +256,7 @@
             // 
             autoConfirmTrade_Buff.AutoSize = true;
             autoConfirmTrade_Buff.ForeColor = Color.Red;
-            autoConfirmTrade_Buff.Location = new Point(167, 77);
+            autoConfirmTrade_Buff.Location = new Point(167, 104);
             autoConfirmTrade_Buff.Name = "autoConfirmTrade_Buff";
             autoConfirmTrade_Buff.Size = new Size(75, 21);
             autoConfirmTrade_Buff.TabIndex = 28;
@@ -212,7 +267,7 @@
             // 
             label8.AutoSize = true;
             label8.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label8.Location = new Point(6, 50);
+            label8.Location = new Point(6, 77);
             label8.Name = "label8";
             label8.Size = new Size(68, 17);
             label8.TabIndex = 26;
@@ -222,7 +277,7 @@
             // 
             label7.AutoSize = true;
             label7.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label7.Location = new Point(6, 24);
+            label7.Location = new Point(6, 51);
             label7.Name = "label7";
             label7.Size = new Size(60, 17);
             label7.TabIndex = 25;
@@ -232,7 +287,7 @@
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label6.Location = new Point(6, 132);
+            label6.Location = new Point(6, 159);
             label6.Name = "label6";
             label6.Size = new Size(60, 17);
             label6.TabIndex = 24;
@@ -242,7 +297,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label5.Location = new Point(6, 78);
+            label5.Location = new Point(6, 105);
             label5.Name = "label5";
             label5.Size = new Size(67, 17);
             label5.TabIndex = 23;
@@ -253,29 +308,29 @@
             label4.AutoSize = true;
             label4.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label4.ForeColor = Color.Gray;
-            label4.Location = new Point(249, 132);
+            label4.Location = new Point(249, 159);
             label4.Name = "label4";
-            label4.Size = new Size(296, 17);
+            label4.Size = new Size(272, 17);
             label4.TabIndex = 22;
-            label4.Text = "除了以上报价以外, 通过其他平台/方式向你发起的报价";
+            label4.Text = "除了以上报价以外, 通过其他平台/方式产生的报价";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label3.ForeColor = Color.Gray;
-            label3.Location = new Point(249, 78);
+            label3.Location = new Point(249, 105);
             label3.Name = "label3";
-            label3.Size = new Size(289, 17);
+            label3.Size = new Size(265, 17);
             label3.TabIndex = 21;
-            label3.Text = "BUFF平台向你发起的报价, 仅在登录BUFF帐号后生效";
+            label3.Text = "BUFF平台产生的报价, 仅在登录BUFF帐号后生效";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label2.ForeColor = Color.Red;
-            label2.Location = new Point(249, 24);
+            label2.Location = new Point(249, 51);
             label2.Name = "label2";
             label2.Size = new Size(310, 17);
             label2.TabIndex = 20;
@@ -286,7 +341,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label1.ForeColor = Color.Gray;
-            label1.Location = new Point(311, 50);
+            label1.Location = new Point(311, 77);
             label1.Name = "label1";
             label1.Size = new Size(176, 17);
             label1.TabIndex = 19;
@@ -295,7 +350,7 @@
             // setAcceptGiveOfferRoleBtn
             // 
             setAcceptGiveOfferRoleBtn.AutoSize = true;
-            setAcceptGiveOfferRoleBtn.Location = new Point(249, 50);
+            setAcceptGiveOfferRoleBtn.Location = new Point(249, 77);
             setAcceptGiveOfferRoleBtn.Name = "setAcceptGiveOfferRoleBtn";
             setAcceptGiveOfferRoleBtn.Size = new Size(56, 17);
             setAcceptGiveOfferRoleBtn.TabIndex = 18;
@@ -306,7 +361,7 @@
             // autoAcceptGiveOffer_Custom
             // 
             autoAcceptGiveOffer_Custom.AutoSize = true;
-            autoAcceptGiveOffer_Custom.Location = new Point(86, 50);
+            autoAcceptGiveOffer_Custom.Location = new Point(86, 77);
             autoAcceptGiveOffer_Custom.Name = "autoAcceptGiveOffer_Custom";
             autoAcceptGiveOffer_Custom.Size = new Size(75, 21);
             autoAcceptGiveOffer_Custom.TabIndex = 17;
@@ -316,7 +371,7 @@
             // autoAcceptGiveOffer_Other
             // 
             autoAcceptGiveOffer_Other.AutoSize = true;
-            autoAcceptGiveOffer_Other.Location = new Point(86, 131);
+            autoAcceptGiveOffer_Other.Location = new Point(86, 158);
             autoAcceptGiveOffer_Other.Name = "autoAcceptGiveOffer_Other";
             autoAcceptGiveOffer_Other.Size = new Size(75, 21);
             autoAcceptGiveOffer_Other.TabIndex = 16;
@@ -326,7 +381,7 @@
             // autoAcceptGiveOffer_Buff
             // 
             autoAcceptGiveOffer_Buff.AutoSize = true;
-            autoAcceptGiveOffer_Buff.Location = new Point(86, 77);
+            autoAcceptGiveOffer_Buff.Location = new Point(86, 104);
             autoAcceptGiveOffer_Buff.Name = "autoAcceptGiveOffer_Buff";
             autoAcceptGiveOffer_Buff.Size = new Size(75, 21);
             autoAcceptGiveOffer_Buff.TabIndex = 15;
@@ -338,12 +393,12 @@
             groupBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox3.Controls.Add(label9);
             groupBox3.Controls.Add(autoAcceptReceiveOffer);
-            groupBox3.Location = new Point(12, 303);
+            groupBox3.Location = new Point(12, 320);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(618, 66);
+            groupBox3.Size = new Size(572, 66);
             groupBox3.TabIndex = 18;
             groupBox3.TabStop = false;
-            groupBox3.Text = "自动处理 收到的 赠送 报价（收到的 收货 报价）";
+            groupBox3.Text = "自动收货 设置（收到的 收货报价）";
             // 
             // label9
             // 
@@ -355,53 +410,11 @@
             label9.TabIndex = 26;
             label9.Text = "全部 报价";
             // 
-            // autoConfirmTrade_Eco
-            // 
-            autoConfirmTrade_Eco.AutoSize = true;
-            autoConfirmTrade_Eco.ForeColor = Color.Red;
-            autoConfirmTrade_Eco.Location = new Point(167, 104);
-            autoConfirmTrade_Eco.Name = "autoConfirmTrade_Eco";
-            autoConfirmTrade_Eco.Size = new Size(75, 21);
-            autoConfirmTrade_Eco.TabIndex = 34;
-            autoConfirmTrade_Eco.Text = "自动确认";
-            autoConfirmTrade_Eco.UseVisualStyleBackColor = true;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label10.Location = new Point(6, 105);
-            label10.Name = "label10";
-            label10.Size = new Size(61, 17);
-            label10.TabIndex = 33;
-            label10.Text = "ECO 报价";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            label11.ForeColor = Color.Gray;
-            label11.Location = new Point(249, 105);
-            label11.Name = "label11";
-            label11.Size = new Size(281, 17);
-            label11.TabIndex = 32;
-            label11.Text = "ECO平台向你发起的报价, 仅在登录ECO帐号后生效";
-            // 
-            // autoAcceptGiveOffer_Eco
-            // 
-            autoAcceptGiveOffer_Eco.AutoSize = true;
-            autoAcceptGiveOffer_Eco.Location = new Point(86, 104);
-            autoAcceptGiveOffer_Eco.Name = "autoAcceptGiveOffer_Eco";
-            autoAcceptGiveOffer_Eco.Size = new Size(75, 21);
-            autoAcceptGiveOffer_Eco.TabIndex = 31;
-            autoAcceptGiveOffer_Eco.Text = "自动接受";
-            autoAcceptGiveOffer_Eco.UseVisualStyleBackColor = true;
-            // 
             // UserSetting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(642, 434);
+            ClientSize = new Size(596, 436);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -456,5 +469,6 @@
         private Label label10;
         private Label label11;
         private CheckBox autoAcceptGiveOffer_Eco;
+        private Label label12;
     }
 }
