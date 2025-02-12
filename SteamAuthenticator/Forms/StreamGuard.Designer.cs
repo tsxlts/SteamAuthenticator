@@ -94,7 +94,7 @@
             GuardText.ForeColor = Color.Red;
             GuardText.Location = new Point(61, 53);
             GuardText.Name = "GuardText";
-            GuardText.Size = new Size(55, 17);
+            GuardText.Size = new Size(60, 17);
             GuardText.TabIndex = 4;
             GuardText.Text = "*****";
             GuardText.TextAlign = ContentAlignment.MiddleLeft;
@@ -180,7 +180,7 @@
             RevocationCode.ForeColor = Color.Red;
             RevocationCode.Location = new Point(61, 124);
             RevocationCode.Name = "RevocationCode";
-            RevocationCode.Size = new Size(55, 17);
+            RevocationCode.Size = new Size(60, 17);
             RevocationCode.TabIndex = 10;
             RevocationCode.Text = "******";
             RevocationCode.TextAlign = ContentAlignment.MiddleLeft;

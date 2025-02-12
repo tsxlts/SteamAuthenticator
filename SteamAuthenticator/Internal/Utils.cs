@@ -54,27 +54,37 @@ namespace Steam_Authenticator.Internal
                 return true;
             }
 
-            bool success = false;
-            while (true)
+            var tasks = confirmations.Select(async confirm =>
             {
-                if (accept)
+                bool success = false;
+                while (true)
                 {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                }
-                else
-                {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                }
+                    if (accept)
+                    {
+                        success = await webClient.Confirmation.AllowConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
+                    }
+                    else
+                    {
+                        success = await webClient.Confirmation.CancelConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
+                    }
 
-                if (cancellationToken.IsCancellationRequested || success)
-                {
-                    break;
-                }
+                    if (cancellationToken.IsCancellationRequested || success)
+                    {
+                        break;
+                    }
 
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                }
+                return success;
+            });
+
+            var results = await Task.WhenAll(tasks);
+            if (results.Any(c => !c))
+            {
+                return false;
             }
 
-            return success;
+            return true;
         }
     }
 }
