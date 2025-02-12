@@ -2,7 +2,7 @@
 
 namespace Steam_Authenticator.Model
 {
-    public class User : JsonStreamSerializer<User>
+    public class User : JsonStreamSerializer
     {
         public string Account { get; set; }
 
@@ -26,12 +26,6 @@ namespace Steam_Authenticator.Model
         public bool PeriodicCheckingConfirmation { get; set; }
 
         /// <summary>
-        /// 是否自动确认报价
-        /// </summary>
-        [JsonProperty("auto_confirm_trade")]
-        public bool AutoConfirmTrade { get; set; }
-
-        /// <summary>
         /// 是否自动确认市场上架
         /// </summary>
         [JsonProperty("auto_confirm_market")]
@@ -44,6 +38,7 @@ namespace Steam_Authenticator.Model
         [JsonProperty("auto_accept_receive_offer")]
         public bool AutoAcceptReceiveOffer { get; set; }
 
+        #region 全部报价
         /// <summary>
         /// 是否自动接受 全部 索取报价
         /// 别人索取我的
@@ -52,12 +47,43 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptGiveOffer { get; set; }
 
         /// <summary>
+        /// 是否自动确认 全部 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade")]
+        public bool AutoConfirmTrade { get; set; }
+        #endregion
+
+        #region BUFF报价
+        /// <summary>
         /// 是否自动接受 BUFF 索取报价
         /// 别人索取我的
         /// </summary>
         [JsonProperty("auto_accept_give_offer_buff")]
         public bool AutoAcceptGiveOffer_Buff { get; set; }
 
+        /// <summary>
+        /// 是否自动确认 BUFF 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_buff")]
+        public bool AutoConfirmTrade_Buff { get; set; }
+        #endregion
+
+        #region ECO报价
+        /// <summary>
+        /// 是否自动接受 ECO 索取报价
+        /// 别人索取我的
+        /// </summary>
+        [JsonProperty("auto_accept_give_offer_eco")]
+        public bool AutoAcceptGiveOffer_Eco { get; set; }
+
+        /// <summary>
+        /// 是否自动确认 ECO 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_eco")]
+        public bool AutoConfirmTrade_Eco { get; set; }
+        #endregion
+
+        #region 其他报价
         /// <summary>
         /// 是否自动接受 其他 索取报价
         /// 别人索取我的
@@ -66,18 +92,69 @@ namespace Steam_Authenticator.Model
         public bool AutoAcceptGiveOffer_Other { get; set; }
 
         /// <summary>
+        /// 是否自动确认 其他 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_other")]
+        public bool AutoConfirmTrade_Other { get; set; }
+        #endregion
+
+        #region 自定义报价
+        /// <summary>
         /// 是否自动接受 自定义 索取报价
         /// 别人索取我的
         /// </summary>
+        [JsonProperty("auto_accept_give_offer_cstom")]
         public bool AutoAcceptGiveOffer_Custom { get; set; }
+
+        /// <summary>
+        /// 是否自动确认 自定义 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_cstom")]
+        public bool AutoConfirmTrade_Custom { get; set; }
+        #endregion
 
         /// <summary>
         /// 自动接受索取报价 自定义 规则
         /// </summary>
         public AcceptOfferRuleSetting AutoAcceptGiveOfferRule { get; set; } = new AcceptOfferRuleSetting();
+
+        /// <summary>
+        /// 是否自动确认报价
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoConfirmOffer()
+        {
+            return AutoConfirmTrade
+                || AutoConfirmTrade_Buff
+                || AutoConfirmTrade_Eco
+                || AutoConfirmTrade_Other
+                || AutoConfirmTrade_Custom;
+        }
+
+        /// <summary>
+        /// 是否自动接受索取报价 别人索取我的
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoAcceptGive()
+        {
+            return AutoAcceptGiveOffer
+                || AutoAcceptGiveOffer_Buff
+                || AutoAcceptGiveOffer_Eco
+                || AutoAcceptGiveOffer_Other
+                || AutoAcceptGiveOffer_Custom;
+        }
+
+        /// <summary>
+        /// 是否自动接受赠送报价 别人赠送给我的
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoAcceptReceive()
+        {
+            return AutoAcceptReceiveOffer;
+        }
     }
 
-    public class BuffUser : JsonStreamSerializer<BuffUser>
+    public class BuffUser : JsonStreamSerializer
     {
         public string BuffCookies { get; set; }
 
@@ -88,19 +165,22 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public string Nickname { get; set; }
-
-        public BuffUserSetting Setting { get; set; } = new BuffUserSetting
-        {
-            AutoAcceptGiveOffer = false
-        };
     }
 
-    public class BuffUserSetting
+    public class EcoUser : JsonStreamSerializer
     {
-        /// <summary>
-        /// 是否自动接收索取报价
-        /// 发货报价
-        /// </summary>
-        public bool AutoAcceptGiveOffer { get; set; }
+        public string ClientId { get; set; }
+
+        public string RefreshToken { get; set; }
+
+        public DateTime RefreshTokenExpireTime { get; set; }
+
+        public string UserId { get; set; }
+
+        public List<string> SteamIds { get; set; } = new List<string>();
+
+        public string Avatar { get; set; }
+
+        public string Nickname { get; set; }
     }
 }

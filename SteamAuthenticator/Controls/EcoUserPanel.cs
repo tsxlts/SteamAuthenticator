@@ -1,22 +1,22 @@
 ﻿namespace Steam_Authenticator.Controls
 {
-    internal class BuffUserPanel : ClientItemPanel<BuffClient>
+    internal class EcoUserPanel : ClientItemPanel<EcoClient>
     {
         public Label Offer;
 
-        public BuffUserPanel(bool hasUser) : base(hasUser)
+        public EcoUserPanel(bool hasUser) : base(hasUser)
         {
 
         }
 
-        public BuffUserPanel SetOfferBox(Label offer)
+        public EcoUserPanel SetOfferBox(Label offer)
         {
             this.Offer = offer;
             this.Controls.Add(this.Offer);
             return this;
         }
 
-        public BuffUserPanel SetOffer(int? offerCount)
+        public EcoUserPanel SetOffer(int? offerCount)
         {
             if (!HasItem)
             {

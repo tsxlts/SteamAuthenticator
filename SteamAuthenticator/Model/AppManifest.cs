@@ -7,6 +7,7 @@ namespace Steam_Authenticator.Model
         private readonly string guardPath = "sda/guard";
         private readonly string userPath = "sda/user";
         private readonly string buffUserPath = "sda/buffUser";
+        private readonly string ecoUserPath = "sda/ecoUser";
         private readonly Manifest manifest;
 
         public AppManifest()
@@ -14,6 +15,16 @@ namespace Steam_Authenticator.Model
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string file = Path.Combine(commonAppDataPath, "SA", "Manifest", "sda.manifest");
             manifest = Manifest.FromFile(file);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changed"></param>
+        /// <returns></returns>
+        public void WithChanged(Action<object, ManifestChangedEventArgs> changed)
+        {
+            manifest.ManifestChanged += new ManifestChangedEventHandler(changed);
         }
 
         #region Guard
@@ -32,7 +43,7 @@ namespace Steam_Authenticator.Model
         public Guard GetGuard(string accountName)
         {
             string password = GetPassword();
-            return manifest.GetEntry<Guard>(guardPath, accountName, password)?.Value;
+            return manifest.GetEntry<Guard>(guardPath, accountName, password);
         }
 
         public IEnumerable<string> GetGuards()
@@ -57,7 +68,7 @@ namespace Steam_Authenticator.Model
         public User GetSteamUser(string steamId)
         {
             string password = GetPassword();
-            return manifest.GetEntry<User>(userPath, steamId, password)?.Value;
+            return manifest.GetEntry<User>(userPath, steamId, password);
         }
 
         public IEnumerable<string> GetSteamUsers()
@@ -82,12 +93,37 @@ namespace Steam_Authenticator.Model
         public BuffUser GetBuffUser(string userId)
         {
             string password = GetPassword();
-            return manifest.GetEntry<BuffUser>(buffUserPath, userId, password)?.Value;
+            return manifest.GetEntry<BuffUser>(buffUserPath, userId, password);
         }
 
         public IEnumerable<string> GetBuffUser()
         {
             return manifest.GetEntries(buffUserPath);
+        }
+        #endregion
+
+        #region EcoUser
+        public void SaveEcoUser(string userId, EcoUser entry)
+        {
+            string password = GetPassword();
+            manifest.SaveEntry(ecoUserPath, userId, password, entry);
+        }
+
+        public bool RemoveEcoUser(string userId, out EcoUser entry)
+        {
+            string password = GetPassword();
+            return manifest.RemoveEntry(ecoUserPath, userId, password, out entry);
+        }
+
+        public EcoUser GetEcoUser(string userId)
+        {
+            string password = GetPassword();
+            return manifest.GetEntry<EcoUser>(ecoUserPath, userId, password);
+        }
+
+        public IEnumerable<string> GetEcoUser()
+        {
+            return manifest.GetEntries(ecoUserPath);
         }
         #endregion
 

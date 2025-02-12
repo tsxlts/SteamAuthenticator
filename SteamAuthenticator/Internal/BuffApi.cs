@@ -7,15 +7,17 @@ namespace Steam_Authenticator.Internal
 {
     internal static class BuffApi
     {
+        public const string Api = "https://buff.163.com";
+
         public static async Task<IWebResponse<BuffResponse<BuffUserInfoResponse>>> QueryUserInfo(CookieCollection cookies, CancellationToken cancellationToken = default)
         {
-            var response = await SteamApi.GetAsync<BuffResponse<BuffUserInfoResponse>>("https://buff.163.com/account/api/user/info", headers: InitHeaders(cookies), currentCookies: cookies, cancellationToken: cancellationToken);
+            var response = await SteamApi.GetAsync<BuffResponse<BuffUserInfoResponse>>($"{Api}/account/api/user/info", headers: InitHeaders(cookies), currentCookies: cookies, cancellationToken: cancellationToken);
             return response;
         }
 
         public static async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade(CookieCollection cookies, CancellationToken cancellationToken = default)
         {
-            var response = await SteamApi.GetAsync<BuffResponse<List<SteamTradeResponse>>>("https://buff.163.com/api/market/steam_trade", headers: InitHeaders(cookies), currentCookies: cookies, cancellationToken: cancellationToken);
+            var response = await SteamApi.GetAsync<BuffResponse<List<SteamTradeResponse>>>($"{Api}/api/market/steam_trade", headers: InitHeaders(cookies), currentCookies: cookies, cancellationToken: cancellationToken);
             return response;
         }
 

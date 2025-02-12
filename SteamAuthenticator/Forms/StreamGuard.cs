@@ -1,6 +1,4 @@
-﻿using Steam_Authenticator.Internal;
-using Steam_Authenticator.Model;
-using SteamKit;
+﻿using SteamKit;
 
 namespace Steam_Authenticator.Forms
 {
@@ -8,8 +6,6 @@ namespace Steam_Authenticator.Forms
     {
         private readonly string account;
         private readonly System.Threading.Timer timer;
-
-        private string initialDirectory;
 
         public StreamGuard(string account)
         {
@@ -100,7 +96,7 @@ namespace Steam_Authenticator.Forms
             }
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void CopyRevocationCode_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(RevocationCode.Text);
         }
@@ -179,96 +175,9 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                if (Appsetting.Instance.Manifest.Encrypted)
-                {
-                    string tips = "请输入访问密码";
-                    Input input;
-                    while (true)
-                    {
-                        input = new Input("导出令牌", tips, password: true, required: true, errorMsg: "请输入密码");
-                        if (input.ShowDialog() != DialogResult.OK)
-                        {
-                            return;
-                        }
-
-                        string password = input.InputValue;
-                        if (!Appsetting.Instance.Manifest.CheckPassword(password))
-                        {
-                            tips = "访问密码错误，请重新输入";
-                            continue;
-                        }
-                        break;
-                    }
-                }
-
                 string account = Users.SelectedItem?.ToString();
                 ExportGuardOptions exportGuardOptions = new ExportGuardOptions(account);
-                if (exportGuardOptions.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                List<Guard> guards = exportGuardOptions.SelectGuards;
-                if (guards.Count == 0)
-                {
-                    MessageBox.Show("请选择要导出的令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                string encryptPassword = exportGuardOptions.EncryptPassword;
-                bool encrypt = !string.IsNullOrWhiteSpace(encryptPassword);
-
-                using (var stream = new MemoryStream())
-                {
-                    stream.WriteBoolean(encrypt);
-
-                    var iv = new byte[0];
-                    var salt = new byte[0];
-                    if (encrypt)
-                    {
-                        iv = FileEncryptor.GetInitializationVector();
-                        salt = FileEncryptor.GetRandomSalt();
-
-                        stream.WriteInt32(iv.Length);
-                        stream.Write(iv);
-
-                        stream.WriteInt32(salt.Length);
-                        stream.Write(salt);
-                    }
-
-                    foreach (var guard in guards)
-                    {
-                        using (var guardStream = guard.Serialize())
-                        {
-                            byte[] dataBuffer = new byte[guardStream.Length];
-                            guardStream.Read(dataBuffer);
-                            if (encrypt)
-                            {
-                                dataBuffer = FileEncryptor.EncryptData(encryptPassword, salt, iv, dataBuffer);
-                            }
-
-                            stream.WriteInt32(dataBuffer.Length);
-                            stream.Write(dataBuffer);
-                        }
-                    }
-
-                    SaveFileDialog saveFileDialog = new SaveFileDialog
-                    {
-                        Title = "导出令牌",
-                        Filter = "令牌文件 (*.entry)|*.entry",
-                        DefaultExt = ".entry",
-                        FileName = $"{DateTime.Now:yyyyMMddHHmmss}.guard.entry",
-                        InitialDirectory = initialDirectory ?? AppContext.BaseDirectory,
-                    };
-
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string filePath = saveFileDialog.FileName;
-                        File.WriteAllBytes(filePath, stream.ToArray());
-
-                        initialDirectory = new FileInfo(filePath).DirectoryName;
-                    }
-                }
+                exportGuardOptions.ShowDialog();
             }
             catch (Exception ex)
             {

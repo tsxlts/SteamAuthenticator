@@ -2,6 +2,7 @@
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
+using Steam_Authenticator.Model.ECO;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
@@ -29,6 +30,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public List<BuffClient> BuffClients { get; private set; } = new List<BuffClient>();
+
+        [JsonIgnore]
+        public List<EcoClient> EcoClients { get; private set; } = new List<EcoClient>();
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
@@ -68,13 +72,20 @@ namespace Steam_Authenticator
         public int Port { get; set; }
     }
 
-    public class UserClient
+    public interface Client
+    {
+        public string Key { get; }
+    }
+
+    public class UserClient : Client
     {
         public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
 
+        private List<Offer> giveOffers = new List<Offer>();
+        private List<Offer> autoConfirmOffers = new List<Offer>();
         private Action startLogin = null;
         private Action<bool> endLogin = null;
 
@@ -88,6 +99,12 @@ namespace Steam_Authenticator
 
         public User User { get; set; }
 
+        public string Key => User?.SteamId;
+
+        public List<Offer> AutoConfirmOffers => autoConfirmOffers ?? new List<Offer>();
+
+        public List<Offer> GiveOffers => giveOffers ?? new List<Offer>();
+
         public UserClient WithStartLogin(Action action)
         {
             startLogin = action;
@@ -98,6 +115,16 @@ namespace Steam_Authenticator
         {
             endLogin = action;
             return this;
+        }
+
+        public void SetAutoConfirmOffers(List<Offer> offers)
+        {
+            autoConfirmOffers = offers;
+        }
+
+        public void SetGiveOffers(List<Offer> offers)
+        {
+            giveOffers = offers;
         }
 
         /// <summary>
@@ -157,7 +184,7 @@ namespace Steam_Authenticator
         }
     }
 
-    public class BuffClient
+    public class BuffClient : Client
     {
         public static BuffClient None = new BuffClient(new BuffUser());
 
@@ -170,6 +197,8 @@ namespace Steam_Authenticator
         }
 
         public BuffUser User { get; private set; }
+
+        public string Key => User?.UserId;
 
         public CookieCollection Cookies => Extension.GetCookies(User?.BuffCookies ?? "");
 
@@ -207,6 +236,7 @@ namespace Steam_Authenticator
                 newCookies.Add(buffResponse.Cookies);
 
                 var buffUser = buffResponse.Body.data;
+                User.SteamId = buffUser.steamid;
                 User.Nickname = buffUser.nickname;
                 User.Avatar = buffUser.avatar;
                 User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
@@ -223,6 +253,7 @@ namespace Steam_Authenticator
         {
             User.BuffCookies = string.Empty;
             Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
+
             LoggedIn = false;
             endLogin?.Invoke(false, false);
             return Task.CompletedTask;
@@ -231,6 +262,107 @@ namespace Steam_Authenticator
         public async Task<IWebResponse<BuffResponse<List<SteamTradeResponse>>>> QuerySteamTrade()
         {
             return await BuffApi.QuerySteamTrade(cookies: Cookies);
+        }
+    }
+
+    public class EcoClient : Client
+    {
+        public static EcoClient None = new EcoClient(new EcoUser());
+
+        private Action<bool> startLogin = null;
+        private Action<bool, bool> endLogin = null;
+
+        public EcoClient(EcoUser user)
+        {
+            User = user;
+        }
+
+        public EcoUser User { get; private set; }
+
+        public string Key => User?.UserId;
+
+        public bool LoggedIn => !string.IsNullOrWhiteSpace(Token);
+
+        public string Token { get; set; }
+
+        public async Task<bool> RefreshTokenAsync(bool relogin, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                startLogin?.Invoke(relogin);
+
+                var refreshToken = await EcoApi.RefreshTokenAsync(User.ClientId, User.RefreshToken, cancellationToken);
+                var refreshTokenData = refreshToken.Body?.StatusData?.ResultData;
+                if (string.IsNullOrWhiteSpace(refreshTokenData?.Token))
+                {
+                    Token = null;
+                    return false;
+                }
+
+                User.RefreshToken = refreshTokenData.RefreshToken;
+                User.RefreshTokenExpireTime = refreshTokenData.RefreshTokenExpireDate;
+                Token = refreshTokenData.Token;
+
+                Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+                return true;
+            }
+            finally
+            {
+                endLogin?.Invoke(relogin, LoggedIn);
+            }
+        }
+
+        public async Task RefreshClientAsync(CancellationToken cancellationToken = default)
+        {
+            var refreshTokenExpire = User.RefreshTokenExpireTime - DateTime.Now;
+            if (TimeSpan.Zero < refreshTokenExpire && refreshTokenExpire < TimeSpan.FromMinutes(30) && !string.IsNullOrWhiteSpace(User.RefreshToken))
+            {
+                await RefreshTokenAsync(false, cancellationToken);
+            }
+
+            var userResponse = await EcoApi.QueryUserAsync(this, cancellationToken);
+            var userData = userResponse?.StatusData?.ResultData;
+
+            if (string.IsNullOrWhiteSpace(userData?.UserId))
+            {
+                return;
+            }
+
+            var steamUserResponse = await EcoApi.QuerySteamUserAsync(this, cancellationToken);
+            var steamUserData = steamUserResponse?.StatusData?.ResultData;
+
+            User.Nickname = userData.UserName;
+            User.Avatar = userData.UserHead;
+            User.SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
+
+            Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+        }
+
+        public async Task<EcoResponse<List<QueryOffersResponse>>> QueryOffers(string gameId = "730", CancellationToken cancellationToken = default)
+        {
+            return await EcoApi.QueryOffers(this, gameId, cancellationToken);
+        }
+
+        public Task LogoutAsync()
+        {
+            User.RefreshToken = null;
+            Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+
+            Token = null;
+            endLogin?.Invoke(false, false);
+            return Task.CompletedTask;
+        }
+
+        public EcoClient WithStartLogin(Action<bool> action)
+        {
+            startLogin = action;
+            return this;
+        }
+
+        public EcoClient WithEndLogin(Action<bool, bool> action)
+        {
+            endLogin = action;
+            return this;
         }
     }
 

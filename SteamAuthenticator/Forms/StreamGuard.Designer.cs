@@ -39,7 +39,7 @@
             deleteGuardBtn = new Button();
             exportGuardBtn = new Button();
             splitContainer1 = new SplitContainer();
-            label1 = new Label();
+            copyRevocationCode = new Label();
             RevocationCode = new Label();
             label7 = new Label();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -94,7 +94,7 @@
             GuardText.ForeColor = Color.Red;
             GuardText.Location = new Point(61, 53);
             GuardText.Name = "GuardText";
-            GuardText.Size = new Size(55, 17);
+            GuardText.Size = new Size(60, 17);
             GuardText.TabIndex = 4;
             GuardText.Text = "*****";
             GuardText.TextAlign = ContentAlignment.MiddleLeft;
@@ -161,18 +161,18 @@
             splitContainer1.SplitterDistance = 97;
             splitContainer1.TabIndex = 8;
             // 
-            // label1
+            // copyRevocationCode
             // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label1.Cursor = Cursors.Hand;
-            label1.ForeColor = Color.FromArgb(128, 128, 128);
-            label1.Location = new Point(128, 124);
-            label1.Name = "label1";
-            label1.Size = new Size(56, 17);
-            label1.TabIndex = 11;
-            label1.Text = "点此复制";
-            label1.TextAlign = ContentAlignment.MiddleLeft;
-            label1.Click += label1_Click;
+            copyRevocationCode.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            copyRevocationCode.Cursor = Cursors.Hand;
+            copyRevocationCode.ForeColor = Color.FromArgb(128, 128, 128);
+            copyRevocationCode.Location = new Point(128, 124);
+            copyRevocationCode.Name = "copyRevocationCode";
+            copyRevocationCode.Size = new Size(56, 17);
+            copyRevocationCode.TabIndex = 11;
+            copyRevocationCode.Text = "点此复制";
+            copyRevocationCode.TextAlign = ContentAlignment.MiddleLeft;
+            copyRevocationCode.Click += CopyRevocationCode_Click;
             // 
             // RevocationCode
             // 
@@ -180,7 +180,7 @@
             RevocationCode.ForeColor = Color.Red;
             RevocationCode.Location = new Point(61, 124);
             RevocationCode.Name = "RevocationCode";
-            RevocationCode.Size = new Size(55, 17);
+            RevocationCode.Size = new Size(60, 17);
             RevocationCode.TabIndex = 10;
             RevocationCode.Text = "******";
             RevocationCode.TextAlign = ContentAlignment.MiddleLeft;
@@ -201,7 +201,7 @@
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(196, 193);
-            Controls.Add(label1);
+            Controls.Add(copyRevocationCode);
             Controls.Add(RevocationCode);
             Controls.Add(label7);
             Controls.Add(splitContainer1);
@@ -240,7 +240,7 @@
         private Button exportGuardBtn;
         private Button deleteGuardBtn;
         private SplitContainer splitContainer1;
-        private Label label1;
+        private Label copyRevocationCode;
         private Label RevocationCode;
         private Label label7;
     }

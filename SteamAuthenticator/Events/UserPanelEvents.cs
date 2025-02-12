@@ -13,7 +13,7 @@ namespace Steam_Authenticator
     {
         private void UsersPanel_SizeChanged(object sender, EventArgs e)
         {
-            ResetUserPanel();
+            usersPanel.Reset();
         }
 
         private async void addUserBtn_Click(object sender, EventArgs e)
@@ -29,8 +29,8 @@ namespace Steam_Authenticator
             }
 
             Control control = sender as Control;
-            UserPanel panel = control.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = control.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             await SwitchUser(userClient);
         }
@@ -40,8 +40,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             StringBuilder stringBuilder = new StringBuilder();
             foreach (var item in userClient.Client.WebCookie)
@@ -61,8 +61,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
             string accessToken = userClient.Client.AccessToken;
             if (string.IsNullOrWhiteSpace(accessToken))
             {
@@ -77,8 +77,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
             string refreshToken = userClient.Client.RefreshToken;
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -93,8 +93,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             await SwitchUser(userClient);
         }
@@ -104,12 +104,11 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             var userSetting = new Forms.UserSetting(userClient.User);
             userSetting.ShowDialog();
-            panel.RefreshIcon();
         }
 
         private async void reloginMenuItem_Click(object sender, EventArgs e)
@@ -117,8 +116,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             if (await userClient.LoginAsync())
             {
@@ -133,8 +132,8 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             await userClient.LogoutAsync();
 
@@ -146,15 +145,15 @@ namespace Steam_Authenticator
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 
-            UserPanel panel = menuStrip.SourceControl.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             userClient.Client.Dispose();
 
             Appsetting.Instance.Manifest.RemoveSteamUser(userClient.User.SteamId, out var entry);
             Appsetting.Instance.Clients.Remove(userClient);
-            usersPanel.Controls.Remove(panel);
-            ResetUserPanel();
+
+            usersPanel.RemoveClient(userClient);
 
             if (userClient.User.SteamId == currentClient?.User?.SteamId)
             {
@@ -165,8 +164,8 @@ namespace Steam_Authenticator
         private void offersNumberBtn_Click(object sender, EventArgs e)
         {
             Control control = sender as Control;
-            UserPanel panel = control.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = control.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
 
             Offers offersForm = new Offers(this, userClient);
             offersForm.ShowDialog();
@@ -175,8 +174,8 @@ namespace Steam_Authenticator
         private void confirmationNumberBtn_Click(object sender, EventArgs e)
         {
             Control control = sender as Control;
-            UserPanel panel = control.Parent as UserPanel;
-            UserClient userClient = panel.UserClient;
+            SteamUserPanel panel = control.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
             var webClient = userClient.Client;
 
             if (webClient == null || !webClient.LoggedIn)
@@ -199,69 +198,33 @@ namespace Steam_Authenticator
         {
             try
             {
-                usersPanel.Controls.Clear();
-
-                int startX = GetUserControlStartPointX(out int cells);
-
-                Appsetting.Instance.Clients.RemoveAll(c => !c.Client.LoggedIn);
-
+                usersPanel.ClearItems();
                 var accounts = Appsetting.Instance.Manifest.GetSteamUsers().ToList();
-                int index = 0;
+
                 foreach (string account in accounts)
                 {
                     User user = Appsetting.Instance.Manifest.GetSteamUser(account);
+                    UserClient client = new UserClient(user, new SteamCommunityClient());
 
-                    UserPanel panel = CreateUserPanel(startX, cells, index, new UserClient(user, new SteamCommunityClient()));
-                    usersPanel.Controls.Add(panel);
+                    AddUserPanel(client);
 
-                    index++;
-
-                    Appsetting.Instance.Clients.Add(panel.UserClient);
+                    Appsetting.Instance.Clients.Add(client);
                 }
 
                 {
-                    UserPanel panel = new UserPanel(false)
-                    {
-                        Size = new Size(80, 136),
-                        Location = new Point(startX * (index % cells) + 10, 146 * (index / cells) + 10),
-                        UserClient = UserClient.None
-                    };
 
-                    PictureBox pictureBox = new PictureBox()
-                    {
-                        Width = 80,
-                        Height = 80,
-                        Location = new Point(0, 0),
-                        Cursor = Cursors.Hand,
-                        SizeMode = PictureBoxSizeMode.Zoom
-                    };
-                    pictureBox.Image = Properties.Resources.add;
-                    pictureBox.Click += addUserBtn_Click;
-                    panel.SetUserAvatarBox(pictureBox);
+                    SteamUserPanel panel = usersPanel.AddItemPanel(false, UserClient.None);
 
-                    IconLabel iconLabel = new IconLabel()
-                    {
-                        Name = "icons",
-                        Size = new Size(80, 20),
-                        IconSize = new Size(16, 16),
-                        Location = new Point(0, 80),
-                    };
-                    panel.SetIconsBox(iconLabel);
+                    panel.ItemIcon.Image = Properties.Resources.add;
+                    panel.ItemIcon.Click += addUserBtn_Click;
 
-                    Label nameLabel = new Label()
-                    {
-                        Text = $"添加帐号",
-                        AutoSize = false,
-                        AutoEllipsis = true,
-                        Cursor = Cursors.Hand,
-                        Size = new Size(80, 18),
-                        TextAlign = ContentAlignment.TopCenter,
-                        ForeColor = Color.FromArgb(244, 164, 96),
-                        Location = new Point(0, iconLabel.Location.Y + iconLabel.Height)
-                    };
-                    nameLabel.Click += addUserBtn_Click;
-                    panel.SetUserNameBox(nameLabel);
-                    usersPanel.Controls.Add(panel);
+                    panel.ItemName.Text = $"添加帐号";
+                    panel.ItemName.ForeColor = Color.FromArgb(244, 164, 96);
+                    panel.ItemName.Click += addUserBtn_Click;
+
+                    panel.Icons.Hide();
+                    panel.Offer.Hide();
+                    panel.Confirmation.Hide();
                 }
 
                 var tasks = Appsetting.Instance.Clients.Select(c => c.LoginAsync());
@@ -300,27 +263,9 @@ namespace Steam_Authenticator
                     SetCurrentClient(Appsetting.Instance.Clients[0]);
                 }
 
-                var controlCollection = usersPanel.Controls.Cast<UserPanel>().ToList();
-                var index = controlCollection.FindIndex(c => c.UserClient.User.SteamId == user.SteamId);
+                AddUserPanel(userClient);
 
-                if (index < 0)
-                {
-                    index = controlCollection.Count - 1;
-                }
-                else
-                {
-                    controlCollection.RemoveAt(index);
-                }
-
-                int startX = GetUserControlStartPointX(out int cells);
-                UserPanel panel = CreateUserPanel(startX, cells, index, userClient);
-                controlCollection.Insert(index, panel);
-
-                usersPanel.Controls.Clear();
-                usersPanel.Controls.AddRange(controlCollection.ToArray());
-                ResetUserPanel();
-
-                return panel.UserClient;
+                return userClient;
             }
 
             return null;
@@ -339,7 +284,7 @@ namespace Steam_Authenticator
 
                 var user = new User
                 {
-                    Account = !string.IsNullOrWhiteSpace(client.Account) ? client.Account : localUser.Account,
+                    Account = !string.IsNullOrWhiteSpace(client.Account) ? client.Account : localUser?.Account,
 
                     SteamId = client.SteamId,
                     RefreshToken = client.RefreshToken,
@@ -425,204 +370,29 @@ namespace Steam_Authenticator
             Appsetting.Instance.AppSetting.Save();
         }
 
-        private UserPanel CreateUserPanel(int startX, int cells, int index, UserClient userClient)
+        private SteamUserPanel AddUserPanel(UserClient userClient)
         {
             userClient.Client.SetLanguage(Language.Schinese);
-            UserPanel panel = new UserPanel(true)
-            {
-                Name = userClient.User.SteamId,
-                Size = new Size(80, 136),
-                Location = new Point(startX * (index % cells) + 10, 146 * (index / cells) + 10),
-                UserClient = userClient
-            };
-            var auto_deliver = new CustomIcon(Properties.Resources.auto_deliver_32, new CustomIcon.Options
-            {
-                Convert = (icon) =>
-                {
-                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return CustomIcon.ConvertToPurple(icon);
-                    }
+            SteamUserPanel panel = usersPanel.AddItemPanel(true, userClient);
 
-                    if (userClient.User.Setting.AutoAcceptGiveOffer)
-                    {
-                        return icon;
-                    }
-                    if (userClient.User.Setting.AutoAcceptGiveOffer_Buff)
-                    {
-                        return icon;
-                    }
-                    if (userClient.User.Setting.AutoAcceptGiveOffer_Other)
-                    {
-                        return icon;
-                    }
-                    if (userClient.User.Setting.AutoAcceptGiveOffer_Custom)
-                    {
-                        return icon;
-                    }
+            panel.ItemIcon.MouseClick += btnUser_Click;
+            panel.ItemIcon.ContextMenuStrip = userContextMenuStrip;
 
-                    return CustomIcon.ConvertToGrayscale(icon);
-                }
-            });
-            var auto_confirm = new CustomIcon(Properties.Resources.auto_confirm_32, new CustomIcon.Options
-            {
-                Convert = (icon) =>
-                {
-                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return CustomIcon.ConvertToPurple(icon);
-                    }
+            panel.ItemName.MouseClick += btnUser_Click;
+            panel.ItemName.ContextMenuStrip = userContextMenuStrip;
 
-                    if (userClient.User.Setting.AutoConfirmTrade)
-                    {
-                        return icon;
-                    }
-                    if (userClient.User.Setting.AutoConfirmMarket)
-                    {
-                        return icon;
-                    }
+            panel.Offer.Click += offersNumberBtn_Click;
 
-                    return CustomIcon.ConvertToGrayscale(icon);
-                }
-            });
-            var auto_accept = new CustomIcon(Properties.Resources.auto_accept_32, new CustomIcon.Options
-            {
-                Convert = (icon) =>
-                {
-                    if (!userClient.User.Setting.PeriodicCheckingConfirmation)
-                    {
-                        return CustomIcon.ConvertToPurple(icon);
-                    }
+            panel.Confirmation.Click += confirmationNumberBtn_Click;
 
-                    if (userClient.User.Setting.AutoAcceptReceiveOffer)
-                    {
-                        return icon;
-                    }
-
-                    return CustomIcon.ConvertToGrayscale(icon);
-                }
-            });
-            var icons = new CustomIcon[] { auto_deliver, auto_confirm, auto_accept };
-
-            PictureBox pictureBox = new PictureBox()
-            {
-                Name = "useravatar",
-                Width = 80,
-                Height = 80,
-                Location = new Point(0, 0),
-                Cursor = Cursors.Hand,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                InitialImage = Properties.Resources.loading,
-            };
-            string avatar = userClient.User.Avatar;
-            pictureBox.Image = Properties.Resources.userimg;
-            if (!string.IsNullOrEmpty(avatar))
-            {
-                pictureBox.LoadAsync(avatar);
-            }
-            pictureBox.MouseClick += btnUser_Click;
-            pictureBox.ContextMenuStrip = userContextMenuStrip;
-            panel.SetUserAvatarBox(pictureBox);
-
-            IconLabel iconLabel = new IconLabel(icons)
-            {
-                Name = "icons",
-                Size = new Size(80, 20),
-                IconSize = new Size(16, 16),
-                Location = new Point(0, 80),
-            };
-            panel.SetIconsBox(iconLabel);
-
-            Label nameLabel = new Label()
-            {
-                Name = "username",
-                Text = $"{userClient.GetAccount()} [{userClient.User.NickName}]",
-                AutoSize = false,
-                AutoEllipsis = true,
-                Cursor = Cursors.Hand,
-                Size = new Size(80, 18),
-                TextAlign = ContentAlignment.TopCenter,
-                ForeColor = userClient.Client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
-                Location = new Point(0, iconLabel.Location.Y + iconLabel.Height)
-            };
-            nameLabel.MouseClick += btnUser_Click;
-            nameLabel.ContextMenuStrip = userContextMenuStrip;
-            panel.SetUserNameBox(nameLabel);
-
-            Label offerLabel = new Label()
-            {
-                Name = "offer",
-                Text = $"---",
-                AutoSize = false,
-                AutoEllipsis = true,
-                Cursor = Cursors.Hand,
-                Size = new Size(38, 18),
-                TextAlign = ContentAlignment.TopRight,
-                ForeColor = Color.FromArgb(255, 128, 0),
-                Location = new Point(0, nameLabel.Location.Y + nameLabel.Height)
-            };
-            offerLabel.Click += offersNumberBtn_Click;
-            panel.SetOfferBox(offerLabel);
-
-            Label confirmationLabel = new Label()
-            {
-                Name = "confirmation",
-                Text = $"---",
-                AutoSize = false,
-                AutoEllipsis = true,
-                Cursor = Cursors.Hand,
-                Size = new Size(38, 18),
-                TextAlign = ContentAlignment.TopLeft,
-                ForeColor = Color.FromArgb(0, 128, 255),
-                Location = new Point(42, nameLabel.Location.Y + nameLabel.Height)
-            };
-            confirmationLabel.Click += confirmationNumberBtn_Click;
-            panel.SetConfirmationBox(confirmationLabel);
-
-            panel.UserClient
-                .WithStartLogin(() => nameLabel.ForeColor = Color.FromArgb(128, 128, 128))
+            panel.Client
+                .WithStartLogin(() => panel.ItemName.ForeColor = Color.FromArgb(128, 128, 128))
                 .WithEndLogin(loggined =>
                 {
-                    nameLabel.ForeColor = loggined ? Color.Green : Color.Red;
+                    panel.ItemName.ForeColor = loggined ? Color.Green : Color.Red;
                 });
 
             return panel;
-        }
-
-        private void ResetUserPanel()
-        {
-            try
-            {
-                var controlCollection = usersPanel.Controls.Cast<Control>().ToArray();
-
-                int x = GetUserControlStartPointX(out int cells);
-
-                int index = 0;
-                foreach (Control control in controlCollection)
-                {
-                    control.Location = new Point(x * (index % cells) + 10, 146 * (index / cells) + 10);
-                    index++;
-                }
-
-                usersPanel.Controls.Clear();
-                usersPanel.Controls.AddRange(controlCollection);
-            }
-            catch
-            {
-
-            }
-        }
-
-        private int GetUserControlStartPointX(out int cells)
-        {
-            cells = (usersPanel.Size.Width - 30) / 80;
-            int size = (usersPanel.Size.Width - 30 - cells * 80) / (cells - 1) + 80;
-            if (size < 85)
-            {
-                cells = cells - 1;
-                size = (usersPanel.Size.Width - 30 - cells * 80) / (cells - 1) + 80;
-            }
-            return size;
         }
     }
 }

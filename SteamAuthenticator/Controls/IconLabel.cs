@@ -28,7 +28,8 @@
                     y = y - IconSize.Height;
                 }
 
-                e.Graphics.DrawIcon(icon.Icon, new Rectangle(x, y, IconSize.Width, IconSize.Height));
+                var thisIcon = icon.Icon;
+                e.Graphics.DrawIcon(thisIcon, new Rectangle(x, y, IconSize.Width, IconSize.Height));
 
                 x = x + 3 + IconSize.Width;
             }

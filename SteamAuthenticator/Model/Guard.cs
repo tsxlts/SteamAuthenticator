@@ -2,7 +2,7 @@
 
 namespace Steam_Authenticator.Model
 {
-    public class Guard : JsonStreamSerializer<Guard>
+    public class Guard : JsonStreamSerializer
     {
         public string DeviceId { get; set; }
         public string SharedSecret { get; set; }

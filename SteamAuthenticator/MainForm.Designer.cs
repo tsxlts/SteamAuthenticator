@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator
+﻿using Steam_Authenticator.Controls;
+
+namespace Steam_Authenticator
 {
     partial class MainForm
     {
@@ -31,6 +33,7 @@
             importAuthenticatorMenuItem = new ToolStripMenuItem();
             importFileAuthenticatorMenuItem = new ToolStripMenuItem();
             importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
+            exportAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
             submitRequirementsMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
@@ -45,7 +48,7 @@
             OfferCountLabel = new Label();
             label2 = new Label();
             label1 = new Label();
-            usersPanel = new Panel();
+            usersPanel = new SteamUserCollectionPanel();
             pictureBox1 = new PictureBox();
             label3 = new Label();
             label4 = new Label();
@@ -57,9 +60,16 @@
             tabControl = new TabControl();
             steamPage = new TabPage();
             buffPage = new TabPage();
-            buffUsersPanel = new Panel();
+            buffUsersPanel = new BuffUserCollectionPanel();
             pictureBox2 = new PictureBox();
+            ecoPage = new TabPage();
+            ecoUsersPanel = new EcoUserCollectionPanel();
+            pictureBox6 = new PictureBox();
             statusPanel = new Panel();
+            label11 = new Label();
+            pictureBox7 = new PictureBox();
+            label10 = new Label();
+            pictureBox5 = new PictureBox();
             label9 = new Label();
             label8 = new Label();
             pictureBox4 = new PictureBox();
@@ -67,8 +77,6 @@
             SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
-            label10 = new Label();
-            pictureBox5 = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -79,10 +87,14 @@
             buffPage.SuspendLayout();
             buffUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ecoPage.SuspendLayout();
+            ecoUsersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             statusPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -90,7 +102,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, submitRequirementsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(764, 25);
+            menuStrip1.Size = new Size(819, 25);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -138,7 +150,7 @@
             // 
             // authenticatorMenuItem
             // 
-            authenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, removeAuthenticatorMenuItem });
+            authenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardMenuItem, addAuthenticatorMenuItem, moveAuthenticatorMenuItem, importAuthenticatorMenuItem, exportAuthenticatorMenuItem, removeAuthenticatorMenuItem });
             authenticatorMenuItem.Name = "authenticatorMenuItem";
             authenticatorMenuItem.Size = new Size(80, 21);
             authenticatorMenuItem.Text = "令牌验证器";
@@ -185,6 +197,13 @@
             importSecretAuthenticatorMenuItem.Text = "秘钥导入";
             importSecretAuthenticatorMenuItem.Click += importSecretAuthenticatorMenuItem_Click;
             // 
+            // exportAuthenticatorMenuItem
+            // 
+            exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
+            exportAuthenticatorMenuItem.Size = new Size(124, 22);
+            exportAuthenticatorMenuItem.Text = "导出令牌";
+            exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
+            // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
@@ -215,7 +234,7 @@
             UserName.AutoEllipsis = true;
             UserName.Location = new Point(118, 40);
             UserName.Name = "UserName";
-            UserName.Size = new Size(200, 23);
+            UserName.Size = new Size(139, 23);
             UserName.TabIndex = 2;
             UserName.Text = "---";
             UserName.TextAlign = ContentAlignment.MiddleLeft;
@@ -242,7 +261,7 @@
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
-            panel1.Location = new Point(544, 38);
+            panel1.Location = new Point(599, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
             panel1.TabIndex = 6;
@@ -341,20 +360,21 @@
             // 
             // usersPanel
             // 
-            usersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             usersPanel.AutoScroll = true;
             usersPanel.BackgroundImageLayout = ImageLayout.Zoom;
             usersPanel.Controls.Add(pictureBox1);
+            usersPanel.Dock = DockStyle.Fill;
             usersPanel.Location = new Point(3, 3);
             usersPanel.Name = "usersPanel";
-            usersPanel.Size = new Size(730, 298);
+            usersPanel.Size = new Size(785, 298);
             usersPanel.TabIndex = 7;
             usersPanel.SizeChanged += UsersPanel_SizeChanged;
             // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.loading;
-            pictureBox1.Location = new Point(278, 87);
+            pictureBox1.Location = new Point(340, 87);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(100, 100);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -397,7 +417,7 @@
             // versionLabel
             // 
             versionLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            versionLabel.Location = new Point(692, 481);
+            versionLabel.Location = new Point(747, 481);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(60, 23);
             versionLabel.TabIndex = 12;
@@ -444,10 +464,11 @@
             tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl.Controls.Add(steamPage);
             tabControl.Controls.Add(buffPage);
+            tabControl.Controls.Add(ecoPage);
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(744, 334);
+            tabControl.Size = new Size(799, 334);
             tabControl.TabIndex = 16;
             // 
             // steamPage
@@ -456,7 +477,7 @@
             steamPage.Location = new Point(4, 26);
             steamPage.Name = "steamPage";
             steamPage.Padding = new Padding(3);
-            steamPage.Size = new Size(736, 304);
+            steamPage.Size = new Size(791, 304);
             steamPage.TabIndex = 0;
             steamPage.Text = "Steam 帐号";
             steamPage.UseVisualStyleBackColor = true;
@@ -467,36 +488,72 @@
             buffPage.Location = new Point(4, 26);
             buffPage.Name = "buffPage";
             buffPage.Padding = new Padding(3);
-            buffPage.Size = new Size(662, 280);
+            buffPage.Size = new Size(791, 319);
             buffPage.TabIndex = 1;
             buffPage.Text = "BUFF 帐号";
             buffPage.UseVisualStyleBackColor = true;
             // 
             // buffUsersPanel
             // 
-            buffUsersPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             buffUsersPanel.AutoScroll = true;
             buffUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
             buffUsersPanel.Controls.Add(pictureBox2);
+            buffUsersPanel.Dock = DockStyle.Fill;
             buffUsersPanel.Location = new Point(3, 3);
             buffUsersPanel.Name = "buffUsersPanel";
-            buffUsersPanel.Size = new Size(656, 274);
+            buffUsersPanel.Size = new Size(785, 313);
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
             // pictureBox2
             // 
+            pictureBox2.Anchor = AnchorStyles.None;
             pictureBox2.Image = Properties.Resources.loading;
-            pictureBox2.Location = new Point(278, 87);
+            pictureBox2.Location = new Point(340, 94);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(100, 100);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 1;
             pictureBox2.TabStop = false;
             // 
+            // ecoPage
+            // 
+            ecoPage.Controls.Add(ecoUsersPanel);
+            ecoPage.Location = new Point(4, 26);
+            ecoPage.Name = "ecoPage";
+            ecoPage.Padding = new Padding(3);
+            ecoPage.Size = new Size(791, 319);
+            ecoPage.TabIndex = 2;
+            ecoPage.Text = "ECO 帐号";
+            ecoPage.UseVisualStyleBackColor = true;
+            // 
+            // ecoUsersPanel
+            // 
+            ecoUsersPanel.AutoScroll = true;
+            ecoUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            ecoUsersPanel.Controls.Add(pictureBox6);
+            ecoUsersPanel.Dock = DockStyle.Fill;
+            ecoUsersPanel.Location = new Point(3, 3);
+            ecoUsersPanel.Name = "ecoUsersPanel";
+            ecoUsersPanel.Size = new Size(785, 313);
+            ecoUsersPanel.TabIndex = 8;
+            // 
+            // pictureBox6
+            // 
+            pictureBox6.Anchor = AnchorStyles.None;
+            pictureBox6.Image = Properties.Resources.loading;
+            pictureBox6.Location = new Point(340, 94);
+            pictureBox6.Name = "pictureBox6";
+            pictureBox6.Size = new Size(100, 100);
+            pictureBox6.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox6.TabIndex = 0;
+            pictureBox6.TabStop = false;
+            // 
             // statusPanel
             // 
             statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            statusPanel.Controls.Add(label11);
+            statusPanel.Controls.Add(pictureBox7);
             statusPanel.Controls.Add(label10);
             statusPanel.Controls.Add(pictureBox5);
             statusPanel.Controls.Add(label9);
@@ -510,15 +567,57 @@
             statusPanel.Controls.Add(label5);
             statusPanel.Location = new Point(12, 477);
             statusPanel.Name = "statusPanel";
-            statusPanel.Size = new Size(599, 30);
+            statusPanel.Size = new Size(654, 30);
             statusPanel.TabIndex = 17;
+            // 
+            // label11
+            // 
+            label11.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label11.AutoSize = true;
+            label11.ForeColor = Color.FromArgb(102, 162, 183);
+            label11.Location = new Point(322, 7);
+            label11.Name = "label11";
+            label11.Size = new Size(56, 17);
+            label11.TabIndex = 22;
+            label11.Text = "绑定令牌";
+            // 
+            // pictureBox7
+            // 
+            pictureBox7.Image = (Image)resources.GetObject("pictureBox7.Image");
+            pictureBox7.Location = new Point(298, 5);
+            pictureBox7.Name = "pictureBox7";
+            pictureBox7.Size = new Size(21, 21);
+            pictureBox7.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox7.TabIndex = 21;
+            pictureBox7.TabStop = false;
+            // 
+            // label10
+            // 
+            label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            label10.AutoSize = true;
+            label10.ForeColor = Color.FromArgb(57, 89, 220);
+            label10.Location = new Point(578, 7);
+            label10.Name = "label10";
+            label10.Size = new Size(56, 17);
+            label10.TabIndex = 20;
+            label10.Text = "自动收货";
+            // 
+            // pictureBox5
+            // 
+            pictureBox5.Image = Properties.Resources.auto_accept;
+            pictureBox5.Location = new Point(554, 5);
+            pictureBox5.Name = "pictureBox5";
+            pictureBox5.Size = new Size(21, 21);
+            pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox5.TabIndex = 19;
+            pictureBox5.TabStop = false;
             // 
             // label9
             // 
             label9.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label9.AutoSize = true;
             label9.ForeColor = Color.FromArgb(121, 193, 38);
-            label9.Location = new Point(405, 7);
+            label9.Location = new Point(492, 7);
             label9.Name = "label9";
             label9.Size = new Size(56, 17);
             label9.TabIndex = 18;
@@ -529,7 +628,7 @@
             label8.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label8.AutoSize = true;
             label8.ForeColor = Color.FromArgb(93, 151, 255);
-            label8.Location = new Point(320, 7);
+            label8.Location = new Point(407, 7);
             label8.Name = "label8";
             label8.Size = new Size(56, 17);
             label8.TabIndex = 17;
@@ -538,7 +637,7 @@
             // pictureBox4
             // 
             pictureBox4.Image = Properties.Resources.auto_deliver;
-            pictureBox4.Location = new Point(296, 5);
+            pictureBox4.Location = new Point(383, 5);
             pictureBox4.Name = "pictureBox4";
             pictureBox4.Size = new Size(21, 21);
             pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
@@ -548,7 +647,7 @@
             // pictureBox3
             // 
             pictureBox3.Image = Properties.Resources.auto_confirm;
-            pictureBox3.Location = new Point(381, 5);
+            pictureBox3.Location = new Point(468, 5);
             pictureBox3.Name = "pictureBox3";
             pictureBox3.Size = new Size(21, 21);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
@@ -562,7 +661,7 @@
             SteamId.ForeColor = Color.FromArgb(0, 0, 238);
             SteamId.Location = new Point(118, 67);
             SteamId.Name = "SteamId";
-            SteamId.Size = new Size(200, 18);
+            SteamId.Size = new Size(139, 18);
             SteamId.TabIndex = 18;
             SteamId.Text = "---";
             SteamId.TextAlign = ContentAlignment.MiddleLeft;
@@ -572,7 +671,7 @@
             // 
             submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             submitRequirementsLabel.LinkColor = Color.FromArgb(192, 0, 192);
-            submitRequirementsLabel.Location = new Point(626, 481);
+            submitRequirementsLabel.Location = new Point(681, 481);
             submitRequirementsLabel.Name = "submitRequirementsLabel";
             submitRequirementsLabel.Size = new Size(60, 23);
             submitRequirementsLabel.TabIndex = 19;
@@ -588,32 +687,11 @@
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 
-            // label10
-            // 
-            label10.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            label10.AutoSize = true;
-            label10.ForeColor = Color.FromArgb(57, 89, 220);
-            label10.Location = new Point(491, 7);
-            label10.Name = "label10";
-            label10.Size = new Size(56, 17);
-            label10.TabIndex = 20;
-            label10.Text = "自动收货";
-            // 
-            // pictureBox5
-            // 
-            pictureBox5.Image = Properties.Resources.auto_accept;
-            pictureBox5.Location = new Point(467, 5);
-            pictureBox5.Name = "pictureBox5";
-            pictureBox5.Size = new Size(21, 21);
-            pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox5.TabIndex = 19;
-            pictureBox5.TabStop = false;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(764, 511);
+            ClientSize = new Size(819, 511);
             Controls.Add(submitRequirementsLabel);
             Controls.Add(SteamId);
             Controls.Add(statusPanel);
@@ -627,7 +705,7 @@
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
-            MinimumSize = new Size(780, 550);
+            MinimumSize = new Size(835, 550);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Steam验证器";
@@ -645,11 +723,15 @@
             buffPage.ResumeLayout(false);
             buffUsersPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ecoPage.ResumeLayout(false);
+            ecoUsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -679,7 +761,7 @@
         private Label acceptOfferBtn;
         private Label declineOfferBtn;
         private Label confirmationBtn;
-        private Panel usersPanel;
+        private SteamUserCollectionPanel usersPanel;
         private ToolStripMenuItem checkVersionMenuItem;
         private ToolStripMenuItem quitMenuItem;
         private Label label3;
@@ -695,7 +777,7 @@
         private TabPage steamPage;
         private TabPage buffPage;
         private Panel statusPanel;
-        private Panel buffUsersPanel;
+        private BuffUserCollectionPanel buffUsersPanel;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private Label SteamId;
@@ -708,5 +790,11 @@
         private Label label9;
         private Label label10;
         private PictureBox pictureBox5;
+        private TabPage ecoPage;
+        private EcoUserCollectionPanel ecoUsersPanel;
+        private PictureBox pictureBox6;
+        private ToolStripMenuItem exportAuthenticatorMenuItem;
+        private Label label11;
+        private PictureBox pictureBox7;
     }
 }

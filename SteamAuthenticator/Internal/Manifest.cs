@@ -6,6 +6,8 @@ namespace Steam_Authenticator.Internal
 {
     internal class Manifest
     {
+        private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
+
         public static Manifest FromFile(string file) => new Manifest(file);
 
         private Manifest(string file)
@@ -54,6 +56,9 @@ namespace Steam_Authenticator.Internal
 
         public bool SaveEntry<T>(string path, string name, string password, T entry) where T : IStreamSerializer
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path, "path");
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, "name");
+
             using (var stream = entry.Serialize())
             {
                 byte[] encrypted = new byte[stream.Length];
@@ -171,10 +176,12 @@ namespace Steam_Authenticator.Internal
 
         private bool Save()
         {
-            using (var fileStream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            if (!locker.Wait(3000))
             {
-                fileStream.SetLength(0);
-
+                return false;
+            }
+            try
+            {
                 using (MemoryStream stream = new MemoryStream())
                 {
                     stream.WriteBoolean(Encrypted);
@@ -206,7 +213,7 @@ namespace Steam_Authenticator.Internal
                     foreach (ManifestEntry entry in Entries)
                     {
                         pathBuffer = Encoding.UTF8.GetBytes(entry.Path);
-                        nameBuffer = Encoding.UTF8.GetBytes(entry.Name);
+                        nameBuffer = Encoding.UTF8.GetBytes(entry.Name ?? "");
                         dataBuffer = entry.Data;
 
                         stream.WriteInt32(pathBuffer.Length);
@@ -222,12 +229,21 @@ namespace Steam_Authenticator.Internal
                         stream.Write(new byte[] { 0x0A });
                     }
 
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
-                }
-            }
+                    using (var fileStream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        fileStream.SetLength(0);
 
-            return true;
+                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.CopyTo(fileStream);
+                    }
+                }
+                OnChanged();
+                return true;
+            }
+            finally
+            {
+                locker.Release();
+            }
         }
 
         private void Load()
@@ -288,6 +304,11 @@ namespace Steam_Authenticator.Internal
             }
         }
 
+        private void OnChanged()
+        {
+            ManifestChanged?.Invoke(this, new ManifestChangedEventArgs(FileName));
+        }
+
         public bool Encrypted { get; set; }
 
         public byte[] IV { get; set; } = new byte[0];
@@ -304,6 +325,8 @@ namespace Steam_Authenticator.Internal
         };
 
         public List<ManifestEntry> Entries { get; private set; } = new List<ManifestEntry>();
+
+        public event ManifestChangedEventHandler ManifestChanged;
 
         public class ManifestEntry
         {

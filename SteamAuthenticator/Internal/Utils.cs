@@ -49,27 +49,42 @@ namespace Steam_Authenticator.Internal
 
         public static async Task<bool> HandleConfirmation(SteamCommunityClient webClient, Guard guard, IEnumerable<Confirmation> confirmations, bool accept, CancellationToken cancellationToken)
         {
-            bool success = false;
-            while (true)
+            if (confirmations == null || !confirmations.Any())
             {
-                if (accept)
-                {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                }
-                else
-                {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-                }
-
-                if (cancellationToken.IsCancellationRequested || success)
-                {
-                    break;
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                return true;
             }
 
-            return success;
+            var tasks = confirmations.Select(async confirm =>
+            {
+                bool success = false;
+                while (true)
+                {
+                    if (accept)
+                    {
+                        success = await webClient.Confirmation.AllowConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
+                    }
+                    else
+                    {
+                        success = await webClient.Confirmation.CancelConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested || success)
+                    {
+                        break;
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                }
+                return success;
+            });
+
+            var results = await Task.WhenAll(tasks);
+            if (results.Any(c => !c))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

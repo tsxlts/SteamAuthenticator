@@ -17,15 +17,16 @@ namespace Steam_Authenticator
         private readonly System.Threading.Timer refreshClientInfoTimer;
         private readonly System.Threading.Timer refreshUserTimer;
         private readonly System.Threading.Timer refreshBuffUserTimer;
+        private readonly System.Threading.Timer refreshEcoUserTimer;
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
-        private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(20);
+        private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(60);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
         private readonly ContextMenuStrip mainNotifyMenuStrip;
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
+        private readonly ContextMenuStrip ecoUserContextMenuStrip;
 
         private bool showBalloonTip = true;
-        private string initialDirectory = null;
         private UserClient currentClient = null;
 
         public MainForm()
@@ -33,6 +34,15 @@ namespace Steam_Authenticator
             InitializeComponent();
 
             CheckForIllegalCrossThreadCalls = false;
+
+            Appsetting.Instance.AppSetting.WithChanged((s, e) =>
+            {
+                usersPanel.RefreshClients();
+            });
+            Appsetting.Instance.Manifest.WithChanged((s, e) =>
+            {
+                usersPanel.RefreshClients();
+            });
 
             var match = Regex.Match(Application.ProductVersion, @"^[\d.]+");
             currentVersion = new Version(match.Value);
@@ -42,6 +52,7 @@ namespace Steam_Authenticator
             refreshClientInfoTimer = new System.Threading.Timer(RefreshClientInfo, null, -1, -1);
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
+            refreshEcoUserTimer = new System.Threading.Timer(RefreshEcoUser, null, -1, -1);
 
             mainNotifyMenuStrip = new ContextMenuStrip();
             mainNotifyMenuStrip.Items.Add("打开").Click += (sender, e) =>
@@ -67,17 +78,21 @@ namespace Steam_Authenticator
             userContextMenuStrip.Items.Add("移除帐号").Click += removeUserMenuItem_Click;
 
             buffUserContextMenuStrip = new ContextMenuStrip();
-            //buffUserContextMenuStrip.Items.Add("设置").Click += buffSettingMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("重新登录").Click += buffReloginMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("退出登录").Click += buffLogoutMenuItem_Click;
             buffUserContextMenuStrip.Items.Add("移除帐号").Click += removeBuffUserMenuItem_Click;
+
+            ecoUserContextMenuStrip = new ContextMenuStrip();
+            ecoUserContextMenuStrip.Items.Add("重新登录").Click += ecoReloginMenuItem_Click;
+            ecoUserContextMenuStrip.Items.Add("退出登录").Click += ecoLogoutMenuItem_Click;
+            ecoUserContextMenuStrip.Items.Add("移除帐号").Click += removeEcoUserMenuItem_Click;
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
 
-            await Task.WhenAll(LoadUsers(), LoadBuffUsers());
+            await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers());
 
             var user = Appsetting.Instance.Clients?.FirstOrDefault(c => c.User.SteamId == Appsetting.Instance.AppSetting.Entry.CurrentUser);
             user = user ?? Appsetting.Instance.Clients?.FirstOrDefault();
@@ -167,7 +182,7 @@ namespace Steam_Authenticator
             {
                 List<Task> tasks = new List<Task>();
 
-                using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+                using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
                 {
                     tasks.Add(QueryOffers(tokenSource.Token));
                     tasks.Add(QueryConfirmations(tokenSource.Token));
@@ -254,6 +269,7 @@ namespace Steam_Authenticator
                 List<Task> tasks = new List<Task>();
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
                 var buffClients = Appsetting.Instance.BuffClients;
+                var ecoClients = Appsetting.Instance.EcoClients;
                 foreach (var client in checkClients)
                 {
                     if (client == null)
@@ -266,8 +282,28 @@ namespace Steam_Authenticator
                         var webClient = client.Client;
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
-                        int offerCount = 0;
-                        int buffOfferCount = 0;
+                        var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
+
+                        bool acceptAll = user.Setting.AutoAcceptGiveOffer;
+                        bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
+                        bool accectEco = acceptAll || user.Setting.AutoAcceptGiveOffer_Eco;
+                        bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
+                        bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
+
+                        bool confirmAll = user.Setting.AutoConfirmTrade;
+                        bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
+                        bool confirmEco = confirmAll || user.Setting.AutoConfirmTrade_Eco;
+                        bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
+                        bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
+
+                        List<Offer> giveOffers = new List<Offer>();
+                        List<Offer> customGiveOffers;
+                        List<Offer> buffGiveOffers = null;
+                        List<Offer> ecoGiveOffers = null;
+                        List<Offer> otherGiveOffers = null;
+
+                        List<Offer> autoConfirmOffers = new List<Offer>();
+
                         try
                         {
                             if (!webClient.LoggedIn)
@@ -275,39 +311,42 @@ namespace Steam_Authenticator
                                 return;
                             }
 
-                            var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: false, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
+                            var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
-                            var offers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
-                            offerCount = offers.Count;
+                            var receivedOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                            var sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
 
-                            if (client.User.SteamId == currentClient?.User.SteamId)
-                            {
-                                OfferCountLabel.Text = $"{offerCount}";
-                                OfferCountLabel.Tag = offers;
-                            }
-
-                            var receiveOffers = offers.Where(c => !(c.ItemsToGive?.Any() ?? false)).ToList();
-                            var giveOffers = offers.Where(c => c.ItemsToGive?.Any() ?? false).ToList();
-
+                            var receiveOffers = receivedOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
                             if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
 
-                            if (user.Setting.AutoAcceptGiveOffer_Custom)
+                            var reveiceGiveOffers = receivedOffers.Where(c => c.ItemsToGive?.Any() ?? false);
+                            var sentGiveOffers = sentOffer.Where(c => c.ItemsToGive?.Any() ?? false);
+
+                            giveOffers.AddRange(reveiceGiveOffers);
+                            giveOffers.AddRange(sentGiveOffers);
+
+                            customGiveOffers = new List<Offer>();
+                            buffGiveOffers = new List<Offer>();
+                            ecoGiveOffers = new List<Offer>();
+                            otherGiveOffers = giveOffers.ToList();
+
+                            #region 自定义报价
+                            if (giveOffers.Any())
                             {
-                                var rules = new[]
+                                var rules = (new[]
                                 {
                                     user.Setting.AutoAcceptGiveOfferRule.OfferMessage,
                                     user.Setting.AutoAcceptGiveOfferRule.AssetName
-                                }.Where(c => c.Enabled);
+                                }).Where(c => c.Enabled);
 
-                                List<Offer> customOffers = new List<Offer>();
                                 foreach (var offer in giveOffers)
                                 {
                                     foreach (var rule in rules)
                                     {
-                                        if (customOffers.Any(c => c.TradeOfferId == offer.TradeOfferId))
+                                        if (customGiveOffers.Any(c => c.TradeOfferId == offer.TradeOfferId))
                                         {
                                             break;
                                         }
@@ -318,7 +357,7 @@ namespace Steam_Authenticator
                                                 string message = offer.Message ?? "";
                                                 if (rule.Check(message))
                                                 {
-                                                    customOffers.Add(offer);
+                                                    customGiveOffers.Add(offer);
                                                 }
                                                 break;
 
@@ -326,68 +365,130 @@ namespace Steam_Authenticator
                                                 var itemDescriptions = descriptions.Where(c => offer.ItemsToGive.Any(a => c.ClassId == a.ClassId && c.InstanceId == a.InstanceId)).ToList();
                                                 if (itemDescriptions.Count > 0 && itemDescriptions.All(d => rule.Check(d.MarketName) || rule.Check(d.MarketHashName)))
                                                 {
-                                                    customOffers.Add(offer);
+                                                    customGiveOffers.Add(offer);
                                                 }
                                                 break;
                                         }
                                     }
                                 }
 
-                                if (customOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid))
-                                {
-                                    HandleOffer(webClient, customOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
-                                }
-
-                                return;
+                                otherGiveOffers.RemoveAll(o => customGiveOffers.Any(c => c.TradeOfferId == o.TradeOfferId));
                             }
+                            #endregion
 
-                            bool acceptAll = user.Setting.AutoAcceptGiveOffer;
-                            bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
-                            bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
-
-                            if (!acceptAll && giveOffers.Any() && buffClinet != null)
+                            #region BUFF 报价
+                            if (giveOffers.Any() && buffClinet != null)
                             {
                                 var buffOffer = buffClinet.QuerySteamTrade().Result;
-                                if (!(buffOffer.Body?.IsSuccess ?? false))
+                                if (buffOffer.Body?.IsSuccess ?? false)
                                 {
-                                    return;
+                                    var buffOfferIds = buffOffer.Body.data?.Select(c => c.tradeofferid)?.ToList() ?? new List<string>();
+                                    buffGiveOffers = giveOffers.Where(c => buffOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => buffOfferIds.Contains(c.TradeOfferId));
                                 }
-
-                                var buffOfferIds = buffOffer.Body.data?.Select(c => c.tradeofferid)?.ToList() ?? new List<string>();
-                                var buffOffers = giveOffers.Where(c => buffOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
-                                buffOfferCount = buffOffers.Count;
-
-                                giveOffers.RemoveAll(c => buffOffers.Any(b => b.TradeOfferId == c.TradeOfferId));
-
-                                if (buffOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetBuff)
+                                else
                                 {
-                                    HandleOffer(webClient, buffOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                    otherGiveOffers = new List<Offer>();
                                 }
                             }
+                            #endregion
 
-                            if (giveOffers.Any(c => c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid) && accpetOther)
+                            #region ECO 报价
+                            if (giveOffers.Any() && ecoClient != null)
                             {
-                                HandleOffer(webClient, giveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                                var ecoOffer = ecoClient.QueryOffers().Result;
+                                if (ecoOffer?.IsSuccess ?? false)
+                                {
+                                    var ecoOfferIds = ecoOffer.StatusData?.ResultData
+                                    ?.Where(c => c.CurrentSteamId == user.SteamId && !string.IsNullOrWhiteSpace(c.OfferId))
+                                    ?.Select(c => c.OfferId)?.ToList() ?? new List<string>();
+                                    ecoGiveOffers = giveOffers.Where(c => ecoOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => ecoOfferIds.Contains(c.TradeOfferId));
+                                }
+                                else
+                                {
+                                    otherGiveOffers = new List<Offer>();
+                                }
                             }
+                            #endregion
+
+                            List<Offer> acceptOffers = new List<Offer>();
+                            if (acceptAll)
+                            {
+                                var acceptItemOffers = giveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && acceptCustom)
+                            {
+                                var acceptItemOffers = customGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accpetBuff)
+                            {
+                                var acceptItemOffers = buffGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accectEco)
+                            {
+                                var acceptItemOffers = ecoGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accpetOther)
+                            {
+                                var acceptItemOffers = otherGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+
+                            acceptOffers = acceptOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
+                            HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+
+                            if (confirmAll)
+                            {
+                                autoConfirmOffers.AddRange(giveOffers);
+                            }
+                            if (!confirmAll && confirmCustom)
+                            {
+                                autoConfirmOffers.AddRange(customGiveOffers);
+                            }
+                            if (!confirmAll && confirmBuff)
+                            {
+                                autoConfirmOffers.AddRange(buffGiveOffers);
+                            }
+                            if (!confirmAll && confirmEco)
+                            {
+                                autoConfirmOffers.AddRange(ecoGiveOffers);
+                            }
+                            if (!confirmAll && confirmOther)
+                            {
+                                autoConfirmOffers.AddRange(otherGiveOffers);
+                            }
+
+                            autoConfirmOffers = autoConfirmOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
                         }
                         catch
                         {
                         }
                         finally
                         {
-                            UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
-                            if (userPanel != null)
+                            client.SetAutoConfirmOffers(autoConfirmOffers);
+                            client.SetGiveOffers(giveOffers);
+
+                            if (user.SteamId == currentClient?.User.SteamId)
                             {
-                                userPanel.SetOffer(offerCount);
+                                OfferCountLabel.Text = $"{giveOffers.Count}";
                             }
+
+                            usersPanel.SetOffer(client, giveOffers.Count);
 
                             if (buffClinet != null)
                             {
-                                BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
-                                if (buffUserPanel != null)
-                                {
-                                    buffUserPanel.SetOffer(buffOfferCount);
-                                }
+                                buffUsersPanel.SetOffer(buffClinet, buffGiveOffers?.Count);
+                            }
+                            if (ecoClient != null)
+                            {
+                                ecoUsersPanel.SetOffer(ecoClient, ecoGiveOffers?.Count);
                             }
                         }
                     });
@@ -407,23 +508,20 @@ namespace Steam_Authenticator
                         if (client.User.SteamId == currentClient?.User.SteamId)
                         {
                             OfferCountLabel.Text = $"---";
-                            OfferCountLabel.Tag = new List<Offer>();
                         }
 
-                        UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId ?? "--", false).FirstOrDefault() as UserPanel;
-                        if (userPanel != null)
-                        {
-                            userPanel.SetOffer(null);
-                        }
+                        usersPanel.SetOffer(client, null);
 
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == client.User.SteamId);
                         if (buffClinet != null)
                         {
-                            BuffUserPanel buffUserPanel = buffUsersPanel.Controls.Find(buffClinet.User.UserId, false).FirstOrDefault() as BuffUserPanel;
-                            if (buffUserPanel != null)
-                            {
-                                buffUserPanel.SetOffer(null);
-                            }
+                            buffUsersPanel.SetOffer(buffClinet, null);
+                        }
+
+                        var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(client.User.SteamId) ?? false);
+                        if (ecoClient != null)
+                        {
+                            ecoUsersPanel.SetOffer(ecoClient, null);
                         }
                     }
                 }));
@@ -488,19 +586,26 @@ namespace Steam_Authenticator
                             ConfirmationCountLable.Text = $"{confirmations.Count}";
                         }
 
-                        UserPanel userPanel = usersPanel.Controls.Find(webClient.SteamId, false).FirstOrDefault() as UserPanel;
-                        if (userPanel != null)
-                        {
-                            userPanel.SetConfirmation(confirmations.Count);
-                        }
+                        usersPanel.SetConfirmation(client, confirmations.Count);
 
                         List<Confirmation> autoConfirm = new List<Confirmation>();
                         List<Confirmation> waitConfirm = new List<Confirmation>();
 
-                        foreach (var conf in confirmations)
+                        foreach (var conf in confirmations.Where(c => c.ConfType != ConfirmationType.Trade))
                         {
-                            if ((conf.ConfType == ConfirmationType.MarketListing && user.Setting.AutoConfirmMarket) ||
-                              (conf.ConfType == ConfirmationType.Trade && user.Setting.AutoConfirmTrade))
+                            if ((conf.ConfType == ConfirmationType.MarketListing && user.Setting.AutoConfirmMarket))
+                            {
+                                autoConfirm.Add(conf);
+                                continue;
+                            }
+
+                            waitConfirm.Add(conf);
+                        }
+
+                        var autoConfirmOffers = client.AutoConfirmOffers;
+                        foreach (var conf in confirmations.Where(c => c.ConfType == ConfirmationType.Trade))
+                        {
+                            if (autoConfirmOffers.Any(o => o.TradeOfferId == $"{conf.CreatorId}"))
                             {
                                 autoConfirm.Add(conf);
                                 continue;
@@ -559,11 +664,7 @@ namespace Steam_Authenticator
                         ConfirmationCountLable.Text = $"---";
                     }
 
-                    UserPanel userPanel = usersPanel.Controls.Find(client.User.SteamId, false).FirstOrDefault() as UserPanel;
-                    if (userPanel != null)
-                    {
-                        userPanel.SetConfirmation(null);
-                    }
+                    usersPanel.SetConfirmation(client, null);
                 }
             }));
 
@@ -605,15 +706,15 @@ namespace Steam_Authenticator
             {
                 using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
                 {
-                    var controlCollection = usersPanel.Controls.Cast<UserPanel>().ToArray();
-                    foreach (UserPanel userPanel in controlCollection)
+                    var controlCollection = usersPanel.ItemPanels;
+                    foreach (SteamUserPanel userPanel in controlCollection)
                     {
-                        if (string.IsNullOrWhiteSpace(userPanel.UserName))
+                        if (!userPanel.HasItem)
                         {
                             continue;
                         }
 
-                        var userClinet = userPanel.UserClient;
+                        var userClinet = userPanel.Client;
                         var client = userClinet.Client;
                         var user = userClinet.User;
 
@@ -626,11 +727,11 @@ namespace Steam_Authenticator
                         bool reloadCurrent = false;
                         if (client.LoggedIn)
                         {
-                            userPanel.SetUserName(userPanel.UserName, Color.Green);
+                            userPanel.SetItemName(userPanel.ItemDisplayName, Color.Green);
                         }
                         else
                         {
-                            userPanel.SetUserName(userPanel.UserName, Color.Red);
+                            userPanel.SetItemName(userPanel.ItemDisplayName, Color.Red);
 
                             reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
                         }
@@ -644,7 +745,7 @@ namespace Steam_Authenticator
                                 user.Avatar = player.AvatarFull;
                                 Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
 
-                                userPanel.SetUserAvatar(user.Avatar);
+                                userPanel.SetItemIcon(user.Avatar);
 
                                 reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
                             }
@@ -685,6 +786,11 @@ namespace Steam_Authenticator
         private void ResetRefreshBuffUserTimer(TimeSpan dueTime, TimeSpan period)
         {
             refreshBuffUserTimer.Change(dueTime, period);
+        }
+
+        private void ResetRefreshEcoUserTimer(TimeSpan dueTime, TimeSpan period)
+        {
+            refreshEcoUserTimer.Change(dueTime, period);
         }
 
         private async Task<bool> CheckVersion()
