@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Offers));
             panel1 = new Panel();
+            sentOffer = new CheckBox();
+            receivedOffer = new CheckBox();
             refreshBtn = new Label();
             declineAllBtn = new Label();
             acceptAllBtn = new Label();
@@ -41,13 +43,43 @@
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.FromArgb(255, 248, 220);
+            panel1.Controls.Add(sentOffer);
+            panel1.Controls.Add(receivedOffer);
             panel1.Controls.Add(refreshBtn);
             panel1.Controls.Add(declineAllBtn);
             panel1.Controls.Add(acceptAllBtn);
             panel1.Location = new Point(1, 1);
             panel1.Name = "panel1";
-            panel1.Size = new Size(365, 40);
+            panel1.Size = new Size(435, 40);
             panel1.TabIndex = 0;
+            // 
+            // sentOffer
+            // 
+            sentOffer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            sentOffer.AutoSize = true;
+            sentOffer.ForeColor = Color.DeepSkyBlue;
+            sentOffer.Location = new Point(63, 12);
+            sentOffer.Name = "sentOffer";
+            sentOffer.Size = new Size(87, 21);
+            sentOffer.TabIndex = 11;
+            sentOffer.Text = "发送的报价";
+            sentOffer.UseVisualStyleBackColor = true;
+            sentOffer.CheckedChanged += offerRole_CheckedChanged;
+            // 
+            // receivedOffer
+            // 
+            receivedOffer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            receivedOffer.AutoSize = true;
+            receivedOffer.Checked = true;
+            receivedOffer.CheckState = CheckState.Checked;
+            receivedOffer.ForeColor = Color.FromArgb(155, 48, 255);
+            receivedOffer.Location = new Point(156, 12);
+            receivedOffer.Name = "receivedOffer";
+            receivedOffer.Size = new Size(87, 21);
+            receivedOffer.TabIndex = 10;
+            receivedOffer.Text = "收到的报价";
+            receivedOffer.UseVisualStyleBackColor = true;
+            receivedOffer.CheckedChanged += offerRole_CheckedChanged;
             // 
             // refreshBtn
             // 
@@ -55,7 +87,7 @@
             refreshBtn.AutoSize = true;
             refreshBtn.Cursor = Cursors.Hand;
             refreshBtn.ForeColor = Color.Green;
-            refreshBtn.Location = new Point(179, 13);
+            refreshBtn.Location = new Point(249, 13);
             refreshBtn.Name = "refreshBtn";
             refreshBtn.Size = new Size(56, 17);
             refreshBtn.TabIndex = 9;
@@ -68,7 +100,7 @@
             declineAllBtn.AutoSize = true;
             declineAllBtn.Cursor = Cursors.Hand;
             declineAllBtn.ForeColor = Color.Red;
-            declineAllBtn.Location = new Point(303, 13);
+            declineAllBtn.Location = new Point(373, 13);
             declineAllBtn.Name = "declineAllBtn";
             declineAllBtn.Size = new Size(56, 17);
             declineAllBtn.TabIndex = 8;
@@ -81,7 +113,7 @@
             acceptAllBtn.AutoSize = true;
             acceptAllBtn.Cursor = Cursors.Hand;
             acceptAllBtn.ForeColor = Color.Green;
-            acceptAllBtn.Location = new Point(241, 13);
+            acceptAllBtn.Location = new Point(311, 13);
             acceptAllBtn.Name = "acceptAllBtn";
             acceptAllBtn.Size = new Size(56, 17);
             acceptAllBtn.TabIndex = 7;
@@ -94,14 +126,14 @@
             offersPanel.BackColor = Color.White;
             offersPanel.Location = new Point(1, 47);
             offersPanel.Name = "offersPanel";
-            offersPanel.Size = new Size(365, 228);
+            offersPanel.Size = new Size(435, 228);
             offersPanel.TabIndex = 3;
             // 
             // Offers
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(367, 276);
+            ClientSize = new Size(437, 276);
             Controls.Add(offersPanel);
             Controls.Add(panel1);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -122,5 +154,7 @@
         private Label acceptAllBtn;
         private Label refreshBtn;
         private Panel offersPanel;
+        private CheckBox sentOffer;
+        private CheckBox receivedOffer;
     }
 }

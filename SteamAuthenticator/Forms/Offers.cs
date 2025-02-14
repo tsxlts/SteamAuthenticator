@@ -41,6 +41,11 @@ namespace Steam_Authenticator.Forms
 
             Text = $"交易报价 [{client.GetAccount()}]";
 
+            receivedOffer.Checked = true;
+            sentOffer.Checked = true;
+            receivedOffer.Enabled = false;
+            sentOffer.Enabled = false;
+
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
             offersPanel.AutoScroll = true;
@@ -235,8 +240,16 @@ namespace Steam_Authenticator.Forms
                     cancellationToken: cancellationToken);
 
                 var descriptions = queryOffers.Descriptions ?? new List<BaseDescription>();
-                var offers = queryOffers?.TradeOffersReceived?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>();
-                offers.AddRange(queryOffers?.TradeOffersSent?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>());
+                var offers = new List<Offer>();
+
+                if (sentOffer.Checked)
+                {
+                    offers.AddRange(queryOffers?.TradeOffersSent?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>());
+                }
+                if (receivedOffer.Checked)
+                {
+                    offers.AddRange(queryOffers?.TradeOffersReceived?.OrderBy(c => c.TimeCreated)?.ToList() ?? new List<Offer>());
+                }
                 thisOffers = offers;
 
                 offersPanel.Controls.Clear();
@@ -327,28 +340,45 @@ namespace Steam_Authenticator.Forms
 
                     StringBuilder statusBuilder = new StringBuilder();
                     Color statusColor = Color.FromArgb(0, 0, 238);
-                    switch (offer.ConfirmationMethod)
+                    if (offer.IsOurOffer)
                     {
-                        case TradeOfferConfirmationMethod.Email:
-                            stringBuilder.AppendLine("等待你 邮箱令牌确认");
-                            statusColor = Color.FromArgb(238, 0, 238);
-                            break;
-                        case TradeOfferConfirmationMethod.MobileApp:
-                            statusBuilder.AppendLine("等待你 手机令牌确认");
-                            statusColor = Color.FromArgb(238, 0, 238);
-                            break;
+                        switch (offer.TradeOfferState)
+                        {
+                            case TradeOfferState.NeedsConfirmation:
+                                statusBuilder.AppendLine($"等待你 {(offer.ConfirmationMethod == TradeOfferConfirmationMethod.Email ? "邮箱令牌确认" : "手机令牌确认")}");
+                                statusColor = Color.FromArgb(238, 0, 238);
+                                break;
 
-                        case TradeOfferConfirmationMethod.Invalid:
-                        default:
-                            statusBuilder.AppendLine("等待你 接受报价");
-                            break;
+                            default:
+                                statusBuilder.AppendLine($"等待对方 接受报价");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (offer.ConfirmationMethod)
+                        {
+                            case TradeOfferConfirmationMethod.Email:
+                                statusBuilder.AppendLine("等待你 邮箱令牌确认");
+                                statusColor = Color.FromArgb(238, 0, 238);
+                                break;
+                            case TradeOfferConfirmationMethod.MobileApp:
+                                statusBuilder.AppendLine("等待你 手机令牌确认");
+                                statusColor = Color.FromArgb(238, 0, 238);
+                                break;
+
+                            case TradeOfferConfirmationMethod.Invalid:
+                            default:
+                                statusBuilder.AppendLine($"等待你 接受报价");
+                                break;
+                        }
                     }
 
                     Label nameLabel = new Label()
                     {
                         Text = $"{stringBuilder}",
                         AutoSize = true,
-                        ForeColor = Color.Green,
+                        ForeColor = offer.IsOurOffer ? sentOffer.ForeColor : receivedOffer.ForeColor,
                         Location = new Point(90, 20),
                         BackColor = Color.Transparent
                     };
@@ -366,7 +396,7 @@ namespace Steam_Authenticator.Forms
                         {
                             Text = $"{offer.Message}",
                             AutoSize = true,
-                            ForeColor = Color.FromArgb(32, 64, 205),
+                            ForeColor = Color.FromArgb(128, 128, 128),
                             Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
                             BackColor = Color.Transparent
                         };
@@ -446,6 +476,11 @@ namespace Steam_Authenticator.Forms
                 refreshBtn.Enabled = true;
                 refreshBtn.Focus();
             }
+        }
+
+        private async void offerRole_CheckedChanged(object sender, EventArgs e)
+        {
+            await RefreshOffers(default);
         }
     }
 }

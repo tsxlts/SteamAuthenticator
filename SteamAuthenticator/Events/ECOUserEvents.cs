@@ -30,7 +30,7 @@ namespace Steam_Authenticator
 
         private async void addEcoUserBtn_Click(object sender, EventArgs e)
         {
-            await EcoLogin("请扫码登录 ECO 帐号");
+            await EcoLogin($"请使用 ECO App 扫码{Environment.NewLine}登录 ECO 帐号");
         }
 
         private async void ecoReloginMenuItem_Click(object sender, EventArgs e)

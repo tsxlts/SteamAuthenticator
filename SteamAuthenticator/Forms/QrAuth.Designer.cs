@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QrAuth));
             qrBox = new PictureBox();
+            msg = new Label();
             ((System.ComponentModel.ISupportInitialize)qrBox).BeginInit();
             SuspendLayout();
             // 
@@ -44,11 +45,22 @@
             qrBox.TabIndex = 0;
             qrBox.TabStop = false;
             // 
+            // msg
+            // 
+            msg.ForeColor = Color.Red;
+            msg.Location = new Point(12, 212);
+            msg.Name = "msg";
+            msg.Size = new Size(199, 38);
+            msg.TabIndex = 8;
+            msg.Text = "请使用 Steam App 扫码\r\n登录 Steam 帐号";
+            msg.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // QrAuth
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(223, 218);
+            ClientSize = new Size(223, 256);
+            Controls.Add(msg);
             Controls.Add(qrBox);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -66,5 +78,6 @@
         #endregion
 
         private PictureBox qrBox;
+        private Label msg;
     }
 }

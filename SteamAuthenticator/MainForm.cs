@@ -54,6 +54,30 @@ namespace Steam_Authenticator
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
             refreshEcoUserTimer = new System.Threading.Timer(RefreshEcoUser, null, -1, -1);
 
+            var usersPanelContextMenuStrip = new ContextMenuStrip();
+            usersPanelContextMenuStrip.Items.Add("刷新").Click += (send, e) =>
+            {
+                usersPanel.Reset();
+            };
+            usersPanelContextMenuStrip.Items.Add("添加帐号").Click += addUserBtn_Click;
+            usersPanel.ContextMenuStrip = usersPanelContextMenuStrip;
+
+            var buffUsersPanelContextMenuStrip = new ContextMenuStrip();
+            buffUsersPanelContextMenuStrip.Items.Add("刷新").Click += (send, e) =>
+            {
+                buffUsersPanel.Reset();
+            };
+            buffUsersPanelContextMenuStrip.Items.Add("添加帐号").Click += addBuffUserBtn_Click;
+            buffUsersPanel.ContextMenuStrip = buffUsersPanelContextMenuStrip;
+
+            var ecoUsersPanelContextMenuStrip = new ContextMenuStrip();
+            ecoUsersPanelContextMenuStrip.Items.Add("刷新").Click += (send, e) =>
+            {
+                ecoUsersPanel.Reset();
+            };
+            ecoUsersPanelContextMenuStrip.Items.Add("添加帐号").Click += addEcoUserBtn_Click;
+            ecoUsersPanel.ContextMenuStrip = ecoUsersPanelContextMenuStrip;
+
             mainNotifyMenuStrip = new ContextMenuStrip();
             mainNotifyMenuStrip.Items.Add("打开").Click += (sender, e) =>
             {
@@ -296,6 +320,8 @@ namespace Steam_Authenticator
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
+                        List<Offer> receivedOffers = new List<Offer>();
+                        List<Offer> sentOffer = new List<Offer>();
                         List<Offer> giveOffers = new List<Offer>();
                         List<Offer> customGiveOffers;
                         List<Offer> buffGiveOffers = null;
@@ -313,8 +339,8 @@ namespace Steam_Authenticator
 
                             var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
                             var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
-                            var receivedOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
-                            var sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
+                            receivedOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
+                            sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
 
                             var receiveOffers = receivedOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
                             if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
@@ -473,14 +499,14 @@ namespace Steam_Authenticator
                         finally
                         {
                             client.SetAutoConfirmOffers(autoConfirmOffers);
-                            client.SetGiveOffers(giveOffers);
+                            client.SetReceivedOffers(receivedOffers);
 
                             if (user.SteamId == currentClient?.User.SteamId)
                             {
-                                OfferCountLabel.Text = $"{giveOffers.Count}";
+                                OfferCountLabel.Text = $"{receivedOffers.Count}";
                             }
 
-                            usersPanel.SetOffer(client, giveOffers.Count);
+                            usersPanel.SetOffer(client, receivedOffers.Count);
 
                             if (buffClinet != null)
                             {

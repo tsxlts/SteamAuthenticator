@@ -971,7 +971,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                IEnumerable<Offer> offers = currentClient.ReceivedOffers;
                 if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;
@@ -1007,7 +1007,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                IEnumerable<Offer> offers = currentClient.ReceivedOffers;
                 if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;

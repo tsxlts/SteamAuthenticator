@@ -71,7 +71,7 @@ namespace Steam_Authenticator.Controls
             {
                 int height = ItemSize.Height;
 
-                var controlCollection = this.Controls.Cast<Panel>().ToArray();
+                var controlCollection = Sort(this.Controls.Cast<TItemPanel>().ToArray());
 
                 int index = 0;
                 foreach (Panel control in controlCollection)
@@ -104,6 +104,11 @@ namespace Steam_Authenticator.Controls
         }
 
         public readonly List<TItemPanel> ItemPanels = new List<TItemPanel>();
+
+        protected virtual TItemPanel[] Sort(TItemPanel[] itemPanels)
+        {
+            return itemPanels;
+        }
 
         protected abstract Size ItemSize { get; }
 
