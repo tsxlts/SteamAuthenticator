@@ -4,6 +4,11 @@
     {
         public BuffUserPanel SetOffer(BuffClient client, int? offerCount)
         {
+            if (client == null)
+            {
+                return null;
+            }
+
             var panel = ItemPanels.Find(c => c.Client?.Key?.Equals(client.Key) ?? false);
             panel?.SetOffer(offerCount);
             return panel;

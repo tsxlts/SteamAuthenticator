@@ -143,6 +143,7 @@
             Name = "Login";
             StartPosition = FormStartPosition.CenterParent;
             Text = "登录";
+            FormClosing += Login_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

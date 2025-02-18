@@ -424,7 +424,7 @@ namespace Steam_Authenticator
             versionLabel.TabStop = true;
             versionLabel.Text = "v1.0.0";
             versionLabel.TextAlign = ContentAlignment.MiddleRight;
-            versionLabel.LinkClicked += versionLabel_LinkClicked;
+            versionLabel.LinkClicked += checkVersionMenuItem_Click;
             // 
             // label6
             // 

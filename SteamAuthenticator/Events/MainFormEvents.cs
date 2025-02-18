@@ -113,14 +113,6 @@ namespace Steam_Authenticator
             }
         }
 
-        private async void versionLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            if (!await CheckVersion())
-            {
-                MessageBox.Show("当前客户端已是最新版本", "版本更新", MessageBoxButtons.OK);
-            }
-        }
-
         private void submitRequirementsLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             SubmitRequirements();

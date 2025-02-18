@@ -43,8 +43,8 @@ namespace Steam_Authenticator.Forms
 
             receivedOffer.Checked = true;
             sentOffer.Checked = true;
-            receivedOffer.Enabled = false;
-            sentOffer.Enabled = false;
+            receivedOffer.Visible = false;
+            sentOffer.Visible = false;
 
             await RefreshOffers(new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
@@ -239,7 +239,7 @@ namespace Steam_Authenticator.Forms
                 var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true,
                     cancellationToken: cancellationToken);
 
-                var descriptions = queryOffers.Descriptions ?? new List<BaseDescription>();
+                var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
                 var offers = new List<Offer>();
 
                 if (sentOffer.Checked)
@@ -286,7 +286,9 @@ namespace Steam_Authenticator.Forms
 
                 IEnumerable<BaseDescription> giveDescription;
                 IEnumerable<BaseDescription> receiveDescription;
-                StringBuilder stringBuilder;
+                StringBuilder nameBuilder;
+                StringBuilder assetBuilder;
+                StringBuilder statusBuilder;
                 PlayerSummaries player;
 
                 foreach (var offer in offers)
@@ -311,34 +313,41 @@ namespace Steam_Authenticator.Forms
                         panel.Controls.Add(pictureBox);
                     }
 
-                    stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine($"{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(offer.TimeCreated).ToLocalTime():yyyy/MM/dd HH:mm:ss}" +
+                    nameBuilder = new StringBuilder();
+                    nameBuilder.AppendLine($"{new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(offer.TimeCreated).ToLocalTime():yyyy/MM/dd HH:mm:ss}" +
                         $"\n{(offer.IsOurOffer ? $"你向 {player?.SteamName ?? offer.AccountIdOther.ToString()} 发起报价" : $"你收到来自 {player?.SteamName ?? offer.AccountIdOther.ToString()} 的报价")}");
+                    if (player != null)
+                    {
+                        nameBuilder.AppendLine($"{player.SteamName} {DateTime.UnixEpoch.AddSeconds(player.TimeCreated).ToLocalTime():yyyy 年 MM 月 dd 日 HH 时 mm 分} 加入Steam");
+                    }
 
+                    assetBuilder = new StringBuilder();
+                    Color assetColor = Color.Green;
                     if (giveDescription?.Any() ?? false)
                     {
+                        assetColor = Color.Red;
                         if (offer.ItemsToGive.Count > 1)
                         {
-                            stringBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName} 等多件物品");
+                            assetBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName} 等多件物品");
                         }
                         else
                         {
-                            stringBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName}");
+                            assetBuilder.AppendLine($"您将送出 {giveDescription.First().MarketName}");
                         }
                     }
                     if (receiveDescription?.Any() ?? false)
                     {
                         if (offer.ItemsToReceive.Count > 1)
                         {
-                            stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} 等多件物品");
+                            assetBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} 等多件物品");
                         }
                         else
                         {
-                            stringBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} ");
+                            assetBuilder.AppendLine($"您将收到 {receiveDescription.First().MarketName} ");
                         }
                     }
 
-                    StringBuilder statusBuilder = new StringBuilder();
+                    statusBuilder = new StringBuilder();
                     Color statusColor = Color.FromArgb(0, 0, 238);
                     if (offer.IsOurOffer)
                     {
@@ -374,19 +383,32 @@ namespace Steam_Authenticator.Forms
                         }
                     }
 
+                    int y = 20;
                     Label nameLabel = new Label()
                     {
-                        Text = $"{stringBuilder}",
+                        Text = $"{nameBuilder}",
                         AutoSize = true,
-                        ForeColor = offer.IsOurOffer ? sentOffer.ForeColor : receivedOffer.ForeColor,
-                        Location = new Point(90, 20),
+                        ForeColor = Color.DeepSkyBlue,// offer.IsOurOffer ? sentOffer.ForeColor : receivedOffer.ForeColor,
+                        Location = new Point(90, y),
                         BackColor = Color.Transparent
                     };
                     panel.Controls.Add(nameLabel);
 
+                    y = y + nameLabel.Height + 10;
+                    Label assetLabel = new Label()
+                    {
+                        Text = $"{assetBuilder}",
+                        AutoSize = true,
+                        ForeColor = assetColor,
+                        Location = new Point(90, y),
+                        BackColor = Color.Transparent
+                    };
+                    panel.Controls.Add(assetLabel);
+
+                    y = y + assetLabel.Height + 10;
                     Label summaryLabel = new Label()
                     {
-                        Location = new Point(90, nameLabel.Height + nameLabel.Location.Y),
+                        Location = new Point(90, y),
                         AutoSize = false,
                         Height = 0
                     };
@@ -397,26 +419,28 @@ namespace Steam_Authenticator.Forms
                             Text = $"{offer.Message}",
                             AutoSize = true,
                             ForeColor = Color.FromArgb(128, 128, 128),
-                            Location = new Point(90, nameLabel.Height + nameLabel.Location.Y + 10),
+                            Location = new Point(90, y),
                             BackColor = Color.Transparent
                         };
                         panel.Controls.Add(summaryLabel);
                     }
 
+                    y = y + summaryLabel.Height + 10;
                     Label statusLabel = new Label()
                     {
                         Text = $"{statusBuilder}",
                         AutoSize = true,
                         ForeColor = statusColor,
-                        Location = new Point(90, summaryLabel.Height + summaryLabel.Location.Y + 10),
+                        Location = new Point(90, y),
                         BackColor = Color.Transparent
                     };
                     panel.Controls.Add(statusLabel);
 
+                    y = y + statusLabel.Height + 10;
                     OfferButton acceptButton = new OfferButton()
                     {
                         Text = "接受",
-                        Location = new Point(90, statusLabel.Height + statusLabel.Location.Y + 10),
+                        Location = new Point(90, y),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
@@ -432,7 +456,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton cancelButton = new OfferButton()
                     {
                         Text = "拒绝",
-                        Location = new Point(180, statusLabel.Height + statusLabel.Location.Y + 10),
+                        Location = new Point(180, y),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
@@ -448,7 +472,7 @@ namespace Steam_Authenticator.Forms
                     OfferButton detailButton = new OfferButton()
                     {
                         Text = "查看",
-                        Location = new Point(270, statusLabel.Height + statusLabel.Location.Y + 10),
+                        Location = new Point(270, y),
                         FlatStyle = FlatStyle.Flat,
                         FlatAppearance = { BorderSize = 0 },
                         BackColor = Color.FromArgb(102, 153, 255),
