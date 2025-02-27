@@ -17,7 +17,7 @@
             versionBox.Text = currentVersion.ToString();
 
             qqBox.Text = "2570096963";
-            wechatBox.Text = "s2570096963";
+            wechatBox.Text = "**********";
         }
 
         private void copyProjectBtn_Click(object sender, EventArgs e)

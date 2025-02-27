@@ -166,7 +166,6 @@
             // 
             // label2
             // 
-            label2.Cursor = Cursors.Hand;
             label2.ForeColor = Color.Gray;
             label2.ImageAlign = ContentAlignment.MiddleLeft;
             label2.Location = new Point(91, 67);
@@ -178,7 +177,6 @@
             // 
             // label5
             // 
-            label5.Cursor = Cursors.Hand;
             label5.ForeColor = Color.Gray;
             label5.ImageAlign = ContentAlignment.MiddleLeft;
             label5.Location = new Point(91, 95);
