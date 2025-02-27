@@ -84,7 +84,7 @@ namespace Steam_Authenticator
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
         public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
 
-        private List<Offer> giveOffers = new List<Offer>();
+        private List<Offer> receivedOffers = new List<Offer>();
         private List<Offer> autoConfirmOffers = new List<Offer>();
         private Action startLogin = null;
         private Action<bool> endLogin = null;
@@ -103,7 +103,10 @@ namespace Steam_Authenticator
 
         public List<Offer> AutoConfirmOffers => autoConfirmOffers ?? new List<Offer>();
 
-        public List<Offer> GiveOffers => giveOffers ?? new List<Offer>();
+        /// <summary>
+        /// 收到的报价
+        /// </summary>
+        public List<Offer> ReceivedOffers => receivedOffers ?? new List<Offer>();
 
         public UserClient WithStartLogin(Action action)
         {
@@ -122,9 +125,9 @@ namespace Steam_Authenticator
             autoConfirmOffers = offers;
         }
 
-        public void SetGiveOffers(List<Offer> offers)
+        public void SetReceivedOffers(List<Offer> offers)
         {
-            giveOffers = offers;
+            receivedOffers = offers;
         }
 
         /// <summary>

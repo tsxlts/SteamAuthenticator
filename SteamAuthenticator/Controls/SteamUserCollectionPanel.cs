@@ -36,6 +36,18 @@ namespace Steam_Authenticator.Controls
 
         protected override Size ItemSize => new Size(80, 136);
 
+        protected override SteamUserPanel[] Sort(SteamUserPanel[] itemPanels)
+        {
+            var sortResults = itemPanels.OrderBy(c =>
+            {
+                Guard guard = Appsetting.Instance.Manifest.GetGuard(c.Client.GetAccount());
+                return guard != null ? 1 : 9;
+            }).ThenBy(c => c.Client.User.Setting.AutoAcceptGive() ? 1 : 9)
+            .ThenBy(c => c.Client.User.Setting.AutoConfirmOffer() ? 1 : 9)
+            .ThenBy(c => c.Client.User.Setting.AutoAcceptReceive() ? 1 : 9);
+            return base.Sort(sortResults.ToArray());
+        }
+
         protected override SteamUserPanel CreateUserPanel(bool hasUser, UserClient client)
         {
             int index = ItemPanels.Count;

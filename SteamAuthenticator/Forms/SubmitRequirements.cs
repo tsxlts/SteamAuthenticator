@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using SteamKit;
+﻿using Steam_Authenticator.Internal;
 using System.Diagnostics;
-using System.Net.Http.Json;
-using static Steam_Authenticator.Factory.HttpClientFactory;
 
 namespace Steam_Authenticator.Forms
 {
@@ -48,38 +45,28 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                string api = "http://api.vdaima.cn/steam/Api/SteamAuthenticator/SubmitRequirements";
-                var response = await SteamApi.PostAsync<JObject>(api, JsonContent.Create(new
-                {
-                    Project = "SteamAuthenticator",
-                    Subject = subject,
-                    Body = body,
-                    ContactInfo = contactInfo,
-                }), proxy: NoProxy.Instance);
-                var responseBody = response.Body;
-                if (responseBody == null)
+                var response = await AuthenticatorApi.SubmitRequirements(subject, body, contactInfo);
+                if (response == null)
                 {
                     MessageBox.Show($"提交失败，请前往SteamAuthenticator项目主页提交需求", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Process.Start(new ProcessStartInfo($"https://github.com/tsxlts/SteamAuthenticator/issues") { UseShellExecute = true });
+                    Process.Start(new ProcessStartInfo(ProjectInfo.Issues) { UseShellExecute = true });
                     DialogResult = DialogResult.OK;
                     return;
                 }
 
-                var resultCode = responseBody.Value<string>("ResultCode");
-                var resultMsg = responseBody.Value<string>("ResultMsg");
-                if (!"0".Equals(resultCode))
+                if (!response.IsSuccess())
                 {
-                    MessageBox.Show($"提交失败{Environment.NewLine}{resultMsg}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"提交失败{Environment.NewLine}{response.ResultMsg}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                MessageBox.Show($"提交成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(response?.ResultData?.Msg ?? $"提交成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 DialogResult = DialogResult.OK;
             }
             catch (HttpRequestException)
             {
                 MessageBox.Show($"提交失败，请前往SteamAuthenticator项目主页提交需求", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Process.Start(new ProcessStartInfo($"https://github.com/tsxlts/SteamAuthenticator/issues") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(ProjectInfo.Issues) { UseShellExecute = true });
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
@@ -89,6 +76,16 @@ namespace Steam_Authenticator.Forms
             finally
             {
                 submit.Enabled = true;
+            }
+        }
+
+        private void bodyBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                bodyBox.SelectedText = Environment.NewLine;
+                e.SuppressKeyPress = true;
+                e.Handled = true;
             }
         }
     }

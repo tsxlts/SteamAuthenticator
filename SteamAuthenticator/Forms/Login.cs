@@ -6,11 +6,18 @@ namespace Steam_Authenticator.Forms
 {
     public partial class Login : Form
     {
+        private bool closed = false;
+
         public Login(string account)
         {
             InitializeComponent();
 
             User.Text = account ?? "";
+        }
+
+        private void Login_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            closed = true;
         }
 
         private async void loginBtn_Click(object sender, EventArgs e)
@@ -68,20 +75,41 @@ namespace Steam_Authenticator.Forms
                     return false;
                 });
 
+                string error = "";
                 var guard = Appsetting.Instance.Manifest.GetGuard(user);
-                int index = 5;
-                while (index > 0 && !cts.IsCancellationRequested)
+                int errorTimes = 0;
+                int waitTime = 0;
+                while (errorTimes < 5 && !cts.IsCancellationRequested && !closed)
                 {
-                    index--;
-
                     try
                     {
+                        waitTime = 1200;
+
                         if (login.AllowedConfirmations!.Any(c => c.ConfirmationType == AuthConfirmationType.DeviceCode))
                         {
                             string code = null;
                             if (!string.IsNullOrWhiteSpace(guard?.SharedSecret))
                             {
+                                error = $"请确认本设备上的令牌信息是否有效," +
+                                    $"{Environment.NewLine}" +
+                                    $"如果你已经转移了你的令牌, 请在令牌页面删除本设备上的令牌";
+
                                 code = GuardCodeGenerator.GenerateSteamGuardCode(Extension.GetSteamTimestampAsync().Result, guard.SharedSecret);
+
+                                if (errorTimes > 3)
+                                {
+                                    input = new Input("确认登录",
+                                    $"你的令牌似乎已经失效了" +
+                                    $"{Environment.NewLine}" +
+                                    $"如果你已经转移了你的令牌, 请在新的设备上确认登录" +
+                                    $"{Environment.NewLine}" +
+                                    $"或者输入手机令牌", required: true, errorMsg: "请输入手机令牌");
+
+                                    if (input.ShowDialog() == DialogResult.OK)
+                                    {
+                                        code = input.InputValue;
+                                    }
+                                };
                             }
                             else
                             {
@@ -91,13 +119,23 @@ namespace Steam_Authenticator.Forms
                                     $"或者输入手机令牌", required: true, errorMsg: "请输入手机令牌");
                                 if (input.ShowDialog() != DialogResult.OK)
                                 {
-                                    return;
+                                    waitTime = 0;
+                                    break;
                                 }
+
+                                error = "请确认你输入的手机令牌是否有效";
 
                                 code = input.InputValue;
                             }
 
                             bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.DeviceCode, code, default);
+                            if (checkCode)
+                            {
+                                waitTime = 0;
+                                break;
+                            }
+
+                            errorTimes++;
                             continue;
                         }
 
@@ -106,11 +144,21 @@ namespace Steam_Authenticator.Forms
                             input = new Input("确认登录", "请输入邮箱令牌", required: true, errorMsg: "请输入邮箱令牌");
                             if (input.ShowDialog() != DialogResult.OK)
                             {
-                                return;
+                                waitTime = 0;
+                                break;
                             }
+
+                            error = "请确认你输入的邮箱令牌是否有效";
 
                             string code = input.InputValue;
                             bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.EmailCode, code, default);
+                            if (checkCode)
+                            {
+                                waitTime = 0;
+                                break;
+                            }
+
+                            errorTimes++;
                             continue;
                         }
                     }
@@ -120,15 +168,15 @@ namespace Steam_Authenticator.Forms
                     }
                     finally
                     {
-                        await Task.Delay(2000);
+                        await Task.Delay(waitTime);
                     }
                 }
                 cts.Cancel();
 
                 var success = await task;
-                if (!success)
+                if (!success && !closed)
                 {
-                    MessageBox.Show($"登录失败,请验证令牌信息失败正确");
+                    MessageBox.Show($"登录失败{Environment.NewLine}{error}", "登录", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)

@@ -54,37 +54,55 @@ namespace Steam_Authenticator.Internal
                 return true;
             }
 
-            var tasks = confirmations.Select(async confirm =>
+            if (confirmations.Count() == 1)
             {
-                bool success = false;
-                while (true)
-                {
-                    if (accept)
-                    {
-                        success = await webClient.Confirmation.AllowConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
-                    }
-                    else
-                    {
-                        success = await webClient.Confirmation.CancelConfirmationAsync(confirm, guard.DeviceId, guard.IdentitySecret);
-                    }
-
-                    if (cancellationToken.IsCancellationRequested || success)
-                    {
-                        break;
-                    }
-
-                    await Task.Delay(TimeSpan.FromSeconds(2));
-                }
-                return success;
-            });
-
-            var results = await Task.WhenAll(tasks);
-            if (results.Any(c => !c))
-            {
-                return false;
+                goto SingleConfirm;
             }
 
-            return true;
+            bool success = false;
+            if (accept)
+            {
+                success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+            }
+            else
+            {
+                success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+            }
+            if (success)
+            {
+                return true;
+            }
+
+        SingleConfirm:
+            var tasks = confirmations.Select(confirm => HandleConfirmation(webClient, guard, confirm, accept, cancellationToken));
+            var results = await Task.WhenAll(tasks);
+            success = !results.All(c => c == false);
+
+            return success;
+        }
+
+        public static async Task<bool> HandleConfirmation(SteamCommunityClient webClient, Guard guard, Confirmation confirmation, bool accept, CancellationToken cancellationToken)
+        {
+            bool success = false;
+            while (true)
+            {
+                if (accept)
+                {
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
+                }
+                else
+                {
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
+                }
+
+                if (cancellationToken.IsCancellationRequested || success)
+                {
+                    break;
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+            return success;
         }
     }
 }

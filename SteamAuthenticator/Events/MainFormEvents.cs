@@ -113,19 +113,6 @@ namespace Steam_Authenticator
             }
         }
 
-        private async void versionLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            if (!await CheckVersion())
-            {
-                MessageBox.Show("当前客户端已是最新版本", "版本更新", MessageBoxButtons.OK);
-            }
-        }
-
-        private void submitRequirementsLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            SubmitRequirements();
-        }
-
         private void quitMenuItem_Click(object sender, EventArgs e)
         {
             Environment.Exit(Environment.ExitCode);
@@ -915,7 +902,49 @@ namespace Steam_Authenticator
 
         private void submitRequirementsMenuItem_Click(object sender, EventArgs e)
         {
-            SubmitRequirements();
+            var submitRequirements = new SubmitRequirements(this);
+            submitRequirements.ShowDialog();
+        }
+
+        private async void submitBugMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                RichTextInput richTextInput = new RichTextInput("反馈问题", "请输入您遇到的问题", true, "请输入您遇到的问题");
+                richTextInput.ShowDialog();
+                string body = richTextInput.InputValue;
+                if (string.IsNullOrWhiteSpace(body))
+                {
+                    return;
+                }
+
+                var response = await AuthenticatorApi.SubmitBug(currentVersion, body);
+                if (response == null)
+                {
+                    MessageBox.Show($"提交失败，请前往SteamAuthenticator项目主页反馈问题", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Process.Start(new ProcessStartInfo(ProjectInfo.Issues) { UseShellExecute = true });
+                    DialogResult = DialogResult.OK;
+                    return;
+                }
+
+                if (!response.IsSuccess())
+                {
+                    MessageBox.Show($"提交失败{Environment.NewLine}{response.ResultMsg}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                MessageBox.Show(response?.ResultData?.Msg ?? $"提交成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"提交失败{Environment.NewLine}{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void aboutMenuItem_Click(object sender, EventArgs e)
+        {
+            var about = new About(currentVersion);
+            about.ShowDialog();
         }
 
         private void confirmationBtn_Click(object sender, EventArgs e)
@@ -971,7 +1000,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                IEnumerable<Offer> offers = currentClient.ReceivedOffers;
                 if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;
@@ -1007,7 +1036,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                IEnumerable<Offer> offers = currentClient.GiveOffers;
+                IEnumerable<Offer> offers = currentClient.ReceivedOffers;
                 if (offers == null || !offers.Any(c => !c.IsOurOffer))
                 {
                     return;
@@ -1028,12 +1057,6 @@ namespace Steam_Authenticator
             {
                 declineOfferBtn.Enabled = true;
             }
-        }
-
-        private void SubmitRequirements()
-        {
-            var submitRequirements = new SubmitRequirements(this);
-            submitRequirements.ShowDialog();
         }
     }
 }

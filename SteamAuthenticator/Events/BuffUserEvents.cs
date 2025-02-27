@@ -35,7 +35,7 @@ namespace Steam_Authenticator
 
         private void addBuffUserBtn_Click(object sender, EventArgs e)
         {
-            BuffLogin("请扫码登录 BUFF 帐号");
+            BuffLogin($"请使用 BUFF App 扫码{Environment.NewLine}登录 BUFF 帐号");
         }
 
         private async void buffReloginMenuItem_Click(object sender, EventArgs e)
