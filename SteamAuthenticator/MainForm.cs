@@ -438,7 +438,30 @@ namespace Steam_Authenticator
                             if (giveOffers.Any() && ecoClient != null)
                             {
                                 ecoOfferCount = null;
-                                var ecoOffer = ecoClient.QueryOffers().Result;
+
+                                var gameIds = descriptions.Select(c => c.AppId).Distinct();
+                                var queryOfferTasks = gameIds.Select(gameId => ecoClient.QueryOffers(gameId));
+                                var queryEcoOffers = Task.WhenAll(queryOfferTasks).ContinueWith(offerTasks =>
+                                {
+                                    var results = offerTasks.Result;
+                                    var errorResult = results.FirstOrDefault(c => !(c?.IsSuccess ?? false));
+                                    if (errorResult != null)
+                                    {
+                                        return errorResult;
+                                    }
+
+                                    List<Model.ECO.QueryOffersResponse> list = new List<Model.ECO.QueryOffersResponse>();
+                                    foreach (var item in results)
+                                    {
+                                        list.AddRange(item.StatusData.ResultData);
+                                    }
+
+                                    var successResult = results.First();
+                                    successResult.StatusData.ResultData = list;
+                                    return successResult;
+                                });
+
+                                var ecoOffer = queryEcoOffers.Result;
                                 if (ecoOffer?.IsSuccess ?? false)
                                 {
                                     var ecoOfferIds = ecoOffer.StatusData?.ResultData
@@ -855,7 +878,7 @@ namespace Steam_Authenticator
 
             try
             {
-                var result = await SteamApi.GetAsync<JObject>("https://api.github.com/repos/tsxlts/SteamAuthenticator/releases/latest");
+                var result = await SteamApi.GetAsync<JObject>(ProjectInfo.LatestRelease);
                 var resultObj = result.Body;
                 if (!(resultObj?.TryGetValue("tag_name", out var tag_name) ?? false))
                 {

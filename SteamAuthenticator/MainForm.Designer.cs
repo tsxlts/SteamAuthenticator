@@ -35,7 +35,10 @@ namespace Steam_Authenticator
             importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
             exportAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
+            contactUsMenuItem = new ToolStripMenuItem();
             submitRequirementsMenuItem = new ToolStripMenuItem();
+            submitBugMenuItem = new ToolStripMenuItem();
+            aboutMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
             UserName = new Label();
             Balance = new Label();
@@ -99,7 +102,7 @@ namespace Steam_Authenticator
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, submitRequirementsMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, contactUsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(819, 25);
@@ -211,12 +214,33 @@ namespace Steam_Authenticator
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
+            // contactUsMenuItem
+            // 
+            contactUsMenuItem.DropDownItems.AddRange(new ToolStripItem[] { submitRequirementsMenuItem, submitBugMenuItem, aboutMenuItem });
+            contactUsMenuItem.Name = "contactUsMenuItem";
+            contactUsMenuItem.Size = new Size(68, 21);
+            contactUsMenuItem.Text = "联系我们";
+            // 
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(140, 21);
-            submitRequirementsMenuItem.Text = "联系我们（提交需求）";
+            submitRequirementsMenuItem.Size = new Size(180, 22);
+            submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
+            // 
+            // submitBugMenuItem
+            // 
+            submitBugMenuItem.Name = "submitBugMenuItem";
+            submitBugMenuItem.Size = new Size(180, 22);
+            submitBugMenuItem.Text = "问题反馈";
+            submitBugMenuItem.Click += submitBugMenuItem_Click;
+            // 
+            // aboutMenuItem
+            // 
+            aboutMenuItem.Name = "aboutMenuItem";
+            aboutMenuItem.Size = new Size(180, 22);
+            aboutMenuItem.Text = "关于我们";
+            aboutMenuItem.Click += aboutMenuItem_Click;
             // 
             // UserImg
             // 
@@ -488,7 +512,7 @@ namespace Steam_Authenticator
             buffPage.Location = new Point(4, 26);
             buffPage.Name = "buffPage";
             buffPage.Padding = new Padding(3);
-            buffPage.Size = new Size(791, 319);
+            buffPage.Size = new Size(791, 304);
             buffPage.TabIndex = 1;
             buffPage.Text = "BUFF 帐号";
             buffPage.UseVisualStyleBackColor = true;
@@ -501,7 +525,7 @@ namespace Steam_Authenticator
             buffUsersPanel.Dock = DockStyle.Fill;
             buffUsersPanel.Location = new Point(3, 3);
             buffUsersPanel.Name = "buffUsersPanel";
-            buffUsersPanel.Size = new Size(785, 313);
+            buffUsersPanel.Size = new Size(785, 298);
             buffUsersPanel.TabIndex = 8;
             buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
@@ -509,7 +533,7 @@ namespace Steam_Authenticator
             // 
             pictureBox2.Anchor = AnchorStyles.None;
             pictureBox2.Image = Properties.Resources.loading;
-            pictureBox2.Location = new Point(340, 94);
+            pictureBox2.Location = new Point(340, 87);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(100, 100);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
@@ -522,7 +546,7 @@ namespace Steam_Authenticator
             ecoPage.Location = new Point(4, 26);
             ecoPage.Name = "ecoPage";
             ecoPage.Padding = new Padding(3);
-            ecoPage.Size = new Size(791, 319);
+            ecoPage.Size = new Size(791, 304);
             ecoPage.TabIndex = 2;
             ecoPage.Text = "ECO 帐号";
             ecoPage.UseVisualStyleBackColor = true;
@@ -535,14 +559,14 @@ namespace Steam_Authenticator
             ecoUsersPanel.Dock = DockStyle.Fill;
             ecoUsersPanel.Location = new Point(3, 3);
             ecoUsersPanel.Name = "ecoUsersPanel";
-            ecoUsersPanel.Size = new Size(785, 313);
+            ecoUsersPanel.Size = new Size(785, 298);
             ecoUsersPanel.TabIndex = 8;
             // 
             // pictureBox6
             // 
             pictureBox6.Anchor = AnchorStyles.None;
             pictureBox6.Image = Properties.Resources.loading;
-            pictureBox6.Location = new Point(340, 94);
+            pictureBox6.Location = new Point(340, 87);
             pictureBox6.Name = "pictureBox6";
             pictureBox6.Size = new Size(100, 100);
             pictureBox6.SizeMode = PictureBoxSizeMode.Zoom;
@@ -676,9 +700,9 @@ namespace Steam_Authenticator
             submitRequirementsLabel.Size = new Size(60, 23);
             submitRequirementsLabel.TabIndex = 19;
             submitRequirementsLabel.TabStop = true;
-            submitRequirementsLabel.Text = "联系我们";
+            submitRequirementsLabel.Text = "功能定制";
             submitRequirementsLabel.TextAlign = ContentAlignment.MiddleCenter;
-            submitRequirementsLabel.LinkClicked += submitRequirementsLabel_LinkClicked;
+            submitRequirementsLabel.LinkClicked += submitRequirementsMenuItem_Click;
             // 
             // mainNotifyIcon
             // 
@@ -782,7 +806,7 @@ namespace Steam_Authenticator
         private PictureBox pictureBox2;
         private Label SteamId;
         private LinkLabel submitRequirementsLabel;
-        private ToolStripMenuItem submitRequirementsMenuItem;
+        private ToolStripMenuItem contactUsMenuItem;
         private NotifyIcon mainNotifyIcon;
         private PictureBox pictureBox3;
         private PictureBox pictureBox4;
@@ -796,5 +820,8 @@ namespace Steam_Authenticator
         private ToolStripMenuItem exportAuthenticatorMenuItem;
         private Label label11;
         private PictureBox pictureBox7;
+        private ToolStripMenuItem submitRequirementsMenuItem;
+        private ToolStripMenuItem submitBugMenuItem;
+        private ToolStripMenuItem aboutMenuItem;
     }
 }

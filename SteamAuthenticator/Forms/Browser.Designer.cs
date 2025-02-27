@@ -48,6 +48,7 @@
             ClientSize = new Size(584, 361);
             Controls.Add(WebPanel);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(500, 400);
             Name = "Browser";
             StartPosition = FormStartPosition.CenterScreen;
             FormClosing += Browser_FormClosing;

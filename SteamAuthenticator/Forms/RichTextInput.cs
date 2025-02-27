@@ -42,6 +42,16 @@
             DialogResult = DialogResult.Cancel;
         }
 
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                InputBox.SelectedText = Environment.NewLine;
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
+        }
+
         public string InputValue { get; set; }
     }
 }

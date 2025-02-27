@@ -51,7 +51,7 @@
             panel1.Location = new Point(12, 11);
             panel1.Name = "panel1";
             panel1.Size = new Size(330, 24);
-            panel1.TabIndex = 8;
+            panel1.TabIndex = 98;
             // 
             // TipsLabel
             // 
@@ -95,6 +95,7 @@
             InputBox.Size = new Size(332, 134);
             InputBox.TabIndex = 9;
             InputBox.Text = "";
+            InputBox.KeyDown += InputBox_KeyDown;
             // 
             // splitContainer1
             // 
@@ -112,11 +113,11 @@
             splitContainer1.Panel2.Controls.Add(acceptBtn);
             splitContainer1.Size = new Size(332, 34);
             splitContainer1.SplitterDistance = 166;
-            splitContainer1.TabIndex = 10;
+            splitContainer1.TabIndex = 999;
             // 
             // panel2
             // 
-            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel2.Controls.Add(InputBox);
             panel2.Location = new Point(10, 41);
             panel2.Name = "panel2";
@@ -125,7 +126,6 @@
             // 
             // RichTextInput
             // 
-            AcceptButton = acceptBtn;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(352, 219);
