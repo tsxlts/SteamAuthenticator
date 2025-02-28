@@ -104,5 +104,15 @@ namespace Steam_Authenticator.Internal
             }
             return success;
         }
+
+        public static void CopyText(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            Clipboard.SetText(value);
+        }
     }
 }

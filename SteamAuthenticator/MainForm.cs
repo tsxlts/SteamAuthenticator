@@ -106,6 +106,7 @@ namespace Steam_Authenticator
             userContextMenuStrip = new ContextMenuStrip();
             userContextMenuStrip.Items.Add("切换").Click += setCurrentClientMenuItem_Click;
             userContextMenuStrip.Items.Add("设置").Click += settingMenuItem_Click;
+            userContextMenuStrip.Items.Add("帐号信息").Click += accountInfoMenuItem_Click;
             userContextMenuStrip.Items.Add("复制Cookie").Click += copyCookieMenuItem_Click;
             userContextMenuStrip.Items.Add("复制AccessToken").Click += copyAccessTokenMenuItem_Click;
             userContextMenuStrip.Items.Add("复制RefreshToken").Click += copyRefreshTokenMenuItem_Click;

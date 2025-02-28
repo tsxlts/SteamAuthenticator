@@ -1,4 +1,5 @@
-﻿using SteamKit;
+﻿using Steam_Authenticator.Internal;
+using SteamKit;
 
 namespace Steam_Authenticator.Forms
 {
@@ -69,7 +70,7 @@ namespace Steam_Authenticator.Forms
 
         private void GuardText_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(GuardText.Text);
+            Utils.CopyText(GuardText.Text);
         }
 
         private void RevocationCode_Click(object sender, EventArgs e)
@@ -98,7 +99,7 @@ namespace Steam_Authenticator.Forms
 
         private void CopyRevocationCode_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(RevocationCode.Text);
+            Utils.CopyText(RevocationCode.Text);
         }
 
         private void deleteGuardBtn_Click(object sender, EventArgs e)
