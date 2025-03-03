@@ -15,6 +15,8 @@
 <p>7、支持添加BUFF帐号，自动处理BUFF报价</p>
 <p>8、支持添加ECO帐号，自动处理ECO报价</p>
 <p>9、支持自定义接受报价和令牌确认规则，自动处理指定规则的报价</p>
+<p>10、支持查看交易链接、Apikey等帐户信息</p>
+<p>11、支持Steam帐号状态检测，交易限制、交易暂挂、VAC封禁等</p>
 
 <br /><br />
 
@@ -34,6 +36,9 @@
 ![setting](images/10_setting.png)<br>
 ![steamSetting](images/11_steamSetting.png)<br>
 ![confirmLogin](images/12_confirm_login.png)<br>
+![accountInfo1](images/13_account_info_1.png)<br>
+![accountInfo2](images/13_account_info_2.png)<br>
+![accountInfo3](images/13_account_info_3.png)<br>
 
 
 

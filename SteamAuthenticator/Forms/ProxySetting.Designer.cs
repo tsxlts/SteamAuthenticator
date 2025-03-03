@@ -48,6 +48,8 @@
             label6 = new Label();
             proxyHostBox = new TextBox();
             panel1 = new Panel();
+            helpBox = new TextBox();
+            label7 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)proxyPortBox).BeginInit();
@@ -72,7 +74,7 @@
             // 
             // loginBox
             // 
-            loginBox.Location = new Point(104, 93);
+            loginBox.Location = new Point(104, 85);
             loginBox.Name = "loginBox";
             loginBox.Size = new Size(280, 23);
             loginBox.TabIndex = 2003;
@@ -80,7 +82,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(6, 96);
+            label2.Location = new Point(6, 88);
             label2.Name = "label2";
             label2.Size = new Size(92, 17);
             label2.TabIndex = 2;
@@ -88,7 +90,7 @@
             // 
             // storeBox
             // 
-            storeBox.Location = new Point(104, 130);
+            storeBox.Location = new Point(104, 114);
             storeBox.Name = "storeBox";
             storeBox.Size = new Size(280, 23);
             storeBox.TabIndex = 2004;
@@ -96,7 +98,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(6, 132);
+            label3.Location = new Point(6, 116);
             label3.Name = "label3";
             label3.Size = new Size(92, 17);
             label3.TabIndex = 4;
@@ -104,7 +106,7 @@
             // 
             // apiBox
             // 
-            apiBox.Location = new Point(104, 168);
+            apiBox.Location = new Point(104, 172);
             apiBox.Name = "apiBox";
             apiBox.Size = new Size(280, 23);
             apiBox.TabIndex = 2005;
@@ -112,7 +114,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(6, 170);
+            label4.Location = new Point(6, 174);
             label4.Name = "label4";
             label4.Size = new Size(87, 17);
             label4.TabIndex = 6;
@@ -133,6 +135,8 @@
             // groupBox1
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(helpBox);
+            groupBox1.Controls.Add(label7);
             groupBox1.Controls.Add(useCustomerDomain);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(communityBox);
@@ -235,6 +239,22 @@
             panel1.Size = new Size(415, 45);
             panel1.TabIndex = 13;
             // 
+            // helpBox
+            // 
+            helpBox.Location = new Point(104, 143);
+            helpBox.Name = "helpBox";
+            helpBox.Size = new Size(280, 23);
+            helpBox.TabIndex = 2007;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(6, 145);
+            label7.Name = "label7";
+            label7.Size = new Size(92, 17);
+            label7.TabIndex = 2006;
+            label7.Text = "Steam客服地址";
+            // 
             // ProxySetting
             // 
             AcceptButton = saveBtn;
@@ -282,5 +302,7 @@
         private CheckBox useCustomerDomain;
         private CheckBox useCustomerProxy;
         private Panel panel1;
+        private TextBox helpBox;
+        private Label label7;
     }
 }

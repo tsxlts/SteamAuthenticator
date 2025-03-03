@@ -60,6 +60,7 @@ namespace Steam_Authenticator
         public string SteamCommunity { get; set; }
         public string SteamApi { get; set; }
         public string SteamPowered { get; set; }
+        public string SteamHelp { get; set; }
         public string SteamLogin { get; set; }
     }
 
