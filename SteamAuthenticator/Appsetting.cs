@@ -175,12 +175,13 @@ namespace Steam_Authenticator
 
         public async Task LogoutAsync()
         {
-            User.RefreshToken = string.Empty;
-            Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
             try
             {
                 endLogin?.Invoke(false);
                 await Client.LogoutAsync();
+
+                User.RefreshToken = string.Empty;
+                Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
             }
             catch
             {
