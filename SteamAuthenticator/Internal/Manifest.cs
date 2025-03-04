@@ -19,7 +19,8 @@ namespace Steam_Authenticator.Internal
             }
             if (!fileInfo.Exists)
             {
-                using (fileInfo.Create()) { };
+                using (fileInfo.Create()) { }
+                ;
             }
 
             FileName = file;

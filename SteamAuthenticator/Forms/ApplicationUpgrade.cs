@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using System.Diagnostics;
 
@@ -44,12 +45,12 @@ namespace Steam_Authenticator.Forms
 
         private void giteeDownload_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(downloadUrl);
+            Utils.CopyText(downloadUrl);
         }
 
         private void githubDownload_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(updateUrl);
+            Utils.CopyText(updateUrl);
         }
 
         private void upgradeBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

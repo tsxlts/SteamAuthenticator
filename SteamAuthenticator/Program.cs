@@ -54,6 +54,10 @@ namespace Steam_Authenticator
                         {
                             proxy.WithSteamStore(setting.Domain.SteamPowered);
                         }
+                        if (!string.IsNullOrWhiteSpace(setting.Domain.SteamHelp))
+                        {
+                            proxy.WithSteamHelp(setting.Domain.SteamHelp);
+                        }
                         if (!string.IsNullOrWhiteSpace(setting.Domain.SteamLogin))
                         {
                             proxy.WithSteamLogin(setting.Domain.SteamLogin);

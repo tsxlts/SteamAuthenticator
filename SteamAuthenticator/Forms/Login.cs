@@ -79,10 +79,16 @@ namespace Steam_Authenticator.Forms
                 var guard = Appsetting.Instance.Manifest.GetGuard(user);
                 int errorTimes = 0;
                 int waitTime = 0;
-                while (errorTimes < 5 && !cts.IsCancellationRequested && !closed)
+                while (!cts.IsCancellationRequested && !closed)
                 {
                     try
                     {
+                        if (errorTimes >= 5)
+                        {
+                            cts.Cancel();
+                            break;
+                        }
+
                         waitTime = 1200;
 
                         if (login.AllowedConfirmations!.Any(c => c.ConfirmationType == AuthConfirmationType.DeviceCode))
@@ -109,7 +115,8 @@ namespace Steam_Authenticator.Forms
                                     {
                                         code = input.InputValue;
                                     }
-                                };
+                                }
+                                ;
                             }
                             else
                             {
@@ -171,7 +178,6 @@ namespace Steam_Authenticator.Forms
                         await Task.Delay(waitTime);
                     }
                 }
-                cts.Cancel();
 
                 var success = await task;
                 if (!success && !closed)
@@ -261,9 +267,11 @@ namespace Steam_Authenticator.Forms
                 Client = steamWebClient;
                 DialogResult = DialogResult.OK;
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageBox.Show($"登录失败" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

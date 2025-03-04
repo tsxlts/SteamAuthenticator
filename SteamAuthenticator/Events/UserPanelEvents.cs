@@ -1,5 +1,6 @@
 ﻿using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
@@ -53,7 +54,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Clipboard.SetText(stringBuilder.ToString());
+            Utils.CopyText(stringBuilder.ToString());
         }
 
         private void copyAccessTokenMenuItem_Click(object sender, EventArgs e)
@@ -69,7 +70,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Clipboard.SetText(accessToken);
+            Utils.CopyText(accessToken);
         }
 
         private void copyRefreshTokenMenuItem_Click(object sender, EventArgs e)
@@ -85,7 +86,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Clipboard.SetText(refreshToken);
+            Utils.CopyText(refreshToken);
         }
 
         private async void setCurrentClientMenuItem_Click(object sender, EventArgs e)
@@ -109,6 +110,18 @@ namespace Steam_Authenticator
 
             var userSetting = new Forms.UserSetting(userClient.User);
             userSetting.ShowDialog();
+        }
+
+        private void accountInfoMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
+
+            var accountInfo = new AccountInfo(userClient);
+            accountInfo.ShowDialog();
         }
 
         private async void reloginMenuItem_Click(object sender, EventArgs e)

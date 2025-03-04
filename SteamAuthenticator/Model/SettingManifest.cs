@@ -48,6 +48,7 @@ namespace Steam_Authenticator.Model
                     SteamCommunity = "https://steamcommunity.com",
                     SteamApi = "https://api.steampowered.com",
                     SteamPowered = "https://store.steampowered.com",
+                    SteamHelp = "https://help.steampowered.com",
                     SteamLogin = "https://login.steampowered.com"
                 };
 

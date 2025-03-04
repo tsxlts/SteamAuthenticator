@@ -60,6 +60,7 @@ namespace Steam_Authenticator
         public string SteamCommunity { get; set; }
         public string SteamApi { get; set; }
         public string SteamPowered { get; set; }
+        public string SteamHelp { get; set; }
         public string SteamLogin { get; set; }
     }
 
@@ -174,12 +175,13 @@ namespace Steam_Authenticator
 
         public async Task LogoutAsync()
         {
-            User.RefreshToken = string.Empty;
-            Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
             try
             {
                 endLogin?.Invoke(false);
                 await Client.LogoutAsync();
+
+                User.RefreshToken = string.Empty;
+                Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
             }
             catch
             {

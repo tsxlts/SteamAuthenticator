@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator.Forms
+﻿using Steam_Authenticator.Internal;
+
+namespace Steam_Authenticator.Forms
 {
     public partial class About : Form
     {
@@ -22,17 +24,17 @@
 
         private void copyProjectBtn_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(projectBox.Text);
+            Utils.CopyText(projectBox.Text);
         }
 
         private void copyQQBtn_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(qqBox.Text);
+            Utils.CopyText(qqBox.Text);
         }
 
         private void copyWeChatBtn_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(wechatBox.Text);
+            Utils.CopyText(wechatBox.Text);
         }
     }
 }

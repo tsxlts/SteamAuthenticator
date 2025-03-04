@@ -23,6 +23,7 @@ namespace Steam_Authenticator.Forms
             communityBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity;
             apiBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamApi;
             storeBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamPowered;
+            helpBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamHelp;
             loginBox.Text = Appsetting.Instance.AppSetting.Entry.Domain.SteamLogin;
         }
 
@@ -56,6 +57,7 @@ namespace Steam_Authenticator.Forms
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity = communityBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamApi = apiBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamPowered = storeBox.Text;
+                Appsetting.Instance.AppSetting.Entry.Domain.SteamHelp = helpBox.Text;
                 Appsetting.Instance.AppSetting.Entry.Domain.SteamLogin = loginBox.Text;
 
                 Appsetting.Instance.AppSetting.Save();
