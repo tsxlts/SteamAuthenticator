@@ -356,8 +356,8 @@ namespace Steam_Authenticator
             UserName.ForeColor = Color.Black;
             UserName.Text = "---";
             SteamId.Text = "---";
-            Balance.Text = "￥0.00";
-            DelayedBalance.Text = "￥0.00";
+            Balance.Text = "---";
+            DelayedBalance.Text = "---";
 
             OfferCountLabel.Text = "---";
             ConfirmationCountLable.Text = "---";
@@ -374,8 +374,8 @@ namespace Steam_Authenticator
                 UserName.ForeColor = Color.Green;
                 UserName.Text = $"{userClient.GetAccount()} [{userClient.User.NickName}]";
                 SteamId.Text = $"{userClient.User.SteamId}";
-                Balance.Text = "￥0.00";
-                DelayedBalance.Text = "￥0.00";
+                Balance.Text = "---";
+                DelayedBalance.Text = "---";
             }
 
             currentClient = userClient;

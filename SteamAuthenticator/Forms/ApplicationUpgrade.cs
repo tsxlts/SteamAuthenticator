@@ -16,9 +16,8 @@ namespace Steam_Authenticator.Forms
         private readonly string downloadUrl;
         private readonly string appName;
 
-        private Task downloadTask = Task.CompletedTask;
-        private bool downloadCompleted = false;
-        private string downloadFileName = null;
+        private TaskCompletionSource downloadTask;
+        private string tempfile;
 
         private CancellationTokenSource downloadCts = new CancellationTokenSource();
 
@@ -53,90 +52,81 @@ namespace Steam_Authenticator.Forms
             Utils.CopyText(updateUrl);
         }
 
-        private void upgradeBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private async void upgradeBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
                 upgradeBtn.Enabled = false;
-                if (downloadFileName != null)
+
+                var installPackage = Path.Combine(Appsetting.Instance.DownloadDirectory, appName);
+                if (File.Exists(installPackage))
                 {
-                    StratInstall();
+                    StratInstall(installPackage);
                     return;
                 }
 
                 this.progress.Text = "0%";
-                downloadFileName = Path.Combine(Appsetting.Instance.DownloadDirectory, appName);
-                if (File.Exists(downloadFileName))
+                tempfile = Path.Combine(Appsetting.Instance.DownloadDirectory, $"{appName}.bin");
+                if (File.Exists(tempfile))
                 {
-                    File.Delete(downloadFileName);
+                    File.Delete(tempfile);
                 }
 
+                downloadTask = new TaskCompletionSource();
                 downloadCts = new CancellationTokenSource();
-                downloadTask = Task.Run(async () =>
+                using (var client = new HttpClient(new HttpClientHandler()))
                 {
-                    try
+                    var httpResponseMessage = await client.GetAsync(updateUrl, HttpCompletionOption.ResponseHeadersRead, downloadCts.Token).ConfigureAwait(true);
+                    var contentLength = httpResponseMessage.Content.Headers.ContentLength.Value;
+
+                    this.progressBar.Minimum = 0;
+                    this.progressBar.Maximum = 100;
+
+                    using (var stream = await httpResponseMessage.Content.ReadAsStreamAsync(downloadCts.Token).ConfigureAwait(true))
                     {
-                        using (var client = new HttpClient(new HttpClientHandler()))
+                        long downloadSize = 0;
+                        var readLength = 1024000;
+                        byte[] bytes = new byte[readLength];
+                        int writeLength;
+                        while ((writeLength = await stream.ReadAsync(bytes, 0, readLength, downloadCts.Token).ConfigureAwait(true)) > 0)
                         {
-                            var httpResponseMessage = await client.GetAsync(updateUrl, HttpCompletionOption.ResponseHeadersRead, downloadCts.Token);
-                            var contentLength = httpResponseMessage.Content.Headers.ContentLength.Value;
-
-                            this.progressBar.Minimum = 0;
-                            this.progressBar.Maximum = 100;
-
-                            using (var stream = await httpResponseMessage.Content.ReadAsStreamAsync(downloadCts.Token))
+                            if (downloadCts.IsCancellationRequested)
                             {
-                                long downloadSize = 0;
-                                var readLength = 1024000;
-                                byte[] bytes = new byte[readLength];
-                                int writeLength;
-                                while ((writeLength = await stream.ReadAsync(bytes, 0, readLength, downloadCts.Token)) > 0)
-                                {
-                                    if (downloadCts.IsCancellationRequested)
-                                    {
-                                        return;
-                                    }
+                                break;
+                            }
 
-                                    using (FileStream fs = new FileStream(downloadFileName, FileMode.Append, FileAccess.Write))
-                                    {
-                                        await fs.WriteAsync(bytes, 0, writeLength, downloadCts.Token);
-                                    }
-                                    downloadSize += writeLength;
+                            using (FileStream fs = new FileStream(tempfile, FileMode.Append, FileAccess.Write))
+                            {
+                                await fs.WriteAsync(bytes, 0, writeLength, downloadCts.Token).ConfigureAwait(true);
+                            }
+                            downloadSize += writeLength;
 
-                                    int progressPercentage = (int)Math.Floor(Math.Min(downloadSize * 100.00m / contentLength, 100.00m));
-                                    this.progressBar.Value = progressPercentage;
-                                    this.progress.Text = $"{progressPercentage}%";
-                                }
+                            int progressPercentage = (int)Math.Floor(Math.Min(downloadSize * 100.00m / contentLength, 100.00m));
+                            this.progressBar.Value = progressPercentage;
+                            this.progress.Text = $"{progressPercentage}%";
+                        }
 
-                                if (contentLength >= downloadSize)
-                                {
-                                    downloadCompleted = true;
-                                    this.progress.Text = $"下载完成";
-                                    if (MessageBox.Show($"最新版程序已下载完成, 是否立即更新", "检查更新", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                                    {
-                                        StratInstall();
-                                    }
-                                }
+                        if (downloadSize >= contentLength)
+                        {
+                            File.Move(tempfile, installPackage);
+
+                            this.progress.Text = $"下载完成";
+                            if (MessageBox.Show($"最新版程序已下载完成, 是否立即更新", "检查更新", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                StratInstall(installPackage);
                             }
                         }
                     }
-                    catch (TaskCanceledException)
-                    {
-
-                    }
-                    catch (Exception)
-                    {
-                        this.progress.Text = $"下载失败";
-                    }
-                });
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show($"更新失败, {ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.progress.Text = $"下载失败";
             }
             finally
             {
                 upgradeBtn.Enabled = true;
+                downloadTask.TrySetResult();
             }
         }
 
@@ -154,21 +144,27 @@ namespace Steam_Authenticator.Forms
             try
             {
                 downloadCts.Cancel();
-                await downloadTask;
-                this.Dispose();
-
-                if (!downloadCompleted && File.Exists(downloadFileName))
+                if (downloadTask != null)
                 {
-                    File.Delete(downloadFileName);
+                    await downloadTask.Task;
                 }
+
+                if (File.Exists(tempfile))
+                {
+                    File.Delete(tempfile);
+                }  
             }
             catch
             {
 
             }
+            finally
+            {
+                this.Dispose();
+            }
         }
 
-        private void StratInstall()
+        private void StratInstall(string installPackage)
         {
             string install = Appsetting.Instance.SetupApplication;
             if (!File.Exists(install))
@@ -188,7 +184,7 @@ namespace Steam_Authenticator.Forms
             startInfo.ArgumentList.Add(JsonConvert.SerializeObject(new InstallRunParams
             {
                 InstallPath = AppContext.BaseDirectory,
-                InstallPackage = downloadFileName,
+                InstallPackage = installPackage,
                 RunningProcessId = Process.GetCurrentProcess().Id
             }));
 

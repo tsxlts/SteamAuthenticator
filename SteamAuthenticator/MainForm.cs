@@ -293,6 +293,34 @@ namespace Steam_Authenticator
             }
         }
 
+        private async Task QueryWalletDetails(CancellationToken cancellationToken)
+        {
+            if (currentClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var webClient = currentClient.Client;
+
+                var walletDetails = await webClient.User.QueryWalletDetailsAsync(cancellationToken);
+
+                if (!(walletDetails?.HasWallet ?? false))
+                {
+                    Balance.Text = "---";
+                    DelayedBalance.Text = "---";
+                    return;
+                }
+
+                Balance.Text = $"{walletDetails.FormattedBalance}";
+                DelayedBalance.Text = $"{walletDetails.FormattedDelayedBalance}";
+            }
+            catch
+            {
+            }
+        }
+
         private async Task QueryOffers(CancellationToken cancellationToken)
         {
             try
@@ -748,35 +776,6 @@ namespace Steam_Authenticator
             await Task.WhenAll(tasks);
         }
 
-        private async Task QueryWalletDetails(CancellationToken cancellationToken)
-        {
-            if (currentClient == null)
-            {
-                return;
-            }
-
-            try
-            {
-                var webClient = currentClient.Client;
-
-                var walletDetails = await webClient.User.QueryWalletDetailsAsync(cancellationToken);
-
-                if (walletDetails?.HasWallet ?? false)
-                {
-                    Balance.Text = $"{walletDetails.FormattedBalance}";
-
-                    DelayedBalance.Text = "гд0.00";
-                    if (!string.IsNullOrWhiteSpace(walletDetails.FormattedDelayedBalance))
-                    {
-                        DelayedBalance.Text = $"{walletDetails.FormattedDelayedBalance}";
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
         private void RefreshUser(object _)
         {
             try
@@ -898,8 +897,11 @@ namespace Steam_Authenticator
                     DateTime published = resultObj.Value<DateTime>("published_at");
                     if (!string.IsNullOrWhiteSpace(updateUrl))
                     {
-                        ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, updateUrl, name);
-                        DialogResult updateDialog = applicationUpgrade.ShowDialog();
+                        this.Invoke(()=>
+                        {
+                            ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, updateUrl, name);
+                            DialogResult updateDialog = applicationUpgrade.ShowDialog();
+                        });
                     }
                     return true;
                 }

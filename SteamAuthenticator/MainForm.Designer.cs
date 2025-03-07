@@ -224,21 +224,21 @@ namespace Steam_Authenticator
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(180, 22);
+            submitRequirementsMenuItem.Size = new Size(124, 22);
             submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // submitBugMenuItem
             // 
             submitBugMenuItem.Name = "submitBugMenuItem";
-            submitBugMenuItem.Size = new Size(180, 22);
+            submitBugMenuItem.Size = new Size(124, 22);
             submitBugMenuItem.Text = "问题反馈";
             submitBugMenuItem.Click += submitBugMenuItem_Click;
             // 
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new Size(180, 22);
+            aboutMenuItem.Size = new Size(124, 22);
             aboutMenuItem.Text = "关于我们";
             aboutMenuItem.Click += aboutMenuItem_Click;
             // 
@@ -271,7 +271,7 @@ namespace Steam_Authenticator
             Balance.Name = "Balance";
             Balance.Size = new Size(200, 18);
             Balance.TabIndex = 4;
-            Balance.Text = "￥0.00";
+            Balance.Text = "---";
             Balance.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // panel1
@@ -480,7 +480,7 @@ namespace Steam_Authenticator
             DelayedBalance.Name = "DelayedBalance";
             DelayedBalance.Size = new Size(200, 18);
             DelayedBalance.TabIndex = 15;
-            DelayedBalance.Text = "￥0.00";
+            DelayedBalance.Text = "---";
             DelayedBalance.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // tabControl
