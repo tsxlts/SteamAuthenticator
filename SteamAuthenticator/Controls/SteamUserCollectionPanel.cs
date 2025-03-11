@@ -38,13 +38,14 @@ namespace Steam_Authenticator.Controls
 
         protected override SteamUserPanel[] Sort(SteamUserPanel[] itemPanels)
         {
-            var sortResults = itemPanels.OrderBy(c =>
+            var sortResults = itemPanels.OrderBy(c => c.HasItem ? 1 : 999).ThenBy(c =>
             {
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(c.Client.GetAccount());
                 return guard != null ? 1 : 9;
             }).ThenBy(c => c.Client.User.Setting.AutoAcceptGive() ? 1 : 9)
             .ThenBy(c => c.Client.User.Setting.AutoConfirmOffer() ? 1 : 9)
-            .ThenBy(c => c.Client.User.Setting.AutoAcceptReceive() ? 1 : 9);
+            .ThenBy(c => c.Client.User.Setting.AutoAcceptReceive() ? 1 : 9)
+            .ThenBy(c => c.Client.GetAccount());
             return base.Sort(sortResults.ToArray());
         }
 
@@ -141,7 +142,7 @@ namespace Steam_Authenticator.Controls
             Label nameLabel = new Label()
             {
                 Name = "username",
-                Text = $"{client.GetAccount()} [{client.User.NickName}]",
+                Text = $"{client.GetAccount()}",
                 AutoSize = false,
                 AutoEllipsis = true,
                 Cursor = Cursors.Hand,
@@ -181,6 +182,20 @@ namespace Steam_Authenticator.Controls
             panel.SetConfirmationBox(confirmationLabel);
 
             return panel;
+        }
+
+        protected override void RefreshItems()
+        {
+            foreach (var client in ItemPanels)
+            {
+                if (!client.HasItem)
+                {
+                    continue;
+                }
+
+                client.SetItemIcon(client.Client.User.Avatar);
+                client.SetItemName(client.Client.GetAccount(), client.Client.Client.LoggedIn ? Color.Green : Color.Red);
+            }
         }
     }
 }

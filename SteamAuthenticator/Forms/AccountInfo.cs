@@ -58,12 +58,15 @@ namespace Steam_Authenticator.Forms
             {
                 refreshBtn.Enabled = false;
 
+                steamAccountBox.Text = client.GetAccount();
                 steamNameBox.Text = client.User.NickName;
                 steamIdBox.Text = client.User.SteamId;
 
                 loginStatusBox.Text = client.Client.LoggedIn ? "已登录" : "未登录";
                 loginStatusBox.ForeColor = client.Client.LoggedIn ? Color.Green : Color.Red;
 
+                emailBox.Text = "";
+                phoneBox.Text = "";
                 guardStatusBox.Text = "";
                 tradeLinkBox.Text = "";
                 apikeyBox.Text = "";
@@ -73,6 +76,7 @@ namespace Steam_Authenticator.Forms
 
                 tradeStatusBtn.Hide();
 
+                accountSettingLoading.Show();
                 guardStatusLoading.Show();
                 tradeLinkLoading.Show();
                 apikeyLoading.Show();
@@ -87,7 +91,13 @@ namespace Steam_Authenticator.Forms
 
                 List<Task> tasks = new List<Task>();
 
-                var task1 = SteamAuthenticator.QueryAuthenticatorStatusAsync(client.Client.WebApiToken, client.User.SteamId).ContinueWith(status =>
+                var accountSettingTask = AccountSetting().ContinueWith(task =>
+                {
+                    accountSettingLoading.Hide();
+                });
+                tasks.Add(accountSettingTask);
+
+                var authenticatorStatusTask = SteamAuthenticator.QueryAuthenticatorStatusAsync(client.Client.WebApiToken, client.User.SteamId).ContinueWith(status =>
                 {
                     guardStatusLoading.Hide();
                     guardStatusBox.Text = "**********";
@@ -111,9 +121,9 @@ namespace Steam_Authenticator.Forms
                             break;
                     }
                 });
-                tasks.Add(task1);
+                tasks.Add(authenticatorStatusTask);
 
-                var task2 = SteamApi.GetTradeLinkAsync(client.User.SteamId, client.Client.WebCookie).ContinueWith(tradeLink =>
+                var tradeLinkTask = SteamApi.GetTradeLinkAsync(client.User.SteamId, client.Client.WebCookie).ContinueWith(tradeLink =>
                 {
                     tradeLinkLoading.Hide();
 
@@ -125,9 +135,9 @@ namespace Steam_Authenticator.Forms
 
                     tradeLinkBox.Text = result;
                 });
-                tasks.Add(task2);
+                tasks.Add(tradeLinkTask);
 
-                var task3 = SteamApi.GetApiKeyAsync(client.Client.WebCookie).ContinueWith(apikey =>
+                var apiKeyTask = SteamApi.GetApiKeyAsync(client.Client.WebCookie).ContinueWith(apikey =>
                 {
                     apikeyLoading.Hide();
 
@@ -139,18 +149,18 @@ namespace Steam_Authenticator.Forms
 
                     apikeyBox.Text = result;
                 });
-                tasks.Add(task3);
+                tasks.Add(apiKeyTask);
 
-                var task4 = TradableStatusCheck().ContinueWith(task =>
+                var tradableStatusTask = TradableStatusCheck().ContinueWith(task =>
                 {
                     tradeStatusLoading.Hide();
                 });
-                tasks.Add(task4);
+                tasks.Add(tradableStatusTask);
 
-                tradePermissionBox.Text = "**********";
+                //tradePermissionBox.Text = "**********";
                 if (!string.IsNullOrWhiteSpace(DefaultPartnerTradeLink))
                 {
-                    var task5 = SteamApi.QueryTradePermissionsAsync(client.Client.WebCookie, DefaultPartnerTradeLink).ContinueWith(tradePermissions =>
+                    var tradePermissionsTask = SteamApi.QueryTradePermissionsAsync(client.Client.WebCookie, DefaultPartnerTradeLink).ContinueWith(tradePermissions =>
                     {
                         tradePermissionLoading.Hide();
 
@@ -184,10 +194,14 @@ namespace Steam_Authenticator.Forms
 
                         tradePermissionBox.Text = string.Join($"；{Environment.NewLine}", permissions);
                     });
-                    tasks.Add(task5);
+                    tasks.Add(tradePermissionsTask);
+                }
+                else
+                {
+                    tradePermissionBox.Text = "**********";
                 }
 
-                var task6 = SteamApi.QueryPlayerBansAsync(null, client.Client.WebApiToken, [client.User.SteamId]).ContinueWith(playersBans =>
+                var playerBansTask = SteamApi.QueryPlayerBansAsync(null, client.Client.WebApiToken, [client.User.SteamId]).ContinueWith(playersBans =>
                 {
                     bansStatusLoading.Hide();
                     bansStatusBox.Text = "**********";
@@ -215,7 +229,7 @@ namespace Steam_Authenticator.Forms
                     bansStatusBox.ForeColor = bans.Any() ? Color.Red : Color.Green;
                     bansStatusBox.Text = bans.Any() ? string.Join("；", bans) : "未封禁";
                 });
-                tasks.Add(task6);
+                tasks.Add(playerBansTask);
 
                 await Task.WhenAll(tasks);
             }
@@ -225,6 +239,7 @@ namespace Steam_Authenticator.Forms
             }
             finally
             {
+                accountSettingLoading.Hide();
                 guardStatusLoading.Hide();
                 tradeLinkLoading.Hide();
                 apikeyLoading.Hide();
@@ -233,6 +248,31 @@ namespace Steam_Authenticator.Forms
                 bansStatusLoading.Hide();
 
                 refreshBtn.Enabled = true;
+            }
+        }
+
+        private async Task AccountSetting()
+        {
+            try
+            {
+                SteamStoreClient storeClient = new SteamStoreClient();
+                await storeClient.LoginAsync(client.Client.RefreshToken);
+                var accountSetting = await SteamApi.GetAccountSettingAsync(storeClient.WebCookie);
+                var accountSettingBody = accountSetting.Body;
+                if (accountSettingBody == null)
+                {
+                    emailBox.ForeColor = phoneBox.ForeColor = Color.OrangeRed;
+                    emailBox.Text = phoneBox.Text = $"获取失败 ({(int)accountSetting.HttpStatusCode})";
+                    return;
+                }
+
+                emailBox.ForeColor = phoneBox.ForeColor = SystemColors.ControlText;
+                emailBox.Text = accountSettingBody.Email;
+                phoneBox.Text = accountSettingBody.Phone;
+            }
+            catch
+            {
+
             }
         }
 

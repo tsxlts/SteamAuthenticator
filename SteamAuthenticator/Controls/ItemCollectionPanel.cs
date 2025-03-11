@@ -65,7 +65,7 @@ namespace Steam_Authenticator.Controls
             this.Controls.Clear();
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             try
             {
@@ -82,6 +82,8 @@ namespace Steam_Authenticator.Controls
 
                 this.Controls.Clear();
                 this.Controls.AddRange(controlCollection);
+
+                RefreshItems();
             }
             catch
             {
@@ -113,5 +115,7 @@ namespace Steam_Authenticator.Controls
         protected abstract Size ItemSize { get; }
 
         protected abstract TItemPanel CreateUserPanel(bool hasItem, TClient client);
+
+        protected abstract void RefreshItems();
     }
 }

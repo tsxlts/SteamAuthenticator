@@ -58,12 +58,21 @@
             bansStatusLoading = new PictureBox();
             guardStatusLoading = new PictureBox();
             refreshBtn = new Label();
+            steamAccountBox = new Label();
+            label11 = new Label();
+            emailBox = new Label();
+            label12 = new Label();
+            accountSettingLoading = new PictureBox();
+            phoneBox = new Label();
+            label13 = new Label();
+            label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)tradeLinkLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)apikeyLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tradeStatusLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tradePermissionLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bansStatusLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)guardStatusLoading).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)accountSettingLoading).BeginInit();
             SuspendLayout();
             // 
             // copyTradeLinkBtn
@@ -72,7 +81,7 @@
             copyTradeLinkBtn.Cursor = Cursors.Hand;
             copyTradeLinkBtn.ForeColor = Color.Gray;
             copyTradeLinkBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            copyTradeLinkBtn.Location = new Point(426, 121);
+            copyTradeLinkBtn.Location = new Point(482, 181);
             copyTradeLinkBtn.Name = "copyTradeLinkBtn";
             copyTradeLinkBtn.Size = new Size(36, 23);
             copyTradeLinkBtn.TabIndex = 15;
@@ -85,9 +94,9 @@
             tradeLinkBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tradeLinkBox.AutoEllipsis = true;
             tradeLinkBox.ImageAlign = ContentAlignment.MiddleLeft;
-            tradeLinkBox.Location = new Point(107, 125);
+            tradeLinkBox.Location = new Point(107, 185);
             tradeLinkBox.Name = "tradeLinkBox";
-            tradeLinkBox.Size = new Size(295, 16);
+            tradeLinkBox.Size = new Size(351, 16);
             tradeLinkBox.TabIndex = 14;
             tradeLinkBox.Text = "**********";
             tradeLinkBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -95,7 +104,7 @@
             // label1
             // 
             label1.ImageAlign = ContentAlignment.MiddleLeft;
-            label1.Location = new Point(16, 121);
+            label1.Location = new Point(16, 181);
             label1.Name = "label1";
             label1.Size = new Size(85, 23);
             label1.TabIndex = 13;
@@ -107,9 +116,9 @@
             steamNameBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             steamNameBox.ForeColor = Color.Green;
             steamNameBox.ImageAlign = ContentAlignment.MiddleLeft;
-            steamNameBox.Location = new Point(107, 9);
+            steamNameBox.Location = new Point(107, 38);
             steamNameBox.Name = "steamNameBox";
-            steamNameBox.Size = new Size(280, 23);
+            steamNameBox.Size = new Size(336, 23);
             steamNameBox.TabIndex = 17;
             steamNameBox.Text = "**********";
             steamNameBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -118,7 +127,7 @@
             // 
             label3.ForeColor = Color.Green;
             label3.ImageAlign = ContentAlignment.MiddleLeft;
-            label3.Location = new Point(16, 9);
+            label3.Location = new Point(16, 38);
             label3.Name = "label3";
             label3.Size = new Size(85, 23);
             label3.TabIndex = 16;
@@ -130,9 +139,9 @@
             steamIdBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             steamIdBox.ForeColor = SystemColors.ControlText;
             steamIdBox.ImageAlign = ContentAlignment.MiddleLeft;
-            steamIdBox.Location = new Point(107, 37);
+            steamIdBox.Location = new Point(107, 66);
             steamIdBox.Name = "steamIdBox";
-            steamIdBox.Size = new Size(295, 23);
+            steamIdBox.Size = new Size(351, 23);
             steamIdBox.TabIndex = 19;
             steamIdBox.Text = "**********";
             steamIdBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -141,7 +150,7 @@
             // 
             label4.ForeColor = SystemColors.ControlText;
             label4.ImageAlign = ContentAlignment.MiddleLeft;
-            label4.Location = new Point(16, 37);
+            label4.Location = new Point(16, 66);
             label4.Name = "label4";
             label4.Size = new Size(85, 23);
             label4.TabIndex = 18;
@@ -154,7 +163,7 @@
             copySteamIdBtn.Cursor = Cursors.Hand;
             copySteamIdBtn.ForeColor = Color.Gray;
             copySteamIdBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            copySteamIdBtn.Location = new Point(426, 37);
+            copySteamIdBtn.Location = new Point(482, 66);
             copySteamIdBtn.Name = "copySteamIdBtn";
             copySteamIdBtn.Size = new Size(36, 23);
             copySteamIdBtn.TabIndex = 20;
@@ -168,7 +177,7 @@
             copyApikeyBtn.Cursor = Cursors.Hand;
             copyApikeyBtn.ForeColor = Color.Gray;
             copyApikeyBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            copyApikeyBtn.Location = new Point(426, 150);
+            copyApikeyBtn.Location = new Point(482, 210);
             copyApikeyBtn.Name = "copyApikeyBtn";
             copyApikeyBtn.Size = new Size(36, 23);
             copyApikeyBtn.TabIndex = 23;
@@ -181,9 +190,9 @@
             apikeyBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             apikeyBox.AutoEllipsis = true;
             apikeyBox.ImageAlign = ContentAlignment.MiddleLeft;
-            apikeyBox.Location = new Point(107, 154);
+            apikeyBox.Location = new Point(107, 214);
             apikeyBox.Name = "apikeyBox";
-            apikeyBox.Size = new Size(295, 16);
+            apikeyBox.Size = new Size(351, 16);
             apikeyBox.TabIndex = 22;
             apikeyBox.Text = "**********";
             apikeyBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -191,7 +200,7 @@
             // label6
             // 
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(16, 150);
+            label6.Location = new Point(16, 210);
             label6.Name = "label6";
             label6.Size = new Size(85, 23);
             label6.TabIndex = 21;
@@ -202,7 +211,7 @@
             // 
             label5.ForeColor = SystemColors.ControlText;
             label5.ImageAlign = ContentAlignment.MiddleLeft;
-            label5.Location = new Point(16, 179);
+            label5.Location = new Point(16, 239);
             label5.Name = "label5";
             label5.Size = new Size(85, 23);
             label5.TabIndex = 24;
@@ -214,9 +223,9 @@
             tradeStatusBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tradeStatusBox.AutoEllipsis = true;
             tradeStatusBox.ImageAlign = ContentAlignment.MiddleLeft;
-            tradeStatusBox.Location = new Point(107, 183);
+            tradeStatusBox.Location = new Point(107, 243);
             tradeStatusBox.Name = "tradeStatusBox";
-            tradeStatusBox.Size = new Size(295, 16);
+            tradeStatusBox.Size = new Size(351, 16);
             tradeStatusBox.TabIndex = 25;
             tradeStatusBox.Text = "**********";
             tradeStatusBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -227,7 +236,7 @@
             tradeStatusBtn.Cursor = Cursors.Hand;
             tradeStatusBtn.ForeColor = Color.Gray;
             tradeStatusBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            tradeStatusBtn.Location = new Point(426, 179);
+            tradeStatusBtn.Location = new Point(482, 239);
             tradeStatusBtn.Name = "tradeStatusBtn";
             tradeStatusBtn.Size = new Size(36, 23);
             tradeStatusBtn.TabIndex = 26;
@@ -240,9 +249,9 @@
             tradePermissionBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tradePermissionBox.AutoEllipsis = true;
             tradePermissionBox.ImageAlign = ContentAlignment.MiddleLeft;
-            tradePermissionBox.Location = new Point(107, 211);
+            tradePermissionBox.Location = new Point(107, 271);
             tradePermissionBox.Name = "tradePermissionBox";
-            tradePermissionBox.Size = new Size(295, 16);
+            tradePermissionBox.Size = new Size(351, 16);
             tradePermissionBox.TabIndex = 28;
             tradePermissionBox.Text = "**********";
             tradePermissionBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -251,7 +260,7 @@
             // 
             label7.ForeColor = SystemColors.ControlText;
             label7.ImageAlign = ContentAlignment.MiddleLeft;
-            label7.Location = new Point(16, 207);
+            label7.Location = new Point(16, 267);
             label7.Name = "label7";
             label7.Size = new Size(85, 23);
             label7.TabIndex = 27;
@@ -263,9 +272,9 @@
             loginStatusBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             loginStatusBox.ForeColor = SystemColors.ControlText;
             loginStatusBox.ImageAlign = ContentAlignment.MiddleLeft;
-            loginStatusBox.Location = new Point(107, 65);
+            loginStatusBox.Location = new Point(107, 95);
             loginStatusBox.Name = "loginStatusBox";
-            loginStatusBox.Size = new Size(295, 23);
+            loginStatusBox.Size = new Size(351, 23);
             loginStatusBox.TabIndex = 30;
             loginStatusBox.Text = "**********";
             loginStatusBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -274,7 +283,7 @@
             // 
             label9.ForeColor = SystemColors.ControlText;
             label9.ImageAlign = ContentAlignment.MiddleLeft;
-            label9.Location = new Point(16, 65);
+            label9.Location = new Point(16, 95);
             label9.Name = "label9";
             label9.Size = new Size(85, 23);
             label9.TabIndex = 29;
@@ -286,9 +295,9 @@
             guardStatusBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             guardStatusBox.AutoEllipsis = true;
             guardStatusBox.ImageAlign = ContentAlignment.MiddleLeft;
-            guardStatusBox.Location = new Point(107, 97);
+            guardStatusBox.Location = new Point(107, 157);
             guardStatusBox.Name = "guardStatusBox";
-            guardStatusBox.Size = new Size(295, 16);
+            guardStatusBox.Size = new Size(351, 16);
             guardStatusBox.TabIndex = 32;
             guardStatusBox.Text = "**********";
             guardStatusBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -297,7 +306,7 @@
             // 
             label10.ForeColor = SystemColors.ControlText;
             label10.ImageAlign = ContentAlignment.MiddleLeft;
-            label10.Location = new Point(16, 93);
+            label10.Location = new Point(16, 153);
             label10.Name = "label10";
             label10.Size = new Size(85, 23);
             label10.TabIndex = 31;
@@ -309,9 +318,9 @@
             bansStatusBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             bansStatusBox.AutoEllipsis = true;
             bansStatusBox.ImageAlign = ContentAlignment.MiddleLeft;
-            bansStatusBox.Location = new Point(107, 239);
+            bansStatusBox.Location = new Point(107, 299);
             bansStatusBox.Name = "bansStatusBox";
-            bansStatusBox.Size = new Size(295, 16);
+            bansStatusBox.Size = new Size(351, 16);
             bansStatusBox.TabIndex = 34;
             bansStatusBox.Text = "**********";
             bansStatusBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -320,7 +329,7 @@
             // 
             label8.ForeColor = SystemColors.ControlText;
             label8.ImageAlign = ContentAlignment.MiddleLeft;
-            label8.Location = new Point(16, 235);
+            label8.Location = new Point(16, 295);
             label8.Name = "label8";
             label8.Size = new Size(85, 23);
             label8.TabIndex = 33;
@@ -329,9 +338,10 @@
             // 
             // tradeLinkLoading
             // 
+            tradeLinkLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             tradeLinkLoading.BackColor = SystemColors.Control;
             tradeLinkLoading.Image = Properties.Resources.loading_full;
-            tradeLinkLoading.Location = new Point(408, 125);
+            tradeLinkLoading.Location = new Point(464, 185);
             tradeLinkLoading.Name = "tradeLinkLoading";
             tradeLinkLoading.Size = new Size(16, 16);
             tradeLinkLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -341,9 +351,10 @@
             // 
             // apikeyLoading
             // 
+            apikeyLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             apikeyLoading.BackColor = SystemColors.Control;
             apikeyLoading.Image = Properties.Resources.loading_full;
-            apikeyLoading.Location = new Point(408, 154);
+            apikeyLoading.Location = new Point(464, 214);
             apikeyLoading.Name = "apikeyLoading";
             apikeyLoading.Size = new Size(16, 16);
             apikeyLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -353,9 +364,10 @@
             // 
             // tradeStatusLoading
             // 
+            tradeStatusLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             tradeStatusLoading.BackColor = SystemColors.Control;
             tradeStatusLoading.Image = Properties.Resources.loading_full;
-            tradeStatusLoading.Location = new Point(408, 183);
+            tradeStatusLoading.Location = new Point(464, 243);
             tradeStatusLoading.Name = "tradeStatusLoading";
             tradeStatusLoading.Size = new Size(16, 16);
             tradeStatusLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -365,9 +377,10 @@
             // 
             // tradePermissionLoading
             // 
+            tradePermissionLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             tradePermissionLoading.BackColor = SystemColors.Control;
             tradePermissionLoading.Image = Properties.Resources.loading_full;
-            tradePermissionLoading.Location = new Point(408, 211);
+            tradePermissionLoading.Location = new Point(464, 271);
             tradePermissionLoading.Name = "tradePermissionLoading";
             tradePermissionLoading.Size = new Size(16, 16);
             tradePermissionLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -377,9 +390,10 @@
             // 
             // bansStatusLoading
             // 
+            bansStatusLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             bansStatusLoading.BackColor = SystemColors.Control;
             bansStatusLoading.Image = Properties.Resources.loading_full;
-            bansStatusLoading.Location = new Point(408, 239);
+            bansStatusLoading.Location = new Point(464, 299);
             bansStatusLoading.Name = "bansStatusLoading";
             bansStatusLoading.Size = new Size(16, 16);
             bansStatusLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -389,9 +403,10 @@
             // 
             // guardStatusLoading
             // 
+            guardStatusLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             guardStatusLoading.BackColor = SystemColors.Control;
             guardStatusLoading.Image = Properties.Resources.loading_full;
-            guardStatusLoading.Location = new Point(408, 97);
+            guardStatusLoading.Location = new Point(464, 157);
             guardStatusLoading.Name = "guardStatusLoading";
             guardStatusLoading.Size = new Size(16, 16);
             guardStatusLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -404,7 +419,7 @@
             refreshBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             refreshBtn.Cursor = Cursors.Hand;
             refreshBtn.ForeColor = Color.DeepSkyBlue;
-            refreshBtn.Location = new Point(402, 9);
+            refreshBtn.Location = new Point(458, 9);
             refreshBtn.Name = "refreshBtn";
             refreshBtn.Size = new Size(60, 23);
             refreshBtn.TabIndex = 41;
@@ -412,11 +427,112 @@
             refreshBtn.TextAlign = ContentAlignment.MiddleCenter;
             refreshBtn.Click += refreshBtn_Click;
             // 
+            // steamAccountBox
+            // 
+            steamAccountBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            steamAccountBox.ForeColor = Color.Green;
+            steamAccountBox.ImageAlign = ContentAlignment.MiddleLeft;
+            steamAccountBox.Location = new Point(107, 9);
+            steamAccountBox.Name = "steamAccountBox";
+            steamAccountBox.Size = new Size(336, 23);
+            steamAccountBox.TabIndex = 16;
+            steamAccountBox.Text = "**********";
+            steamAccountBox.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label11
+            // 
+            label11.ForeColor = Color.Green;
+            label11.ImageAlign = ContentAlignment.MiddleLeft;
+            label11.Location = new Point(16, 9);
+            label11.Name = "label11";
+            label11.Size = new Size(85, 23);
+            label11.TabIndex = 42;
+            label11.Text = "登录帐号名：";
+            label11.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // emailBox
+            // 
+            emailBox.AutoEllipsis = true;
+            emailBox.ForeColor = SystemColors.ControlText;
+            emailBox.ImageAlign = ContentAlignment.MiddleLeft;
+            emailBox.Location = new Point(157, 127);
+            emailBox.Name = "emailBox";
+            emailBox.Size = new Size(128, 16);
+            emailBox.TabIndex = 44;
+            emailBox.Text = "**********";
+            emailBox.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label12
+            // 
+            label12.ForeColor = SystemColors.ControlText;
+            label12.ImageAlign = ContentAlignment.MiddleLeft;
+            label12.Location = new Point(16, 124);
+            label12.Name = "label12";
+            label12.Size = new Size(85, 23);
+            label12.TabIndex = 43;
+            label12.Text = "联系信息：";
+            label12.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // accountSettingLoading
+            // 
+            accountSettingLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            accountSettingLoading.BackColor = SystemColors.Control;
+            accountSettingLoading.Image = Properties.Resources.loading_full;
+            accountSettingLoading.Location = new Point(464, 127);
+            accountSettingLoading.Name = "accountSettingLoading";
+            accountSettingLoading.Size = new Size(16, 16);
+            accountSettingLoading.SizeMode = PictureBoxSizeMode.Zoom;
+            accountSettingLoading.TabIndex = 45;
+            accountSettingLoading.TabStop = false;
+            accountSettingLoading.Visible = false;
+            // 
+            // phoneBox
+            // 
+            phoneBox.AutoEllipsis = true;
+            phoneBox.ForeColor = SystemColors.ControlText;
+            phoneBox.ImageAlign = ContentAlignment.MiddleLeft;
+            phoneBox.Location = new Point(374, 127);
+            phoneBox.Name = "phoneBox";
+            phoneBox.Size = new Size(84, 16);
+            phoneBox.TabIndex = 46;
+            phoneBox.Text = "**********";
+            phoneBox.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label13
+            // 
+            label13.ForeColor = Color.RoyalBlue;
+            label13.ImageAlign = ContentAlignment.MiddleLeft;
+            label13.Location = new Point(309, 124);
+            label13.Name = "label13";
+            label13.Size = new Size(59, 23);
+            label13.TabIndex = 47;
+            label13.Text = "手机号：";
+            label13.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label2
+            // 
+            label2.ForeColor = Color.RoyalBlue;
+            label2.ImageAlign = ContentAlignment.MiddleLeft;
+            label2.Location = new Point(107, 124);
+            label2.Name = "label2";
+            label2.Size = new Size(44, 23);
+            label2.TabIndex = 48;
+            label2.Text = "邮箱：";
+            label2.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // AccountInfo
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(464, 291);
+            ClientSize = new Size(520, 338);
+            Controls.Add(label2);
+            Controls.Add(label13);
+            Controls.Add(phoneBox);
+            Controls.Add(accountSettingLoading);
+            Controls.Add(emailBox);
+            Controls.Add(label12);
+            Controls.Add(steamAccountBox);
+            Controls.Add(label11);
             Controls.Add(refreshBtn);
             Controls.Add(guardStatusLoading);
             Controls.Add(bansStatusLoading);
@@ -447,7 +563,7 @@
             Controls.Add(tradeLinkBox);
             Controls.Add(label1);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(480, 330);
+            MinimumSize = new Size(536, 377);
             Name = "AccountInfo";
             StartPosition = FormStartPosition.CenterParent;
             Text = "帐号信息";
@@ -458,6 +574,7 @@
             ((System.ComponentModel.ISupportInitialize)tradePermissionLoading).EndInit();
             ((System.ComponentModel.ISupportInitialize)bansStatusLoading).EndInit();
             ((System.ComponentModel.ISupportInitialize)guardStatusLoading).EndInit();
+            ((System.ComponentModel.ISupportInitialize)accountSettingLoading).EndInit();
             ResumeLayout(false);
         }
 
@@ -492,5 +609,13 @@
         private PictureBox bansStatusLoading;
         private PictureBox guardStatusLoading;
         private Label refreshBtn;
+        private Label steamAccountBox;
+        private Label label11;
+        private Label emailBox;
+        private Label label12;
+        private PictureBox accountSettingLoading;
+        private Label phoneBox;
+        private Label label13;
+        private Label label2;
     }
 }

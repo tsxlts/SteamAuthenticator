@@ -76,5 +76,19 @@
 
             return panel;
         }
+
+        protected override void RefreshItems()
+        {
+            foreach (var client in ItemPanels)
+            {
+                if (!client.HasItem)
+                {
+                    continue;
+                }
+
+                client.SetItemIcon(client.Client.User.Avatar);
+                client.SetItemName(client.Client.User.Nickname, client.Client.LoggedIn ? Color.Green : Color.Red);
+            }
+        }
     }
 }

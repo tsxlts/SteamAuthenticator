@@ -152,7 +152,7 @@ namespace Steam_Authenticator.Forms
                 if (File.Exists(tempfile))
                 {
                     File.Delete(tempfile);
-                }  
+                }
             }
             catch
             {
