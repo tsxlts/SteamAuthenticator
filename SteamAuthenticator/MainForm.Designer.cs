@@ -44,7 +44,9 @@ namespace Steam_Authenticator
             Balance = new Label();
             panel1 = new Panel();
             confirmationBtn = new Label();
+            SteamId = new Label();
             declineOfferBtn = new Label();
+            DelayedBalance = new Label();
             acceptOfferBtn = new Label();
             offersBtn = new Label();
             ConfirmationCountLable = new Label();
@@ -59,7 +61,6 @@ namespace Steam_Authenticator
             versionLabel = new LinkLabel();
             label6 = new Label();
             label7 = new Label();
-            DelayedBalance = new Label();
             tabControl = new TabControl();
             steamPage = new TabPage();
             buffPage = new TabPage();
@@ -77,7 +78,6 @@ namespace Steam_Authenticator
             label8 = new Label();
             pictureBox4 = new PictureBox();
             pictureBox3 = new PictureBox();
-            SteamId = new Label();
             submitRequirementsLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
             menuStrip1.SuspendLayout();
@@ -257,9 +257,9 @@ namespace Steam_Authenticator
             // 
             UserName.AutoEllipsis = true;
             UserName.ForeColor = Color.Green;
-            UserName.Location = new Point(118, 40);
+            UserName.Location = new Point(1, 1);
             UserName.Name = "UserName";
-            UserName.Size = new Size(139, 23);
+            UserName.Size = new Size(133, 18);
             UserName.TabIndex = 2;
             UserName.Text = "---";
             UserName.TextAlign = ContentAlignment.MiddleLeft;
@@ -268,24 +268,28 @@ namespace Steam_Authenticator
             // 
             Balance.AutoEllipsis = true;
             Balance.ForeColor = Color.Green;
-            Balance.Location = new Point(118, 94);
+            Balance.Location = new Point(140, 1);
             Balance.Name = "Balance";
-            Balance.Size = new Size(200, 18);
+            Balance.Size = new Size(65, 18);
             Balance.TabIndex = 4;
             Balance.Text = "---";
-            Balance.TextAlign = ContentAlignment.MiddleLeft;
+            Balance.TextAlign = ContentAlignment.MiddleRight;
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             panel1.Controls.Add(confirmationBtn);
+            panel1.Controls.Add(SteamId);
             panel1.Controls.Add(declineOfferBtn);
+            panel1.Controls.Add(DelayedBalance);
             panel1.Controls.Add(acceptOfferBtn);
             panel1.Controls.Add(offersBtn);
             panel1.Controls.Add(ConfirmationCountLable);
+            panel1.Controls.Add(Balance);
             panel1.Controls.Add(OfferCountLabel);
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
+            panel1.Controls.Add(UserName);
             panel1.Location = new Point(599, 38);
             panel1.Name = "panel1";
             panel1.Size = new Size(208, 100);
@@ -293,34 +297,61 @@ namespace Steam_Authenticator
             // 
             // confirmationBtn
             // 
+            confirmationBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             confirmationBtn.AutoSize = true;
             confirmationBtn.Cursor = Cursors.Hand;
             confirmationBtn.ForeColor = Color.Green;
-            confirmationBtn.Location = new Point(97, 33);
+            confirmationBtn.Location = new Point(97, 77);
             confirmationBtn.Name = "confirmationBtn";
             confirmationBtn.Size = new Size(32, 17);
             confirmationBtn.TabIndex = 7;
             confirmationBtn.Text = "查看";
             confirmationBtn.Click += confirmationBtn_Click;
             // 
+            // SteamId
+            // 
+            SteamId.AutoEllipsis = true;
+            SteamId.Cursor = Cursors.Hand;
+            SteamId.ForeColor = Color.FromArgb(0, 0, 238);
+            SteamId.Location = new Point(1, 24);
+            SteamId.Name = "SteamId";
+            SteamId.Size = new Size(133, 18);
+            SteamId.TabIndex = 18;
+            SteamId.Text = "---";
+            SteamId.TextAlign = ContentAlignment.MiddleLeft;
+            SteamId.Click += SteamId_Click;
+            // 
             // declineOfferBtn
             // 
+            declineOfferBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             declineOfferBtn.AutoSize = true;
             declineOfferBtn.Cursor = Cursors.Hand;
             declineOfferBtn.ForeColor = Color.Red;
-            declineOfferBtn.Location = new Point(173, 5);
+            declineOfferBtn.Location = new Point(173, 53);
             declineOfferBtn.Name = "declineOfferBtn";
             declineOfferBtn.Size = new Size(32, 17);
             declineOfferBtn.TabIndex = 6;
             declineOfferBtn.Text = "拒绝";
             declineOfferBtn.Click += declineOfferBtn_Click;
             // 
+            // DelayedBalance
+            // 
+            DelayedBalance.AutoEllipsis = true;
+            DelayedBalance.ForeColor = Color.Gray;
+            DelayedBalance.Location = new Point(140, 24);
+            DelayedBalance.Name = "DelayedBalance";
+            DelayedBalance.Size = new Size(65, 18);
+            DelayedBalance.TabIndex = 15;
+            DelayedBalance.Text = "---";
+            DelayedBalance.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // acceptOfferBtn
             // 
+            acceptOfferBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             acceptOfferBtn.AutoSize = true;
             acceptOfferBtn.Cursor = Cursors.Hand;
             acceptOfferBtn.ForeColor = Color.Green;
-            acceptOfferBtn.Location = new Point(136, 5);
+            acceptOfferBtn.Location = new Point(136, 53);
             acceptOfferBtn.Name = "acceptOfferBtn";
             acceptOfferBtn.Size = new Size(32, 17);
             acceptOfferBtn.TabIndex = 5;
@@ -329,10 +360,11 @@ namespace Steam_Authenticator
             // 
             // offersBtn
             // 
+            offersBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             offersBtn.AutoSize = true;
             offersBtn.Cursor = Cursors.Hand;
             offersBtn.ForeColor = Color.Green;
-            offersBtn.Location = new Point(97, 5);
+            offersBtn.Location = new Point(97, 53);
             offersBtn.Name = "offersBtn";
             offersBtn.Size = new Size(32, 17);
             offersBtn.TabIndex = 4;
@@ -341,9 +373,10 @@ namespace Steam_Authenticator
             // 
             // ConfirmationCountLable
             // 
+            ConfirmationCountLable.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             ConfirmationCountLable.AutoSize = true;
             ConfirmationCountLable.ForeColor = Color.FromArgb(0, 128, 255);
-            ConfirmationCountLable.Location = new Point(44, 33);
+            ConfirmationCountLable.Location = new Point(44, 77);
             ConfirmationCountLable.Name = "ConfirmationCountLable";
             ConfirmationCountLable.Size = new Size(23, 17);
             ConfirmationCountLable.TabIndex = 3;
@@ -352,9 +385,10 @@ namespace Steam_Authenticator
             // 
             // OfferCountLabel
             // 
+            OfferCountLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             OfferCountLabel.AutoSize = true;
             OfferCountLabel.ForeColor = Color.FromArgb(255, 128, 0);
-            OfferCountLabel.Location = new Point(44, 5);
+            OfferCountLabel.Location = new Point(44, 53);
             OfferCountLabel.Name = "OfferCountLabel";
             OfferCountLabel.Size = new Size(23, 17);
             OfferCountLabel.TabIndex = 2;
@@ -363,9 +397,10 @@ namespace Steam_Authenticator
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label2.AutoSize = true;
             label2.ForeColor = Color.FromArgb(0, 128, 255);
-            label2.Location = new Point(3, 33);
+            label2.Location = new Point(3, 77);
             label2.Name = "label2";
             label2.Size = new Size(35, 17);
             label2.TabIndex = 1;
@@ -374,9 +409,10 @@ namespace Steam_Authenticator
             // 
             // label1
             // 
+            label1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label1.AutoSize = true;
             label1.ForeColor = Color.FromArgb(255, 128, 0);
-            label1.Location = new Point(3, 5);
+            label1.Location = new Point(3, 53);
             label1.Name = "label1";
             label1.Size = new Size(35, 17);
             label1.TabIndex = 0;
@@ -472,17 +508,6 @@ namespace Steam_Authenticator
             label7.Size = new Size(44, 17);
             label7.TabIndex = 14;
             label7.Text = "确认数";
-            // 
-            // DelayedBalance
-            // 
-            DelayedBalance.AutoEllipsis = true;
-            DelayedBalance.ForeColor = Color.Gray;
-            DelayedBalance.Location = new Point(118, 116);
-            DelayedBalance.Name = "DelayedBalance";
-            DelayedBalance.Size = new Size(200, 18);
-            DelayedBalance.TabIndex = 15;
-            DelayedBalance.Text = "---";
-            DelayedBalance.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // tabControl
             // 
@@ -679,19 +704,6 @@ namespace Steam_Authenticator
             pictureBox3.TabIndex = 15;
             pictureBox3.TabStop = false;
             // 
-            // SteamId
-            // 
-            SteamId.AutoEllipsis = true;
-            SteamId.Cursor = Cursors.Hand;
-            SteamId.ForeColor = Color.FromArgb(0, 0, 238);
-            SteamId.Location = new Point(118, 67);
-            SteamId.Name = "SteamId";
-            SteamId.Size = new Size(139, 18);
-            SteamId.TabIndex = 18;
-            SteamId.Text = "---";
-            SteamId.TextAlign = ContentAlignment.MiddleLeft;
-            SteamId.Click += SteamId_Click;
-            // 
             // submitRequirementsLabel
             // 
             submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
@@ -718,14 +730,10 @@ namespace Steam_Authenticator
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(819, 511);
             Controls.Add(submitRequirementsLabel);
-            Controls.Add(SteamId);
             Controls.Add(statusPanel);
             Controls.Add(tabControl);
-            Controls.Add(DelayedBalance);
             Controls.Add(versionLabel);
             Controls.Add(panel1);
-            Controls.Add(Balance);
-            Controls.Add(UserName);
             Controls.Add(UserImg);
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");

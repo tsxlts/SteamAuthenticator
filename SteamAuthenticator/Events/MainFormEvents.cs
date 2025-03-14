@@ -23,7 +23,6 @@ namespace Steam_Authenticator
             }
 
             Utils.CopyText(webClient.SteamId);
-            Process.Start(new ProcessStartInfo($"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}") { UseShellExecute = true });
         }
 
         private void globalSettingMenuItem_Click(object sender, EventArgs e)

@@ -133,9 +133,9 @@ namespace Steam_Authenticator.Controls
             IconLabel iconLabel = new IconLabel(icons)
             {
                 Name = "icons",
-                Size = new Size(80, 20),
-                IconSize = new Size(16, 16),
-                Location = new Point(0, 80),
+                Size = new Size(75, 20),
+                IconSize = new Size(15, 15),
+                Location = new Point(5, 80),
             };
             panel.SetIconsBox(iconLabel);
 
