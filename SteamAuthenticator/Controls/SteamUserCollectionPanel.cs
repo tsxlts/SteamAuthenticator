@@ -115,9 +115,9 @@ namespace Steam_Authenticator.Controls
             PictureBox pictureBox = new PictureBox()
             {
                 Name = "useravatar",
-                Width = 80,
-                Height = 80,
-                Location = new Point(0, 0),
+                Width = ItemSize.Width - 10,
+                Height = ItemSize.Width - 10,
+                Location = new Point(5, 5),
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
                 InitialImage = Properties.Resources.loading,

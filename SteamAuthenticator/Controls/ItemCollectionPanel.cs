@@ -1,5 +1,4 @@
-﻿
-namespace Steam_Authenticator.Controls
+﻿namespace Steam_Authenticator.Controls
 {
     internal abstract class ItemCollectionPanel<TItemPanel, TClient> : Panel where TItemPanel : ClientItemPanel<TClient> where TClient : Client
     {
@@ -27,6 +26,10 @@ namespace Steam_Authenticator.Controls
             }
 
             TItemPanel userPanel = CreateUserPanel(hasItem, client);
+            if (!hasItem)
+            {
+                userPanel.BgColor = Color.Transparent;
+            }
 
             ItemPanels.Insert(index, userPanel);
 
@@ -56,6 +59,18 @@ namespace Steam_Authenticator.Controls
             ItemPanels.Remove(panel);
             this.Controls.Remove(panel);
             Reset();
+            return panel;
+        }
+
+        public TItemPanel SetChecked(TClient client, bool isChecked)
+        {
+            var panel = ItemPanels.Find(c => c.Client?.Key?.Equals(client.Key) ?? false);
+            foreach (var item in ItemPanels)
+            {
+                item.SetChecked(false);
+            }
+
+            panel?.SetChecked(isChecked);
             return panel;
         }
 

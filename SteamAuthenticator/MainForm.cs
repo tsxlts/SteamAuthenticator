@@ -131,13 +131,6 @@ namespace Steam_Authenticator
 
             await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers());
 
-            var user = Appsetting.Instance.Clients?.FirstOrDefault(c => c.User.SteamId == Appsetting.Instance.AppSetting.Entry.CurrentUser);
-            user = user ?? Appsetting.Instance.Clients?.FirstOrDefault();
-            if (user != null)
-            {
-                SetCurrentClient(user);
-            }
-
             await Task.Run(() =>
             {
                 try

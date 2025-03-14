@@ -8,5 +8,15 @@
         }
 
         public TClient Client { get; set; }
+
+        public void SetChecked(bool isChecked)
+        {
+            if (!HasItem)
+            {
+                return;
+            }
+
+            BorderColor = isChecked ? Color.OrangeRed : Color.LightGray;
+        }
     }
 }

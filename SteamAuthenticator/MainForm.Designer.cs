@@ -256,6 +256,7 @@ namespace Steam_Authenticator
             // UserName
             // 
             UserName.AutoEllipsis = true;
+            UserName.ForeColor = Color.Green;
             UserName.Location = new Point(118, 40);
             UserName.Name = "UserName";
             UserName.Size = new Size(139, 23);
