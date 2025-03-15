@@ -3,8 +3,8 @@
 ### Steam自动发货工具 Steam自动收货工具
 
 <div>
-<p><strong>联系方式：2570096963（QQ）</strong></p>
   <p><strong>官方服务群：1030346616（QQ群）</strong></p>
+  <p><strong>联系方式：2570096963（QQ）</strong></p>
 </div>
 
 <p>1、支持无15天交易限制转移令牌！！！</p>
