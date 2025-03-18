@@ -5,6 +5,7 @@
 <div>
   <p><strong>官方服务群：1030346616（QQ群）</strong></p>
   <p><strong>联系方式：2570096963（QQ）</strong></p>
+  <p><img src="/images/qqGroup.jpg" width="300" height="300" ></p>
 </div>
 
 <p>1、支持无15天交易限制转移令牌！！！</p>
@@ -21,25 +22,25 @@
 
 <br /><br />
 
-![main](images/1_main.png)<br>
-![main](images/1_main_menu1.png)<br>
-![main](images/1_main_menu2.png)<br>
-![main](images/1_main_steam_menu.png)<br>
-![main](images/2_main_buff.png)<br>
-![main](images/2_main_buff_menu.png)<br>
-![login](images/3_login.png)<br>
-![qrAuth](images/4_qrAuth.png)<br>
-![buffQrAuth](images/5_buffQrAuth.png)<br>
-![offer](images/6_offer.png)<br>
-![confirmation](images/7_confirmation.png)<br>
-![confirmationpopup](images/8_confirmationpopup.png)<br>
-![guard](images/9_guard.png)<br>
-![setting](images/10_setting.png)<br>
-![steamSetting](images/11_steamSetting.png)<br>
-![confirmLogin](images/12_confirm_login.png)<br>
-![accountInfo1](images/13_account_info_1.png)<br>
-![accountInfo2](images/13_account_info_2.png)<br>
-![accountInfo3](images/13_account_info_3.png)<br>
+![main](images/1_main.png)<br />
+![main](images/1_main_menu1.png)<br />
+![main](images/1_main_menu2.png)<br />
+![main](images/1_main_steam_menu.png)<br />
+![main](images/2_main_buff.png)<br />
+![main](images/2_main_buff_menu.png)<br />
+![login](images/3_login.png)<br />
+![qrAuth](images/4_qrAuth.png)<br />
+![buffQrAuth](images/5_buffQrAuth.png)<br />
+![offer](images/6_offer.png)<br />
+![confirmation](images/7_confirmation.png)<br />
+![confirmationpopup](images/8_confirmationpopup.png)<br />
+![guard](images/9_guard.png)<br />
+![setting](images/10_setting.png)<br />
+![steamSetting](images/11_steamSetting.png)<br />
+![confirmLogin](images/12_confirm_login.png)<br />
+![accountInfo1](images/13_account_info_1.png)<br />
+![accountInfo2](images/13_account_info_2.png)<br />
+![accountInfo3](images/13_account_info_3.png)<br />
 
 
 
