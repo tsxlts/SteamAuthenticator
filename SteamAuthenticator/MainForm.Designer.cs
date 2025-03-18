@@ -78,7 +78,7 @@ namespace Steam_Authenticator
             label8 = new Label();
             pictureBox4 = new PictureBox();
             pictureBox3 = new PictureBox();
-            submitRequirementsLabel = new LinkLabel();
+            aboutLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
@@ -224,21 +224,21 @@ namespace Steam_Authenticator
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(124, 22);
+            submitRequirementsMenuItem.Size = new Size(180, 22);
             submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // submitBugMenuItem
             // 
             submitBugMenuItem.Name = "submitBugMenuItem";
-            submitBugMenuItem.Size = new Size(124, 22);
+            submitBugMenuItem.Size = new Size(180, 22);
             submitBugMenuItem.Text = "问题反馈";
             submitBugMenuItem.Click += submitBugMenuItem_Click;
             // 
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new Size(124, 22);
+            aboutMenuItem.Size = new Size(180, 22);
             aboutMenuItem.Text = "关于我们";
             aboutMenuItem.Click += aboutMenuItem_Click;
             // 
@@ -704,18 +704,18 @@ namespace Steam_Authenticator
             pictureBox3.TabIndex = 15;
             pictureBox3.TabStop = false;
             // 
-            // submitRequirementsLabel
+            // aboutLabel
             // 
-            submitRequirementsLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            submitRequirementsLabel.LinkColor = Color.FromArgb(192, 0, 192);
-            submitRequirementsLabel.Location = new Point(681, 481);
-            submitRequirementsLabel.Name = "submitRequirementsLabel";
-            submitRequirementsLabel.Size = new Size(60, 23);
-            submitRequirementsLabel.TabIndex = 19;
-            submitRequirementsLabel.TabStop = true;
-            submitRequirementsLabel.Text = "功能定制";
-            submitRequirementsLabel.TextAlign = ContentAlignment.MiddleCenter;
-            submitRequirementsLabel.LinkClicked += submitRequirementsMenuItem_Click;
+            aboutLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            aboutLabel.LinkColor = Color.FromArgb(192, 0, 192);
+            aboutLabel.Location = new Point(681, 481);
+            aboutLabel.Name = "aboutLabel";
+            aboutLabel.Size = new Size(60, 23);
+            aboutLabel.TabIndex = 19;
+            aboutLabel.TabStop = true;
+            aboutLabel.Text = "联系我们";
+            aboutLabel.TextAlign = ContentAlignment.MiddleCenter;
+            aboutLabel.LinkClicked += aboutMenuItem_Click;
             // 
             // mainNotifyIcon
             // 
@@ -729,7 +729,7 @@ namespace Steam_Authenticator
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(819, 511);
-            Controls.Add(submitRequirementsLabel);
+            Controls.Add(aboutLabel);
             Controls.Add(statusPanel);
             Controls.Add(tabControl);
             Controls.Add(versionLabel);
@@ -814,7 +814,7 @@ namespace Steam_Authenticator
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private Label SteamId;
-        private LinkLabel submitRequirementsLabel;
+        private LinkLabel aboutLabel;
         private ToolStripMenuItem contactUsMenuItem;
         private NotifyIcon mainNotifyIcon;
         private PictureBox pictureBox3;

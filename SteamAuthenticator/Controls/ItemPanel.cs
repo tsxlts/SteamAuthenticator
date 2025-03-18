@@ -1,4 +1,5 @@
 ﻿
+using Steam_Authenticator.Properties;
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
@@ -21,6 +22,15 @@ namespace Steam_Authenticator.Controls
 
         public ItemPanel SetItemIconBox(PictureBox icon)
         {
+            if (icon.ErrorImage == null)
+            {
+                icon.ErrorImage = Resources.loading_full;
+            }
+            if (icon.InitialImage == null)
+            {
+                icon.InitialImage = Resources.loading_full;
+            }
+
             this.ItemIcon = icon;
             this.Controls.Add(this.ItemIcon);
             return this;
@@ -35,6 +45,10 @@ namespace Steam_Authenticator.Controls
 
         public ItemPanel SetItemIcon(string icon)
         {
+            if (!icon.StartsWith("http"))
+            {
+                icon = $"https:{icon}";
+            }
             ItemIcon?.LoadAsync(icon);
             return this;
         }

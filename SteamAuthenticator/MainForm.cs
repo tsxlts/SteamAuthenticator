@@ -154,6 +154,8 @@ namespace Steam_Authenticator
             });
 
             checkVersionTimer.Change(TimeSpan.Zero, TimeSpan.FromHours(3));
+
+            await ShowTips().ConfigureAwait(false);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -927,6 +929,27 @@ namespace Steam_Authenticator
             this.CenterToScreen();
             this.Show();
             this.Activate();
+        }
+
+        private Task ShowTips()
+        {
+            try
+            {
+                if (Appsetting.Instance.AppSetting.Entry.TipVersion >= Appsetting.Instance.LastTipVersion)
+                {
+                    return Task.CompletedTask;
+                }
+
+                new About(currentVersion).ShowDialog();
+
+                Appsetting.Instance.AppSetting.Entry.TipVersion = Appsetting.Instance.LastTipVersion;
+                Appsetting.Instance.AppSetting.Save();
+            }
+            catch
+            {
+            }
+
+            return Task.CompletedTask;
         }
 
         protected override void Dispose(bool disposing)

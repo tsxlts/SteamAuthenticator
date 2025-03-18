@@ -124,8 +124,11 @@
   <data name="auto_accept" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\auto_accept.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="steam" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\File\steam.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="steam16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\File\steam16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="steam1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\File\steam.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="loading" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\loading.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -145,9 +148,6 @@
   <data name="auto_accept_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\auto_accept-32.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="steam16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\File\steam16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="auto_accept_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\auto_accept-16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -157,8 +157,11 @@
   <data name="add" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="steam1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\File\steam.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="loading_full" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\File\loading_full.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="steam" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\File\steam.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="auto_confirm_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\auto_confirm-32.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -166,7 +169,7 @@
   <data name="auto_confirm_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\File\auto_confirm-16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="loading_full" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\File\loading_full.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="qqGroup" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\qqGroup.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
