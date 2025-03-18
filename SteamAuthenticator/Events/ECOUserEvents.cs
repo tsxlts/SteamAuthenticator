@@ -90,10 +90,9 @@ namespace Steam_Authenticator
                 {
                     EcoUser user = Appsetting.Instance.Manifest.GetEcoUser(account);
                     EcoClient client = new EcoClient(user);
+                    Appsetting.Instance.EcoClients.Add(client);
 
                     AddUserPanel(client);
-
-                    Appsetting.Instance.EcoClients.Add(client);
                 }
 
                 {

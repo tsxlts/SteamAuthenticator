@@ -38,13 +38,14 @@ namespace Steam_Authenticator.Controls
 
         protected override SteamUserPanel[] Sort(SteamUserPanel[] itemPanels)
         {
-            var sortResults = itemPanels.OrderBy(c =>
+            var sortResults = itemPanels.OrderBy(c => c.HasItem ? 1 : 999).ThenBy(c =>
             {
                 Guard guard = Appsetting.Instance.Manifest.GetGuard(c.Client.GetAccount());
                 return guard != null ? 1 : 9;
             }).ThenBy(c => c.Client.User.Setting.AutoAcceptGive() ? 1 : 9)
             .ThenBy(c => c.Client.User.Setting.AutoConfirmOffer() ? 1 : 9)
-            .ThenBy(c => c.Client.User.Setting.AutoAcceptReceive() ? 1 : 9);
+            .ThenBy(c => c.Client.User.Setting.AutoAcceptReceive() ? 1 : 9)
+            .ThenBy(c => c.Client.GetAccount());
             return base.Sort(sortResults.ToArray());
         }
 
@@ -114,9 +115,9 @@ namespace Steam_Authenticator.Controls
             PictureBox pictureBox = new PictureBox()
             {
                 Name = "useravatar",
-                Width = 80,
-                Height = 80,
-                Location = new Point(0, 0),
+                Width = ItemSize.Width - 10,
+                Height = ItemSize.Width - 10,
+                Location = new Point(5, 5),
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
                 InitialImage = Properties.Resources.loading,
@@ -132,16 +133,16 @@ namespace Steam_Authenticator.Controls
             IconLabel iconLabel = new IconLabel(icons)
             {
                 Name = "icons",
-                Size = new Size(80, 20),
-                IconSize = new Size(16, 16),
-                Location = new Point(0, 80),
+                Size = new Size(75, 20),
+                IconSize = new Size(15, 15),
+                Location = new Point(5, 80),
             };
             panel.SetIconsBox(iconLabel);
 
             Label nameLabel = new Label()
             {
                 Name = "username",
-                Text = $"{client.GetAccount()} [{client.User.NickName}]",
+                Text = $"{client.GetAccount()}",
                 AutoSize = false,
                 AutoEllipsis = true,
                 Cursor = Cursors.Hand,
@@ -181,6 +182,20 @@ namespace Steam_Authenticator.Controls
             panel.SetConfirmationBox(confirmationLabel);
 
             return panel;
+        }
+
+        protected override void RefreshItems()
+        {
+            foreach (var client in ItemPanels)
+            {
+                if (!client.HasItem)
+                {
+                    continue;
+                }
+
+                client.SetItemIcon(client.Client.User.Avatar);
+                client.SetItemName(client.Client.GetAccount(), client.Client.Client.LoggedIn ? Color.Green : Color.Red);
+            }
         }
     }
 }

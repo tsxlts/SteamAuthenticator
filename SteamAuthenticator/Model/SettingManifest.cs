@@ -69,6 +69,12 @@ namespace Steam_Authenticator.Model
             /// <summary>
             /// 
             /// </summary>
+            [JsonProperty("tip_version")]
+            public int TipVersion { get; set; } = 0;
+
+            /// <summary>
+            /// 
+            /// </summary>
             public string InitialDirectory { get; set; }
 
             /// <summary>

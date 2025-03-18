@@ -41,6 +41,12 @@
             wechatBox = new Label();
             label2 = new Label();
             label5 = new Label();
+            label6 = new Label();
+            copyQQGroupBtn = new Label();
+            qqGroupBox = new Label();
+            qqGroupImg = new PictureBox();
+            label7 = new Label();
+            ((System.ComponentModel.ISupportInitialize)qqGroupImg).BeginInit();
             SuspendLayout();
             // 
             // versionBox
@@ -183,14 +189,78 @@
             label5.Name = "label5";
             label5.Size = new Size(61, 23);
             label5.TabIndex = 19;
-            label5.Text = "WeChat";
+            label5.Text = "微信";
             label5.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label6
+            // 
+            label6.ForeColor = Color.Gray;
+            label6.ImageAlign = ContentAlignment.MiddleLeft;
+            label6.Location = new Point(91, 123);
+            label6.Name = "label6";
+            label6.Size = new Size(61, 23);
+            label6.TabIndex = 22;
+            label6.Text = "QQ 群";
+            label6.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // copyQQGroupBtn
+            // 
+            copyQQGroupBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            copyQQGroupBtn.Cursor = Cursors.Hand;
+            copyQQGroupBtn.ForeColor = Color.Gray;
+            copyQQGroupBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            copyQQGroupBtn.Location = new Point(390, 123);
+            copyQQGroupBtn.Name = "copyQQGroupBtn";
+            copyQQGroupBtn.Size = new Size(42, 23);
+            copyQQGroupBtn.TabIndex = 21;
+            copyQQGroupBtn.Text = "复制";
+            copyQQGroupBtn.TextAlign = ContentAlignment.MiddleLeft;
+            copyQQGroupBtn.Click += copyQQGroupBtn_Click;
+            // 
+            // qqGroupBox
+            // 
+            qqGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            qqGroupBox.ForeColor = SystemColors.ControlText;
+            qqGroupBox.ImageAlign = ContentAlignment.MiddleLeft;
+            qqGroupBox.Location = new Point(158, 123);
+            qqGroupBox.Name = "qqGroupBox";
+            qqGroupBox.Size = new Size(225, 23);
+            qqGroupBox.TabIndex = 20;
+            qqGroupBox.Text = "**********";
+            qqGroupBox.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // qqGroupImg
+            // 
+            qqGroupImg.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            qqGroupImg.Image = Properties.Resources.qqGroup;
+            qqGroupImg.Location = new Point(158, 151);
+            qqGroupImg.Name = "qqGroupImg";
+            qqGroupImg.Size = new Size(150, 150);
+            qqGroupImg.SizeMode = PictureBoxSizeMode.Zoom;
+            qqGroupImg.TabIndex = 23;
+            qqGroupImg.TabStop = false;
+            // 
+            // label7
+            // 
+            label7.ForeColor = Color.Gray;
+            label7.ImageAlign = ContentAlignment.MiddleLeft;
+            label7.Location = new Point(91, 151);
+            label7.Name = "label7";
+            label7.Size = new Size(61, 23);
+            label7.TabIndex = 24;
+            label7.Text = "扫码入群";
+            label7.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // About
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(444, 261);
+            ClientSize = new Size(444, 312);
+            Controls.Add(label7);
+            Controls.Add(qqGroupImg);
+            Controls.Add(label6);
+            Controls.Add(copyQQGroupBtn);
+            Controls.Add(qqGroupBox);
             Controls.Add(label5);
             Controls.Add(label2);
             Controls.Add(copyWeChatBtn);
@@ -203,6 +273,7 @@
             Controls.Add(label3);
             Controls.Add(projectBox);
             Controls.Add(label1);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
@@ -211,6 +282,7 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "关于我们";
             Load += About_Load;
+            ((System.ComponentModel.ISupportInitialize)qqGroupImg).EndInit();
             ResumeLayout(false);
         }
 
@@ -227,5 +299,10 @@
         private Label wechatBox;
         private Label label2;
         private Label label5;
+        private Label label6;
+        private Label copyQQGroupBtn;
+        private Label qqGroupBox;
+        private PictureBox qqGroupImg;
+        private Label label7;
     }
 }

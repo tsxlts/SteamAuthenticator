@@ -218,10 +218,14 @@ namespace Steam_Authenticator
                 {
                     User user = Appsetting.Instance.Manifest.GetSteamUser(account);
                     UserClient client = new UserClient(user, new SteamCommunityClient());
+                    Appsetting.Instance.Clients.Add(client);
 
                     AddUserPanel(client);
 
-                    Appsetting.Instance.Clients.Add(client);
+                    if (client.User.SteamId == Appsetting.Instance.AppSetting.Entry.CurrentUser)
+                    {
+                        SetCurrentClient(client);
+                    }
                 }
 
                 {
@@ -350,33 +354,21 @@ namespace Steam_Authenticator
                 }
             }
 
-            Text = $"Steam验证器";
+            usersPanel.SetChecked(userClient, true);
+
+            UserName.Text = userClient?.User == null ? "---" : $"{userClient.GetAccount()} [{userClient.User.NickName}]";
+            SteamId.Text = userClient?.User == null ? "---" : $"{userClient.User.SteamId}";
 
             UserImg.Image = Properties.Resources.userimg;
-            UserName.ForeColor = Color.Black;
-            UserName.Text = "---";
-            SteamId.Text = "---";
-            Balance.Text = "￥0.00";
-            DelayedBalance.Text = "￥0.00";
+            if (!string.IsNullOrWhiteSpace(userClient?.User?.Avatar))
+            {
+                UserImg.LoadAsync(userClient.User.Avatar);
+            }
 
+            Balance.Text = "---";
+            DelayedBalance.Text = "---";
             OfferCountLabel.Text = "---";
             ConfirmationCountLable.Text = "---";
-
-            if (userClient?.Client?.LoggedIn ?? false)
-            {
-                Text = $"Steam验证器 {userClient.GetAccount()}[{userClient.User.NickName}]";
-
-                UserImg.Image = Properties.Resources.userimg;
-                if (!string.IsNullOrWhiteSpace(userClient.User.Avatar))
-                {
-                    UserImg.LoadAsync(userClient.User.Avatar);
-                }
-                UserName.ForeColor = Color.Green;
-                UserName.Text = $"{userClient.GetAccount()} [{userClient.User.NickName}]";
-                SteamId.Text = $"{userClient.User.SteamId}";
-                Balance.Text = "￥0.00";
-                DelayedBalance.Text = "￥0.00";
-            }
 
             currentClient = userClient;
             Appsetting.Instance.AppSetting.Entry.CurrentUser = currentClient.User.SteamId;

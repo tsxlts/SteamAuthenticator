@@ -31,9 +31,9 @@
             PictureBox pictureBox = new PictureBox()
             {
                 Name = "useravatar",
-                Width = 80,
-                Height = 80,
-                Location = new Point(0, 0),
+                Width = ItemSize.Width - 10,
+                Height = ItemSize.Width - 10,
+                Location = new Point(5, 5),
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
                 InitialImage = Properties.Resources.loading,
@@ -79,6 +79,20 @@
             panel.SetOfferBox(offerLabel);
 
             return panel;
+        }
+
+        protected override void RefreshItems()
+        {
+            foreach (var client in ItemPanels)
+            {
+                if (!client.HasItem)
+                {
+                    continue;
+                }
+
+                client.SetItemIcon(client.Client.User.Avatar);
+                client.SetItemName(client.Client.User.Nickname, client.Client.LoggedIn ? Color.Green : Color.Red);
+            }
         }
     }
 }

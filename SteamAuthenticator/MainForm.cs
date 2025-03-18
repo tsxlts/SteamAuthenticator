@@ -131,13 +131,6 @@ namespace Steam_Authenticator
 
             await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers());
 
-            var user = Appsetting.Instance.Clients?.FirstOrDefault(c => c.User.SteamId == Appsetting.Instance.AppSetting.Entry.CurrentUser);
-            user = user ?? Appsetting.Instance.Clients?.FirstOrDefault();
-            if (user != null)
-            {
-                SetCurrentClient(user);
-            }
-
             await Task.Run(() =>
             {
                 try
@@ -161,6 +154,8 @@ namespace Steam_Authenticator
             });
 
             checkVersionTimer.Change(TimeSpan.Zero, TimeSpan.FromHours(3));
+
+            await ShowTips().ConfigureAwait(false);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -290,6 +285,34 @@ namespace Steam_Authenticator
             finally
             {
                 currentClient?.LoginConfirmLocker.Release();
+            }
+        }
+
+        private async Task QueryWalletDetails(CancellationToken cancellationToken)
+        {
+            if (currentClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var webClient = currentClient.Client;
+
+                var walletDetails = await webClient.User.QueryWalletDetailsAsync(cancellationToken);
+
+                if (!(walletDetails?.HasWallet ?? false))
+                {
+                    Balance.Text = "---";
+                    DelayedBalance.Text = "---";
+                    return;
+                }
+
+                Balance.Text = $"{walletDetails.FormattedBalance}";
+                DelayedBalance.Text = $"{walletDetails.FormattedDelayedBalance}";
+            }
+            catch
+            {
             }
         }
 
@@ -748,35 +771,6 @@ namespace Steam_Authenticator
             await Task.WhenAll(tasks);
         }
 
-        private async Task QueryWalletDetails(CancellationToken cancellationToken)
-        {
-            if (currentClient == null)
-            {
-                return;
-            }
-
-            try
-            {
-                var webClient = currentClient.Client;
-
-                var walletDetails = await webClient.User.QueryWalletDetailsAsync(cancellationToken);
-
-                if (walletDetails?.HasWallet ?? false)
-                {
-                    Balance.Text = $"{walletDetails.FormattedBalance}";
-
-                    DelayedBalance.Text = "гд0.00";
-                    if (!string.IsNullOrWhiteSpace(walletDetails.FormattedDelayedBalance))
-                    {
-                        DelayedBalance.Text = $"{walletDetails.FormattedDelayedBalance}";
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
-
         private void RefreshUser(object _)
         {
             try
@@ -898,8 +892,11 @@ namespace Steam_Authenticator
                     DateTime published = resultObj.Value<DateTime>("published_at");
                     if (!string.IsNullOrWhiteSpace(updateUrl))
                     {
-                        ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, updateUrl, name);
-                        DialogResult updateDialog = applicationUpgrade.ShowDialog();
+                        this.Invoke(() =>
+                        {
+                            ApplicationUpgrade applicationUpgrade = new ApplicationUpgrade(currentVersion, newVersion, published, body, updateUrl, updateUrl, name);
+                            DialogResult updateDialog = applicationUpgrade.ShowDialog();
+                        });
                     }
                     return true;
                 }
@@ -932,6 +929,27 @@ namespace Steam_Authenticator
             this.CenterToScreen();
             this.Show();
             this.Activate();
+        }
+
+        private Task ShowTips()
+        {
+            try
+            {
+                if (Appsetting.Instance.AppSetting.Entry.TipVersion >= Appsetting.Instance.LastTipVersion)
+                {
+                    return Task.CompletedTask;
+                }
+
+                new About(currentVersion).ShowDialog();
+
+                Appsetting.Instance.AppSetting.Entry.TipVersion = Appsetting.Instance.LastTipVersion;
+                Appsetting.Instance.AppSetting.Save();
+            }
+            catch
+            {
+            }
+
+            return Task.CompletedTask;
         }
 
         protected override void Dispose(bool disposing)

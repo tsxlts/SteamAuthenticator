@@ -20,6 +20,7 @@ namespace Steam_Authenticator.Forms
 
             qqBox.Text = "2570096963";
             wechatBox.Text = "**********";
+            qqGroupBox.Text = "1030346616";
         }
 
         private void copyProjectBtn_Click(object sender, EventArgs e)
@@ -35,6 +36,11 @@ namespace Steam_Authenticator.Forms
         private void copyWeChatBtn_Click(object sender, EventArgs e)
         {
             Utils.CopyText(wechatBox.Text);
+        }
+
+        private void copyQQGroupBtn_Click(object sender, EventArgs e)
+        {
+            Utils.CopyText(qqGroupBox.Text);
         }
     }
 }

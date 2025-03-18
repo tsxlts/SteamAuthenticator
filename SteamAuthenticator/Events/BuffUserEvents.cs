@@ -95,10 +95,9 @@ namespace Steam_Authenticator
                 {
                     BuffUser user = Appsetting.Instance.Manifest.GetBuffUser(account);
                     BuffClient client = new BuffClient(user);
+                    Appsetting.Instance.BuffClients.Add(client);
 
                     AddUserPanel(client);
-
-                    Appsetting.Instance.BuffClients.Add(client);
                 }
 
                 {

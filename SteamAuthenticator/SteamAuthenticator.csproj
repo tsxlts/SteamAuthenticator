@@ -8,9 +8,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Steam_Authenticator</RootNamespace>
     <AssemblyName>SteamAuthenticator</AssemblyName>
-    <AssemblyVersion>2.0.3</AssemblyVersion>
-    <FileVersion>2.0.3</FileVersion>
-    <Version>2.0.3</Version>
+    <AssemblyVersion>2.0.4</AssemblyVersion>
+    <FileVersion>2.0.4</FileVersion>
+    <Version>2.0.4</Version>
     <ApplicationIcon>File\steam.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -51,7 +51,7 @@
   <ItemGroup>
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="127.3.50" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="SteamKit" Version="2.0.1.10" />
+    <PackageReference Include="SteamKit" Version="2.0.1.11" />
     <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.14" />
   </ItemGroup>
 

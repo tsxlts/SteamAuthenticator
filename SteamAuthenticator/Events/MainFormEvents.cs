@@ -23,7 +23,6 @@ namespace Steam_Authenticator
             }
 
             Utils.CopyText(webClient.SteamId);
-            Process.Start(new ProcessStartInfo($"{Appsetting.Instance.AppSetting.Entry.Domain.SteamCommunity}/profiles/{webClient.SteamId}") { UseShellExecute = true });
         }
 
         private void globalSettingMenuItem_Click(object sender, EventArgs e)
@@ -107,7 +106,7 @@ namespace Steam_Authenticator
 
         private async void checkVersionMenuItem_Click(object sender, EventArgs e)
         {
-            if (!await CheckVersion())
+            if (!await CheckVersion().ConfigureAwait(true))
             {
                 MessageBox.Show("当前客户端已是最新版本", "版本更新", MessageBoxButtons.OK);
             }

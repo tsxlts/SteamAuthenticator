@@ -53,6 +53,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public string SetupApplication => Path.Combine(AppContext.BaseDirectory, "!setup", "Install.exe");
+
+        [JsonIgnore]
+        public int LastTipVersion => 1;
     }
 
     public class Domain
