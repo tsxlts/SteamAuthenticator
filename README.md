@@ -5,6 +5,7 @@
 <div>
   <p><strong>官方服务群：1030346616（QQ群）</strong></p>
   <p><strong>联系方式：2570096963（QQ）</strong></p>
+  <p><strong>扫描下方二维码加入官方服务群</strong></p>
   <p><img src="/images/qqGroup.jpg" width="300" height="300" ></p>
 </div>
 
