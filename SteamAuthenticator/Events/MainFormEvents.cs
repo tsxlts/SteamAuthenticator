@@ -14,15 +14,35 @@ namespace Steam_Authenticator
     public partial class MainForm
     {
 
-        private void SteamId_Click(object sender, EventArgs e)
+        private async void SteamId_Click(object sender, EventArgs e)
         {
             var webClient = currentClient?.Client;
-            if (webClient == null || !webClient.LoggedIn)
+            if (string.IsNullOrWhiteSpace(webClient?.SteamId))
             {
                 return;
             }
 
             Utils.CopyText(webClient.SteamId);
+
+            Browser browser = new Browser()
+            {
+                WindowState = FormWindowState.Maximized
+            };
+            browser.Show();
+
+            try
+            {
+                var steamcommunity = await SteamApi.GetSteamIdAsync(webClient?.WebCookie ?? new CookieCollection());
+                var uri = steamcommunity.RequestUri;
+                uri = new Uri($"{uri.Scheme}://{uri.Host}/profiles/{webClient.SteamId}/");
+                browser.SetCookies($"{uri.Scheme}://{uri.Host}", webClient.WebCookie.ToArray());
+                await browser.LoadUrl(uri);
+            }
+            catch
+            {
+                browser.Close();
+                browser.Dispose();
+            }
         }
 
         private void globalSettingMenuItem_Click(object sender, EventArgs e)
