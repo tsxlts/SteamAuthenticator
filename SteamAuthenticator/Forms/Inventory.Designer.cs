@@ -47,6 +47,7 @@
             inventoryPages.SelectedIndex = 0;
             inventoryPages.Size = new Size(776, 411);
             inventoryPages.TabIndex = 0;
+            inventoryPages.SelectedIndexChanged += InventoryPages_SelectedIndexChanged;
             // 
             // defaultApp
             // 

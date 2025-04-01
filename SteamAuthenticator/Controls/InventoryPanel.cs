@@ -5,6 +5,7 @@ namespace Steam_Authenticator.Controls
 {
     internal class InventoryPanel : ClientItemPanel<SteamInventory>
     {
+        private Label TradableTime;
         private Label Exterior;
 
         public InventoryPanel(bool hasUser) : base(hasUser)
@@ -28,6 +29,24 @@ namespace Steam_Authenticator.Controls
 
             Exterior.Text = name;
             Exterior.ForeColor = color;
+            return this;
+        }
+
+        public ItemPanel SetTradableTimeBox(Label name)
+        {
+            this.TradableTime = name;
+            this.Controls.Add(this.TradableTime);
+            return this;
+        }
+
+        public ItemPanel SetTradableTime(string time)
+        {
+            if (!HasItem)
+            {
+                return this;
+            }
+
+            TradableTime.Text = time;
             return this;
         }
     }

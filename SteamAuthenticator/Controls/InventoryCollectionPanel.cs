@@ -1,4 +1,5 @@
 ﻿using Steam_Authenticator.Model.Steam;
+using SteamKit;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Controls
@@ -86,10 +87,25 @@ namespace Steam_Authenticator.Controls
             };
             panel.SetExteriorBox(exteriorLabel);
 
+            Label tradableTimeLabel = new Label()
+            {
+                Name = "tradableTime",
+                Text = GetTradableTime(client),
+                AutoSize = false,
+                AutoEllipsis = true,
+                Cursor = Cursors.Hand,
+                Size = new Size(80, 18),
+                TextAlign = ContentAlignment.TopCenter,
+                ForeColor = Color.Red,
+                BackColor = Color.Transparent,
+                Location = new Point(0, 116)
+            };
+            panel.SetTradableTimeBox(tradableTimeLabel);
+
             return panel;
         }
 
-        protected override Size ItemSize => new Size(80, 116);
+        protected override Size ItemSize => new Size(80, 134);
 
         public AppInventoryContextsResponse Context => context;
 
@@ -106,6 +122,43 @@ namespace Steam_Authenticator.Controls
         private string GetIcon(SteamInventory asset)
         {
             return $"https://community.fastly.steamstatic.com/economy/image/{asset.Description?.IconUrl}";
+        }
+
+        private string GetTradableTime(SteamInventory asset)
+        {
+            foreach (var item in asset.Description.OwnerDescriptions ?? new List<AssetDescription>())
+            {
+                if (string.IsNullOrWhiteSpace(item.Value))
+                {
+                    continue;
+                }
+
+                var time = Extension.GetAssetTradableExpires(item.Value);
+                if (!time.HasValue)
+                {
+                    continue;
+                }
+
+                var diff = time.Value - DateTime.Now;
+                if (diff.TotalDays > 1)
+                {
+                    return $"{diff.Days}天{diff.Hours}小时";
+                }
+
+                if (diff.TotalHours > 1)
+                {
+                    return $"{diff.Hours}小时{diff.Minutes}分";
+                }
+
+                if (diff.TotalMinutes > 1)
+                {
+                    return $"{diff.Minutes}分";
+                }
+
+                return $"1分";
+            }
+
+            return "";
         }
     }
 }
