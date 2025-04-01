@@ -124,6 +124,18 @@ namespace Steam_Authenticator
             accountInfo.ShowDialog();
         }
 
+        private void inventoryMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
+
+            SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
+            UserClient userClient = panel.Client;
+
+            var inventory = new Inventory(userClient);
+            inventory.ShowDialog();
+        }
+
         private async void reloginMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
@@ -299,9 +311,10 @@ namespace Steam_Authenticator
                 var players = await SteamApi.QueryPlayerSummariesAsync(null, client.WebApiToken, new[] { client.SteamId });
                 var player = players.Body?.Players?.FirstOrDefault();
 
+                string account = await client.GetAccountNameAsync();
                 var user = new User
                 {
-                    Account = !string.IsNullOrWhiteSpace(client.Account) ? client.Account : localUser?.Account,
+                    Account = !string.IsNullOrWhiteSpace(account) ? account : localUser?.Account,
 
                     SteamId = client.SteamId,
                     RefreshToken = client.RefreshToken,

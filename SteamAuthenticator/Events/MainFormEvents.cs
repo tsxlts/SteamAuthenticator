@@ -22,8 +22,6 @@ namespace Steam_Authenticator
                 return;
             }
 
-            Utils.CopyText(webClient.SteamId);
-
             Browser browser = new Browser()
             {
                 WindowState = FormWindowState.Maximized

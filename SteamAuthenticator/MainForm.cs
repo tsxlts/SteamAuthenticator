@@ -107,6 +107,7 @@ namespace Steam_Authenticator
             userContextMenuStrip.Items.Add("切换").Click += setCurrentClientMenuItem_Click;
             userContextMenuStrip.Items.Add("设置").Click += settingMenuItem_Click;
             userContextMenuStrip.Items.Add("帐号信息").Click += accountInfoMenuItem_Click;
+            userContextMenuStrip.Items.Add("Steam库存").Click += inventoryMenuItem_Click;
             userContextMenuStrip.Items.Add("复制Cookie").Click += copyCookieMenuItem_Click;
             userContextMenuStrip.Items.Add("复制AccessToken").Click += copyAccessTokenMenuItem_Click;
             userContextMenuStrip.Items.Add("复制RefreshToken").Click += copyRefreshTokenMenuItem_Click;
@@ -261,22 +262,25 @@ namespace Steam_Authenticator
                         return;
                     }
 
-                    string clientType = sessionInfo.PlatformType switch
+                    this.Invoke(() =>
                     {
-                        var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
-                        var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
-                        var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
-                        _ => "未知设备"
-                    };
-                    var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
+                        string clientType = sessionInfo.PlatformType switch
+                        {
+                            var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
+                            var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
+                            var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
+                            _ => "未知设备"
+                        };
+                        var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
 
-                    MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
-                    mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{currentClient.GetAccount()} 有新的登录请求";
-                    mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
-                    mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
-                    mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
+                        MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
+                        mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{currentClient.GetAccount()} 有新的登录请求";
+                        mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
+                        mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
+                        mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
 
-                    mobileConfirmationLogin.ShowDialog();
+                        mobileConfirmationLogin.ShowDialog();
+                    });
                 }
             }
             catch
@@ -727,8 +731,11 @@ namespace Steam_Authenticator
 
                         if (waitConfirm.Any() && setting.ConfirmationAutoPopup)
                         {
-                            ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
-                            confirmationPopup.ShowDialog();
+                            this.Invoke(() =>
+                            {
+                                ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
+                                confirmationPopup.ShowDialog();
+                            });
                         }
                     }
                     catch

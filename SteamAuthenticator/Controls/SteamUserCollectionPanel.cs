@@ -149,6 +149,7 @@ namespace Steam_Authenticator.Controls
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = client.Client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
+                BackColor = Color.Transparent,
                 Location = new Point(0, iconLabel.Location.Y + iconLabel.Height)
             };
             panel.SetItemNameBox(nameLabel);
@@ -163,6 +164,7 @@ namespace Steam_Authenticator.Controls
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopRight,
                 ForeColor = Color.FromArgb(255, 128, 0),
+                BackColor = Color.Transparent,
                 Location = new Point(0, nameLabel.Location.Y + nameLabel.Height)
             };
             panel.SetOfferBox(offerLabel);
@@ -177,6 +179,7 @@ namespace Steam_Authenticator.Controls
                 Size = new Size(38, 18),
                 TextAlign = ContentAlignment.TopLeft,
                 ForeColor = Color.FromArgb(0, 128, 255),
+                BackColor = Color.Transparent,
                 Location = new Point(42, nameLabel.Location.Y + nameLabel.Height)
             };
             panel.SetConfirmationBox(confirmationLabel);

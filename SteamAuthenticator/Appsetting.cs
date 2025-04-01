@@ -140,11 +140,6 @@ namespace Steam_Authenticator
         /// <returns></returns>
         public string GetAccount()
         {
-            if (!string.IsNullOrWhiteSpace(Client?.Account))
-            {
-                return Client.Account;
-            }
-
             return User?.Account;
         }
 
@@ -162,9 +157,10 @@ namespace Steam_Authenticator
                 }
 
                 result = await Client.LoginAsync(User.RefreshToken);
-                if (string.IsNullOrWhiteSpace(User.Account) && Client.Account != User.Account)
+                var account = await Client.GetAccountNameAsync();
+                if (string.IsNullOrWhiteSpace(User.Account) && account != User.Account)
                 {
-                    User.Account = Client.Account;
+                    User.Account = account;
                 }
 
                 Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);

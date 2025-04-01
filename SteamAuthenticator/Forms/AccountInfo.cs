@@ -257,7 +257,7 @@ namespace Steam_Authenticator.Forms
             {
                 SteamStoreClient storeClient = new SteamStoreClient();
                 await storeClient.LoginAsync(client.Client.RefreshToken);
-                var accountSetting = await SteamApi.GetAccountSettingAsync(storeClient.WebCookie);
+                var accountSetting = await SteamStoreApi.GetAccountSettingAsync(storeClient.WebCookie);
                 var accountSettingBody = accountSetting.Body;
                 if (accountSettingBody == null)
                 {
@@ -282,7 +282,7 @@ namespace Steam_Authenticator.Forms
             {
                 SteamHelpClient helpClient = new SteamHelpClient();
                 await helpClient.LoginAsync(client.Client.RefreshToken);
-                var tradable = await SteamApi.TradableCheckAsync(helpClient.WebCookie);
+                var tradable = await SteamHelpApi.TradableCheckAsync(helpClient.WebCookie);
                 var tradableBody = tradable.Body;
                 if (tradableBody == null)
                 {
