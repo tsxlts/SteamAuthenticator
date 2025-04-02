@@ -131,6 +131,10 @@ namespace Steam_Authenticator
 
             SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
             UserClient userClient = panel.Client;
+            if (!userClient.Client.LoggedIn)
+            {
+                return;
+            }
 
             var inventory = new Inventory(userClient);
             inventory.ShowDialog();

@@ -87,25 +87,26 @@ namespace Steam_Authenticator.Controls
             };
             panel.SetExteriorBox(exteriorLabel);
 
+            var tradableTime = GetTradableTime(client, out var color);
             Label tradableTimeLabel = new Label()
             {
                 Name = "tradableTime",
-                Text = GetTradableTime(client),
+                Text = tradableTime,
                 AutoSize = false,
                 AutoEllipsis = true,
                 Cursor = Cursors.Hand,
-                Size = new Size(80, 18),
+                Size = new Size(80, 16),
                 TextAlign = ContentAlignment.TopCenter,
-                ForeColor = Color.Red,
-                BackColor = Color.Transparent,
-                Location = new Point(0, 116)
+                ForeColor = color,
+                BackColor = Color.FromArgb(200, 128, 128, 128),
+                Location = new Point(0, pictureBox.Height - 16)
             };
-            panel.SetTradableTimeBox(tradableTimeLabel);
+            pictureBox.Controls.Add(tradableTimeLabel);
 
             return panel;
         }
 
-        protected override Size ItemSize => new Size(80, 134);
+        protected override Size ItemSize => new Size(80, 116);
 
         public AppInventoryContextsResponse Context => context;
 
@@ -124,7 +125,7 @@ namespace Steam_Authenticator.Controls
             return $"https://community.fastly.steamstatic.com/economy/image/{asset.Description?.IconUrl}";
         }
 
-        private string GetTradableTime(SteamInventory asset)
+        private string GetTradableTime(SteamInventory asset, out Color color)
         {
             foreach (var item in asset.Description.OwnerDescriptions ?? new List<AssetDescription>())
             {
@@ -139,6 +140,7 @@ namespace Steam_Authenticator.Controls
                     continue;
                 }
 
+                color = Color.Red;
                 var diff = time.Value - DateTime.Now;
                 if (diff.TotalDays > 1)
                 {
@@ -158,7 +160,8 @@ namespace Steam_Authenticator.Controls
                 return $"1分";
             }
 
-            return "";
+            color = Color.Green;
+            return "可交易";
         }
     }
 }

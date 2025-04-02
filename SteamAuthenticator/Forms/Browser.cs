@@ -56,6 +56,7 @@ namespace Steam_Authenticator.Forms
 
         private async Task SetCookies()
         {
+            await browser.GetCookieManager().DeleteCookiesAsync();
             if (cookies?.Any() ?? false)
             {
                 foreach (var item in cookies)
