@@ -14,6 +14,9 @@ namespace Steam_Authenticator.Forms
 
         public Inventory(UserClient client)
         {
+            MaximizeBox = MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+
             InitializeComponent();
 
             this.client = client;
@@ -26,8 +29,12 @@ namespace Steam_Authenticator.Forms
 
         private async void Inventory_Load(object sender, EventArgs e)
         {
-            await LoadContexts();
-            await LoadAsset(1, pageSize);
+            await Init();
+        }
+
+        private async void reloadBtn_Click(object sender, EventArgs e)
+        {
+            await Init();
         }
 
         private async void refreshInventory_Click(object sender, EventArgs e)
@@ -95,6 +102,21 @@ namespace Steam_Authenticator.Forms
         {
             int.TryParse(currentPageBox.Text, out int pageIndex);
             await LoadAsset(pageIndex + 1, pageSize);
+        }
+
+        private async Task Init()
+        {
+            try
+            {
+                reloadBtn.Enabled = false;
+
+                await LoadContexts();
+                await LoadAsset(1, pageSize);
+            }
+            finally
+            {
+                reloadBtn.Enabled = true;
+            }
         }
 
         private async Task LoadContexts(CancellationToken cancellationToken = default)
@@ -178,7 +200,8 @@ namespace Steam_Authenticator.Forms
                         appInventory.TryAdd(context.AppId, inventoryResponse);
                     }
 
-                    int pageTotal = (int)Math.Ceiling(inventoryResponse.Inventories.Count * 1.0m / pageSize);
+                    int inventoryTotal = inventoryResponse.Inventories.Count;
+                    int pageTotal = (int)Math.Ceiling(inventoryTotal * 1.0m / pageSize);
                     pageInex = Math.Max(1, pageInex);
                     pageInex = Math.Min(pageInex, pageTotal);
 
@@ -193,7 +216,7 @@ namespace Steam_Authenticator.Forms
                     }
                     page.AddItemPanels(true, inventoryContext);
 
-                    inventoryTotalBox.Text = $"{inventoryResponse.Inventories.Count}";
+                    inventoryTotalBox.Text = $"{inventoryTotal}";
                     pageTotalBox.Text = $"{pageTotal}";
                     currentPageBox.Text = $"{pageInex}";
 

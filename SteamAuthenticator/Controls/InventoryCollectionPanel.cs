@@ -1,6 +1,8 @@
 ﻿using Steam_Authenticator.Model.Steam;
 using SteamKit;
 using SteamKit.Model;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace Steam_Authenticator.Controls
 {
@@ -48,6 +50,7 @@ namespace Steam_Authenticator.Controls
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.Zoom,
                 InitialImage = Properties.Resources.loading,
+                BackColor = Color.FromArgb(128, 128, 128, 128),
             };
             string iconurl = GetIcon(client);
             pictureBox.Image = Properties.Resources.loading;

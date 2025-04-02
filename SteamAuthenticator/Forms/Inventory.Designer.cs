@@ -44,13 +44,14 @@
             label5 = new Label();
             currentPageBox = new Label();
             label7 = new Label();
+            reloadBtn = new Label();
             inventoryPages.SuspendLayout();
             defaultApp.SuspendLayout();
             SuspendLayout();
             // 
             // inventoryPages
             // 
-            inventoryPages.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            inventoryPages.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             inventoryPages.Controls.Add(defaultApp);
             inventoryPages.Location = new Point(12, 38);
             inventoryPages.Name = "inventoryPages";
@@ -103,6 +104,7 @@
             // 
             // prePageBtn
             // 
+            prePageBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             prePageBtn.AutoSize = true;
             prePageBtn.Location = new Point(155, 452);
             prePageBtn.Name = "prePageBtn";
@@ -133,6 +135,7 @@
             // 
             // nextPageBtn
             // 
+            nextPageBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             nextPageBtn.AutoSize = true;
             nextPageBtn.Location = new Point(393, 452);
             nextPageBtn.Name = "nextPageBtn";
@@ -145,6 +148,7 @@
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label2.AutoSize = true;
             label2.Location = new Point(205, 452);
             label2.Name = "label2";
@@ -164,6 +168,7 @@
             // 
             // label4
             // 
+            label4.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label4.AutoSize = true;
             label4.Location = new Point(273, 452);
             label4.Name = "label4";
@@ -173,6 +178,7 @@
             // 
             // label5
             // 
+            label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label5.AutoSize = true;
             label5.Location = new Point(367, 452);
             label5.Name = "label5";
@@ -192,6 +198,7 @@
             // 
             // label7
             // 
+            label7.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label7.AutoSize = true;
             label7.Location = new Point(299, 452);
             label7.Name = "label7";
@@ -199,11 +206,25 @@
             label7.TabIndex = 28;
             label7.Text = "第";
             // 
+            // reloadBtn
+            // 
+            reloadBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            reloadBtn.AutoSize = true;
+            reloadBtn.Cursor = Cursors.Hand;
+            reloadBtn.ForeColor = Color.Green;
+            reloadBtn.Location = new Point(725, 9);
+            reloadBtn.Name = "reloadBtn";
+            reloadBtn.Size = new Size(56, 17);
+            reloadBtn.TabIndex = 31;
+            reloadBtn.Text = "重新加载";
+            reloadBtn.Click += reloadBtn_Click;
+            // 
             // Inventory
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 478);
+            Controls.Add(reloadBtn);
             Controls.Add(label5);
             Controls.Add(currentPageBox);
             Controls.Add(label7);
@@ -245,5 +266,6 @@
         private Label label5;
         private Label currentPageBox;
         private Label label7;
+        private Label reloadBtn;
     }
 }
