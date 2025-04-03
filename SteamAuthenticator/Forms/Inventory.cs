@@ -2,6 +2,7 @@
 using Steam_Authenticator.Model.Steam;
 using SteamKit;
 using SteamKit.Model;
+using System.Diagnostics;
 
 namespace Steam_Authenticator.Forms
 {
@@ -102,6 +103,29 @@ namespace Steam_Authenticator.Forms
         {
             int.TryParse(currentPageBox.Text, out int pageIndex);
             await LoadAsset(pageIndex + 1, pageSize);
+        }
+
+        private void inventory_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var inventoryPanel = (sender as Control)?.Parent as InventoryPanel;
+                if (inventoryPanel?.Client?.Description == null)
+                {
+                    return;
+                }
+
+                string url = $"{SteamBulider.DefaultSteamCommunity}" +
+                    $"/market/listings" +
+                    $"/{inventoryPanel.Client.Description.AppId}" +
+                    $"/{Uri.EscapeDataString(inventoryPanel.Client.Description.MarketHashName)}";
+
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch
+            {
+
+            }
         }
 
         private async Task Init()
@@ -214,7 +238,11 @@ namespace Steam_Authenticator.Forms
                         InventoryDescription description = descriptions.FirstOrDefault(c => c.ClassId == item.ClassId && c.InstanceId == item.InstanceId);
                         inventoryContext.Add(new SteamInventory(item, description));
                     }
-                    page.AddItemPanels(true, inventoryContext);
+                    var panels = page.AddItemPanels(true, inventoryContext);
+                    panels.ForEach(c =>
+                    {
+                        c.ItemIcon.Click += inventory_Click;
+                    });
 
                     inventoryTotalBox.Text = $"{inventoryTotal}";
                     pageTotalBox.Text = $"{pageTotal}";

@@ -1,8 +1,6 @@
 ﻿using Steam_Authenticator.Model.Steam;
 using SteamKit;
 using SteamKit.Model;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 
 namespace Steam_Authenticator.Controls
 {
