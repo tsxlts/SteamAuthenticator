@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
@@ -145,6 +146,8 @@ namespace Steam_Authenticator
         private async void MainForm_Load(object sender, EventArgs e)
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
+
+            var report = Report();
 
             await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers(), LoadYouPinUsers());
 
@@ -977,6 +980,22 @@ namespace Steam_Authenticator
             }
 
             return false;
+        }
+
+        private async Task Report()
+        {
+            try
+            {
+                string machineId = Helper.GetMachineGuid();
+                if (string.IsNullOrEmpty(machineId))
+                {
+                    machineId = Helper.GetMachineUniqueId();
+                }
+                var response = await AuthenticatorApi.Report(version: currentVersion, machineId);
+            }
+            catch
+            {
+            }
         }
 
         internal void ShowForm()
