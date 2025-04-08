@@ -117,6 +117,7 @@ namespace Steam_Authenticator.Forms
                     MessageBox.Show($"登录失败" +
                         $"{Environment.NewLine}" +
                         $"{smsLoginBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
                 Token = smsLoginData.Token;

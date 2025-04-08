@@ -28,7 +28,7 @@ namespace Steam_Authenticator.Internal
             RequestTag = Guid.NewGuid().ToString();
         }
 
-        public static async Task<IWebResponse<YouPin898Response<SendSmsCodeResponse>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken)
+        public static async Task<IWebResponse<YouPin898Response<SendSmsCodeResponse>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(new
             {
@@ -43,7 +43,7 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
-        public static async Task<IWebResponse<YouPin898Response<SmsCodeLoginResponse>>> SmsCodeLogin(string sessionId, string area, string phone, string smsCode, CancellationToken cancellationToken)
+        public static async Task<IWebResponse<YouPin898Response<SmsCodeLoginResponse>>> SmsCodeLogin(string sessionId, string area, string phone, string smsCode, CancellationToken cancellationToken = default)
         {
             string url = $"{Api}/api/user/Auth/SmsUpSignIn";
             if (!string.IsNullOrEmpty(smsCode))
@@ -64,17 +64,60 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
-        public static async Task<IWebResponse<YouPin898Response<SmsUpSignInConfigResponse>>> GetSmsUpSignInConfig(CancellationToken cancellationToken)
+        public static async Task<IWebResponse<YouPin898Response<SmsUpSignInConfigResponse>>> GetSmsUpSignInConfig(CancellationToken cancellationToken = default)
         {
             var response = await SteamApi.GetAsync<YouPin898Response<SmsUpSignInConfigResponse>>($"{Api}/api/user/Auth/GetSmsUpSignInConfig",
                 headers: InitDefaultHeaders(), cancellationToken: cancellationToken);
             return response;
         }
 
-        public static async Task<IWebResponse<YouPin898Response<GetUserInfoResponse>>> GetUserInfo(string token, CancellationToken cancellationToken)
+        public static async Task<IWebResponse<YouPin898Response<GetUserInfoResponse>>> GetUserInfo(string token, CancellationToken cancellationToken = default)
         {
             var response = await SteamApi.GetAsync<YouPin898Response<GetUserInfoResponse>>($"{Api}/api/user/Account/getUserInfo",
                 headers: InitDefaultHeaders(token: token), cancellationToken: cancellationToken);
+            return response;
+        }
+
+        public static async Task<IWebResponse<YouPin898Response<GetOfferListResponse>>> GetOfferList(string token, CancellationToken cancellationToken = default)
+        {
+            string code = "1";
+            string subCode = "1-1";
+            var content = JsonContent.Create(new
+            {
+                code = code,
+                subCode = subCode,
+                whetherDark = false,
+                Sessionid = Guid.NewGuid()
+            });
+            var response = await SteamApi.PostAsync<YouPin898Response<GetOfferListResponse>>($"{Api}/api/youpin/bff/offer/component/order/list",
+                content,
+                headers: InitDefaultHeaders(token: token), cancellationToken: cancellationToken);
+
+            var data = response.Body?.GetData();
+            foreach (var item in data?.menuCodeInfoList ?? new List<MenuCodeInfo>())
+            {
+                if (item.code == subCode)
+                {
+                    continue;
+                }
+
+                var itemContent = JsonContent.Create(new
+                {
+                    code = item.code.Split('-')[0],
+                    subCode = item.code,
+                    whetherDark = false,
+                    Sessionid = Guid.NewGuid()
+                });
+
+                var itemResponse = await SteamApi.PostAsync<YouPin898Response<GetOfferListResponse>>($"{Api}/api/youpin/bff/offer/component/order/list",
+                itemContent,
+                headers: InitDefaultHeaders(token: token), cancellationToken: cancellationToken);
+
+                data.orderInfoList.AddRange(itemResponse.Body?.GetData()?.orderInfoList ?? new List<OrderInfo>());
+            }
+
+            response.Body.data = null;
+            response.Body.Data = data;
             return response;
         }
 

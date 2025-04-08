@@ -24,9 +24,9 @@ namespace Steam_Authenticator.Model.YouPin898
             return GetCode() == 0;
         }
 
-        public int? Code { get; set; } = 84101;
+        public int? Code { get; set; }
 
-        public int? code { get; set; } = 84101;
+        public int? code { get; set; }
 
         public string Msg { get; set; }
 
