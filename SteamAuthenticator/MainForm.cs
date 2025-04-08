@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
+using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
@@ -19,6 +20,7 @@ namespace Steam_Authenticator
         private readonly System.Threading.Timer refreshBuffUserTimer;
         private readonly System.Threading.Timer refreshEcoUserTimer;
         private readonly System.Threading.Timer checkVersionTimer;
+        private readonly System.Threading.Timer refreshYouPinUserTimer;
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
         private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(60);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
@@ -26,6 +28,7 @@ namespace Steam_Authenticator
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
         private readonly ContextMenuStrip ecoUserContextMenuStrip;
+        private readonly ContextMenuStrip youpinUserContextMenuStrip;
 
         private bool showBalloonTip = true;
         private UserClient currentClient = null;
@@ -54,6 +57,7 @@ namespace Steam_Authenticator
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
             refreshEcoUserTimer = new System.Threading.Timer(RefreshEcoUser, null, -1, -1);
+            refreshYouPinUserTimer = new System.Threading.Timer(RefreshYouPinUser, null, -1, -1);
             checkVersionTimer = new System.Threading.Timer((obj) =>
             {
                 try
@@ -90,6 +94,14 @@ namespace Steam_Authenticator
             ecoUsersPanelContextMenuStrip.Items.Add("添加帐号").Click += addEcoUserBtn_Click;
             ecoUsersPanel.ContextMenuStrip = ecoUsersPanelContextMenuStrip;
 
+            var youpinUsersPanelContextMenuStrip = new ContextMenuStrip();
+            youpinUsersPanelContextMenuStrip.Items.Add("刷新").Click += (send, e) =>
+            {
+                youpinUsersPanel.Reset();
+            };
+            youpinUsersPanelContextMenuStrip.Items.Add("添加帐号").Click += addYouPinUserBtn_Click;
+            youpinUsersPanel.ContextMenuStrip = youpinUsersPanelContextMenuStrip;
+
             mainNotifyMenuStrip = new ContextMenuStrip();
             mainNotifyMenuStrip.Items.Add("打开").Click += (sender, e) =>
             {
@@ -107,6 +119,7 @@ namespace Steam_Authenticator
             userContextMenuStrip.Items.Add("切换").Click += setCurrentClientMenuItem_Click;
             userContextMenuStrip.Items.Add("设置").Click += settingMenuItem_Click;
             userContextMenuStrip.Items.Add("帐号信息").Click += accountInfoMenuItem_Click;
+            userContextMenuStrip.Items.Add("Steam库存").Click += inventoryMenuItem_Click;
             userContextMenuStrip.Items.Add("复制Cookie").Click += copyCookieMenuItem_Click;
             userContextMenuStrip.Items.Add("复制AccessToken").Click += copyAccessTokenMenuItem_Click;
             userContextMenuStrip.Items.Add("复制RefreshToken").Click += copyRefreshTokenMenuItem_Click;
@@ -123,13 +136,20 @@ namespace Steam_Authenticator
             ecoUserContextMenuStrip.Items.Add("重新登录").Click += ecoReloginMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("退出登录").Click += ecoLogoutMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("移除帐号").Click += removeEcoUserMenuItem_Click;
+
+            youpinUserContextMenuStrip = new ContextMenuStrip();
+            youpinUserContextMenuStrip.Items.Add("重新登录").Click += youpinReloginMenuItem_Click;
+            youpinUserContextMenuStrip.Items.Add("退出登录").Click += youpinLogoutMenuItem_Click;
+            youpinUserContextMenuStrip.Items.Add("移除帐号").Click += removeYouPinUserMenuItem_Click;
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
 
-            await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers());
+            var report = Report();
+
+            await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers(), LoadYouPinUsers());
 
             await Task.Run(() =>
             {
@@ -261,22 +281,25 @@ namespace Steam_Authenticator
                         return;
                     }
 
-                    string clientType = sessionInfo.PlatformType switch
+                    this.Invoke(() =>
                     {
-                        var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
-                        var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
-                        var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
-                        _ => "未知设备"
-                    };
-                    var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
+                        string clientType = sessionInfo.PlatformType switch
+                        {
+                            var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
+                            var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
+                            var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
+                            _ => "未知设备"
+                        };
+                        var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
 
-                    MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
-                    mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{currentClient.GetAccount()} 有新的登录请求";
-                    mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
-                    mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
-                    mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
+                        MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
+                        mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{currentClient.GetAccount()} 有新的登录请求";
+                        mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
+                        mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
+                        mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
 
-                    mobileConfirmationLogin.ShowDialog();
+                        mobileConfirmationLogin.ShowDialog();
+                    });
                 }
             }
             catch
@@ -330,6 +353,7 @@ namespace Steam_Authenticator
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
                 var buffClients = Appsetting.Instance.BuffClients;
                 var ecoClients = Appsetting.Instance.EcoClients;
+                var youpinClinets = Appsetting.Instance.YouPinClients;
                 foreach (var client in checkClients)
                 {
                     if (client == null)
@@ -343,16 +367,19 @@ namespace Steam_Authenticator
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
                         var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
+                        var youpinClient = youpinClinets.FirstOrDefault(c => c.User.SteamId == user.SteamId);
 
                         bool acceptAll = user.Setting.AutoAcceptGiveOffer;
                         bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
                         bool accectEco = acceptAll || user.Setting.AutoAcceptGiveOffer_Eco;
+                        bool accectYouPin = acceptAll || user.Setting.AutoAcceptGiveOffer_YouPin;
                         bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
                         bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
 
                         bool confirmAll = user.Setting.AutoConfirmTrade;
                         bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
                         bool confirmEco = confirmAll || user.Setting.AutoConfirmTrade_Eco;
+                        bool confirmYouPin = confirmAll || user.Setting.AutoConfirmTrade_YouPin;
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
@@ -362,6 +389,7 @@ namespace Steam_Authenticator
 
                         int? buffOfferCount = null;
                         int? ecoOfferCount = null;
+                        int? youpinOfferCount = null;
                         try
                         {
                             if (!webClient.LoggedIn)
@@ -390,6 +418,7 @@ namespace Steam_Authenticator
                             var customGiveOffers = new List<Offer>();
                             var buffGiveOffers = new List<Offer>();
                             var ecoGiveOffers = new List<Offer>();
+                            var youpinGiveOffers = new List<Offer>();
                             var otherGiveOffers = giveOffers.ToList();
 
                             #region 自定义报价
@@ -504,6 +533,28 @@ namespace Steam_Authenticator
                             }
                             #endregion
 
+                            #region 悠悠报价
+                            youpinOfferCount = 0;
+                            if (giveOffers.Any() && youpinClient != null)
+                            {
+                                youpinOfferCount = null;
+                                var youpinOffer = youpinClient.GetOfferList().Result;
+                                if (youpinOffer.Body?.IsSuccess() ?? false)
+                                {
+                                    var youpinOfferIds = youpinOffer.Body.GetData()?.orderInfoList?.Select(c => c.offerId)?.ToList() ?? new List<string>();
+                                    youpinGiveOffers = giveOffers.Where(c => youpinOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => youpinOfferIds.Contains(c.TradeOfferId));
+
+                                    youpinOfferCount = receivedOffers.Count(c => youpinOfferIds.Any(offerId => c.TradeOfferId == offerId));
+                                }
+                                else
+                                {
+                                    otherGiveOffers = new List<Offer>();
+                                }
+                            }
+                            #endregion
+
                             List<Offer> acceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
@@ -523,6 +574,11 @@ namespace Steam_Authenticator
                             if (!acceptAll && accectEco)
                             {
                                 var acceptItemOffers = ecoGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accectYouPin)
+                            {
+                                var acceptItemOffers = youpinGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
@@ -550,6 +606,10 @@ namespace Steam_Authenticator
                             {
                                 autoConfirmOffers.AddRange(ecoGiveOffers);
                             }
+                            if (!confirmAll && confirmYouPin)
+                            {
+                                autoConfirmOffers.AddRange(youpinGiveOffers);
+                            }
                             if (!confirmAll && confirmOther)
                             {
                                 autoConfirmOffers.AddRange(otherGiveOffers);
@@ -568,6 +628,7 @@ namespace Steam_Authenticator
                             usersPanel.SetOffer(client, receivedOffers.Count);
                             buffUsersPanel.SetOffer(buffClinet, buffOfferCount);
                             ecoUsersPanel.SetOffer(ecoClient, ecoOfferCount);
+                            youpinUsersPanel.SetOffer(youpinClient, youpinOfferCount);
 
                             if (user.SteamId == currentClient?.User.SteamId)
                             {
@@ -727,8 +788,11 @@ namespace Steam_Authenticator
 
                         if (waitConfirm.Any() && setting.ConfirmationAutoPopup)
                         {
-                            ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
-                            confirmationPopup.ShowDialog();
+                            this.Invoke(() =>
+                            {
+                                ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
+                                confirmationPopup.ShowDialog();
+                            });
                         }
                     }
                     catch
@@ -864,6 +928,11 @@ namespace Steam_Authenticator
             refreshEcoUserTimer.Change(dueTime, period);
         }
 
+        private void ResetRefreshYouPinUserTimer(TimeSpan dueTime, TimeSpan period)
+        {
+            refreshYouPinUserTimer.Change(dueTime, period);
+        }
+
         private async Task<bool> CheckVersion()
         {
             if (!checkVersionLocker.Wait(0))
@@ -911,6 +980,22 @@ namespace Steam_Authenticator
             }
 
             return false;
+        }
+
+        private async Task Report()
+        {
+            try
+            {
+                string machineId = Helper.GetMachineGuid();
+                if (string.IsNullOrEmpty(machineId))
+                {
+                    machineId = Helper.GetMachineUniqueId();
+                }
+                var response = await AuthenticatorApi.Report(version: currentVersion, machineId);
+            }
+            catch
+            {
+            }
         }
 
         internal void ShowForm()

@@ -48,7 +48,7 @@ namespace Steam_Authenticator.Model.BUFF
         public int login_from { get; set; }
         public string mobile { get; set; }
         public string nickname { get; set; }
-        public int nickname_remaining { get; set; }
+        public double nickname_remaining { get; set; }
         public int seller_exam_state { get; set; }
         public int steam_api_key_state { get; set; }
         public string steam_price_currency { get; set; }

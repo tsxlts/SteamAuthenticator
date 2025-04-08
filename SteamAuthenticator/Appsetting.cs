@@ -3,6 +3,7 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
 using Steam_Authenticator.Model.ECO;
+using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
@@ -33,6 +34,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public List<EcoClient> EcoClients { get; private set; } = new List<EcoClient>();
+
+        [JsonIgnore]
+        public List<YouPinClient> YouPinClients { get; private set; } = new List<YouPinClient>();
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
@@ -140,11 +144,6 @@ namespace Steam_Authenticator
         /// <returns></returns>
         public string GetAccount()
         {
-            if (!string.IsNullOrWhiteSpace(Client?.Account))
-            {
-                return Client.Account;
-            }
-
             return User?.Account;
         }
 
@@ -162,9 +161,10 @@ namespace Steam_Authenticator
                 }
 
                 result = await Client.LoginAsync(User.RefreshToken);
-                if (string.IsNullOrWhiteSpace(User.Account) && Client.Account != User.Account)
+                var account = await Client.GetAccountNameAsync();
+                if (string.IsNullOrWhiteSpace(User.Account) && account != User.Account)
                 {
-                    User.Account = Client.Account;
+                    User.Account = account;
                 }
 
                 Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
@@ -368,6 +368,79 @@ namespace Steam_Authenticator
         }
 
         public EcoClient WithEndLogin(Action<bool, bool> action)
+        {
+            endLogin = action;
+            return this;
+        }
+    }
+
+    public class YouPinClient : Client
+    {
+        public static YouPinClient None = new YouPinClient(new YouPinUser());
+
+        private Action<bool> startLogin = null;
+        private Action<bool, bool> endLogin = null;
+
+        public YouPinClient(YouPinUser user)
+        {
+            User = user;
+        }
+
+        public YouPinUser User { get; private set; }
+
+        public string Key => User?.UserId;
+
+        public bool LoggedIn { get; set; }
+
+        public async Task RefreshAsync(bool relogin, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                startLogin?.Invoke(relogin);
+
+                var userRespnse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
+                if (string.IsNullOrWhiteSpace(userRespnse.Body?.GetData()?.UserId))
+                {
+                    LoggedIn = false;
+                    return;
+                }
+
+                LoggedIn = true;
+
+                var user = userRespnse.Body.GetData();
+                User.Nickname = user.NickName;
+                User.Avatar = user.Avatar;
+                User.SteamId = user.SteamId;
+
+                Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+            }
+            finally
+            {
+                endLogin?.Invoke(relogin, LoggedIn);
+            }
+        }
+
+        public async Task<IWebResponse<YouPin898Response<GetOfferListResponse>>> GetOfferList(CancellationToken cancellationToken = default)
+        {
+            return await YouPin898Api.GetOfferList(User?.Token, cancellationToken);
+        }
+
+        public Task LogoutAsync()
+        {
+            User.Token = null;
+            Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+
+            endLogin?.Invoke(false, false);
+            return Task.CompletedTask;
+        }
+
+        public YouPinClient WithStartLogin(Action<bool> action)
+        {
+            startLogin = action;
+            return this;
+        }
+
+        public YouPinClient WithEndLogin(Action<bool, bool> action)
         {
             endLogin = action;
             return this;

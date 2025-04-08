@@ -1,8 +1,9 @@
-﻿namespace Steam_Authenticator.Controls
+﻿
+namespace Steam_Authenticator.Controls
 {
-    internal class BuffUserCollectionPanel : ItemCollectionPanel<BuffUserPanel, BuffClient>
+    internal class YouPinUserCollectionPanel : ItemCollectionPanel<YouPinUserPanel, YouPinClient>
     {
-        public BuffUserPanel SetOffer(BuffClient client, int? offerCount)
+        public YouPinUserPanel SetOffer(YouPinClient client, int? offerCount)
         {
             if (client == null)
             {
@@ -16,12 +17,12 @@
 
         protected override Size ItemSize => new Size(80, 116);
 
-        protected override BuffUserPanel CreateUserPanel(bool hasUser, BuffClient client)
+        protected override YouPinUserPanel CreateUserPanel(bool hasUser, YouPinClient client)
         {
             int index = ItemPanels.Count;
             int y = ItemSize.Height + 10;
 
-            BuffUserPanel panel = new BuffUserPanel(hasUser)
+            YouPinUserPanel panel = new YouPinUserPanel(hasUser)
             {
                 Size = ItemSize,
                 Location = new Point(ItemStartX * (index % ItemCells) + 10, y * (index / ItemCells) + 10),
@@ -42,6 +43,10 @@
             pictureBox.Image = Properties.Resources.userimg;
             if (!string.IsNullOrEmpty(avatar))
             {
+                if (!avatar.StartsWith("http"))
+                {
+                    avatar = $"https:{avatar}";
+                }
                 pictureBox.LoadAsync(avatar);
             }
             panel.SetItemIconBox(pictureBox);
@@ -56,6 +61,7 @@
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
+                BackColor = Color.Transparent,
                 Location = new Point(0, 80)
             };
             panel.SetItemNameBox(nameLabel);
@@ -70,6 +76,7 @@
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = Color.FromArgb(255, 128, 0),
+                BackColor = Color.Transparent,
                 Location = new Point(0, 98)
             };
             panel.SetOfferBox(offerLabel);

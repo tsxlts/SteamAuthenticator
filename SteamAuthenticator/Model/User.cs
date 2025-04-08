@@ -83,6 +83,21 @@ namespace Steam_Authenticator.Model
         public bool AutoConfirmTrade_Eco { get; set; }
         #endregion
 
+        #region 悠悠报价
+        /// <summary>
+        /// 是否自动接受 ECO 索取报价
+        /// 别人索取我的
+        /// </summary>
+        [JsonProperty("auto_accept_give_offer_youpin")]
+        public bool AutoAcceptGiveOffer_YouPin { get; set; }
+
+        /// <summary>
+        /// 是否自动确认 ECO 报价
+        /// </summary>
+        [JsonProperty("auto_confirm_trade_youpin")]
+        public bool AutoConfirmTrade_YouPin { get; set; }
+        #endregion
+
         #region 其他报价
         /// <summary>
         /// 是否自动接受 其他 索取报价
@@ -127,6 +142,7 @@ namespace Steam_Authenticator.Model
             return AutoConfirmTrade
                 || AutoConfirmTrade_Buff
                 || AutoConfirmTrade_Eco
+                || AutoConfirmTrade_YouPin
                 || AutoConfirmTrade_Other
                 || AutoConfirmTrade_Custom;
         }
@@ -140,6 +156,7 @@ namespace Steam_Authenticator.Model
             return AutoAcceptGiveOffer
                 || AutoAcceptGiveOffer_Buff
                 || AutoAcceptGiveOffer_Eco
+                || AutoAcceptGiveOffer_YouPin
                 || AutoAcceptGiveOffer_Other
                 || AutoAcceptGiveOffer_Custom;
         }
@@ -178,6 +195,19 @@ namespace Steam_Authenticator.Model
         public string UserId { get; set; }
 
         public List<string> SteamIds { get; set; } = new List<string>();
+
+        public string Avatar { get; set; }
+
+        public string Nickname { get; set; }
+    }
+
+    public class YouPinUser : JsonStreamSerializer
+    {
+        public string Token { get; set; }
+
+        public string UserId { get; set; }
+
+        public string SteamId { get; set; }
 
         public string Avatar { get; set; }
 

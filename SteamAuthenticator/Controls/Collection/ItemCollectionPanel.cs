@@ -13,25 +13,25 @@
             };
         }
 
+        public List<TItemPanel> AddItemPanels(bool hasItem, IEnumerable<TClient> clients)
+        {
+            List<TItemPanel> itemPanels = new List<TItemPanel>();
+            foreach (var client in clients)
+            {
+                TItemPanel userPanel = AddItem(hasItem, client);
+
+                itemPanels.Add(userPanel);
+            }
+
+            this.Controls.Clear();
+            this.Controls.AddRange(ItemPanels.ToArray());
+            Reset();
+            return itemPanels;
+        }
+
         public TItemPanel AddItemPanel(bool hasItem, TClient client)
         {
-            int index = ItemPanels.FindIndex(c => c.Client?.Key == client?.Key);
-            if (index < 0)
-            {
-                index = ItemPanels.Count(c => c.HasItem);
-            }
-            else
-            {
-                ItemPanels.RemoveAt(index);
-            }
-
-            TItemPanel userPanel = CreateUserPanel(hasItem, client);
-            if (!hasItem)
-            {
-                userPanel.BgColor = Color.Transparent;
-            }
-
-            ItemPanels.Insert(index, userPanel);
+            TItemPanel userPanel = AddItem(hasItem, client);
 
             this.Controls.Clear();
             this.Controls.AddRange(ItemPanels.ToArray());
@@ -132,5 +132,28 @@
         protected abstract TItemPanel CreateUserPanel(bool hasItem, TClient client);
 
         protected abstract void RefreshItems();
+
+        private TItemPanel AddItem(bool hasItem, TClient client)
+        {
+            int index = ItemPanels.FindIndex(c => c.Client?.Key == client?.Key);
+            if (index < 0)
+            {
+                index = ItemPanels.Count(c => c.HasItem);
+            }
+            else
+            {
+                ItemPanels.RemoveAt(index);
+            }
+
+            TItemPanel panel = CreateUserPanel(hasItem, client);
+            if (!hasItem)
+            {
+                panel.BgColor = Color.Transparent;
+            }
+
+            ItemPanels.Insert(index, panel);
+
+            return panel;
+        }
     }
 }

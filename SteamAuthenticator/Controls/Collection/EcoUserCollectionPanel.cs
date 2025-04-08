@@ -60,6 +60,7 @@
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = client.LoggedIn ? Color.Green : Color.FromArgb(128, 128, 128),
+                BackColor = Color.Transparent,
                 Location = new Point(0, 80)
             };
             panel.SetItemNameBox(nameLabel);
@@ -74,6 +75,7 @@
                 Size = new Size(80, 18),
                 TextAlign = ContentAlignment.TopCenter,
                 ForeColor = Color.FromArgb(255, 128, 0),
+                BackColor = Color.Transparent,
                 Location = new Point(0, 98)
             };
             panel.SetOfferBox(offerLabel);

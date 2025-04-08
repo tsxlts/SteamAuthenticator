@@ -187,6 +187,11 @@ namespace Steam_Authenticator.Forms
             }
             catch (Exception ex)
             {
+                if (closed)
+                {
+                    return;
+                }
+
                 MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -229,6 +234,11 @@ namespace Steam_Authenticator.Forms
             }
             catch (Exception ex)
             {
+                if (closed)
+                {
+                    return;
+                }
+
                 MessageBox.Show(ex.Message, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -269,6 +279,11 @@ namespace Steam_Authenticator.Forms
             }
             catch (Exception ex)
             {
+                if (closed)
+                {
+                    return;
+                }
+
                 MessageBox.Show($"登录失败" +
                     $"{Environment.NewLine}" +
                     $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
