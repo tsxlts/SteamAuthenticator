@@ -183,4 +183,17 @@ namespace Steam_Authenticator.Model
 
         public string Nickname { get; set; }
     }
+
+    public class YouPinUser : JsonStreamSerializer
+    {
+        public string Token { get; set; }
+
+        public string UserId { get; set; }
+
+        public string SteamId { get; set; }
+
+        public string Avatar { get; set; }
+
+        public string Nickname { get; set; }
+    }
 }

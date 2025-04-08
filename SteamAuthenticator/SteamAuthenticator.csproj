@@ -52,11 +52,12 @@
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="134.3.90" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="SteamKit" Version="2.0.1.13" />
+    <PackageReference Include="System.Management" Version="9.0.3" />
     <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.21" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Controls\EcoUserCollectionPanel.cs" />
+    <Compile Update="Controls\Collection\EcoUserCollectionPanel.cs" />
     <Compile Update="Forms\PhoneInput.cs">
       <SubType>Form</SubType>
     </Compile>

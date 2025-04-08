@@ -163,9 +163,6 @@ namespace Steam_Authenticator
             panel.ItemIcon.MouseClick += btnBuffUser_Click;
             panel.ItemIcon.ContextMenuStrip = buffUserContextMenuStrip;
 
-            panel.ItemName.MouseClick += btnBuffUser_Click;
-            panel.ItemName.ContextMenuStrip = buffUserContextMenuStrip;
-
             panel.Client
                 .WithStartLogin((relogin) =>
                 {

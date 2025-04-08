@@ -19,6 +19,7 @@ namespace Steam_Authenticator
         private readonly System.Threading.Timer refreshBuffUserTimer;
         private readonly System.Threading.Timer refreshEcoUserTimer;
         private readonly System.Threading.Timer checkVersionTimer;
+        private readonly System.Threading.Timer refreshYouPinUserTimer;
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
         private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(60);
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
@@ -26,6 +27,7 @@ namespace Steam_Authenticator
         private readonly ContextMenuStrip userContextMenuStrip;
         private readonly ContextMenuStrip buffUserContextMenuStrip;
         private readonly ContextMenuStrip ecoUserContextMenuStrip;
+        private readonly ContextMenuStrip youpinUserContextMenuStrip;
 
         private bool showBalloonTip = true;
         private UserClient currentClient = null;
@@ -54,6 +56,7 @@ namespace Steam_Authenticator
             refreshUserTimer = new System.Threading.Timer(RefreshUser, null, -1, -1);
             refreshBuffUserTimer = new System.Threading.Timer(RefreshBuffUser, null, -1, -1);
             refreshEcoUserTimer = new System.Threading.Timer(RefreshEcoUser, null, -1, -1);
+            refreshYouPinUserTimer = new System.Threading.Timer(RefreshYouPinUser, null, -1, -1);
             checkVersionTimer = new System.Threading.Timer((obj) =>
             {
                 try
@@ -90,6 +93,14 @@ namespace Steam_Authenticator
             ecoUsersPanelContextMenuStrip.Items.Add("Ìí¼ÓÕÊºÅ").Click += addEcoUserBtn_Click;
             ecoUsersPanel.ContextMenuStrip = ecoUsersPanelContextMenuStrip;
 
+            var youpinUsersPanelContextMenuStrip = new ContextMenuStrip();
+            youpinUsersPanelContextMenuStrip.Items.Add("Ë¢ÐÂ").Click += (send, e) =>
+            {
+                youpinUsersPanel.Reset();
+            };
+            youpinUsersPanelContextMenuStrip.Items.Add("Ìí¼ÓÕÊºÅ").Click += addYouPinUserBtn_Click;
+            youpinUsersPanel.ContextMenuStrip = youpinUsersPanelContextMenuStrip;
+
             mainNotifyMenuStrip = new ContextMenuStrip();
             mainNotifyMenuStrip.Items.Add("´ò¿ª").Click += (sender, e) =>
             {
@@ -124,13 +135,18 @@ namespace Steam_Authenticator
             ecoUserContextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += ecoReloginMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += ecoLogoutMenuItem_Click;
             ecoUserContextMenuStrip.Items.Add("ÒÆ³ýÕÊºÅ").Click += removeEcoUserMenuItem_Click;
+
+            youpinUserContextMenuStrip = new ContextMenuStrip();
+            youpinUserContextMenuStrip.Items.Add("ÖØÐÂµÇÂ¼").Click += youpinReloginMenuItem_Click;
+            youpinUserContextMenuStrip.Items.Add("ÍË³öµÇÂ¼").Click += youpinLogoutMenuItem_Click;
+            youpinUserContextMenuStrip.Items.Add("ÒÆ³ýÕÊºÅ").Click += removeYouPinUserMenuItem_Click;
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
 
-            await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers());
+            await Task.WhenAll(LoadUsers(), LoadBuffUsers(), LoadEcoUsers(), LoadYouPinUsers());
 
             await Task.Run(() =>
             {
@@ -869,6 +885,11 @@ namespace Steam_Authenticator
         private void ResetRefreshEcoUserTimer(TimeSpan dueTime, TimeSpan period)
         {
             refreshEcoUserTimer.Change(dueTime, period);
+        }
+
+        private void ResetRefreshYouPinUserTimer(TimeSpan dueTime, TimeSpan period)
+        {
+            refreshYouPinUserTimer.Change(dueTime, period);
         }
 
         private async Task<bool> CheckVersion()

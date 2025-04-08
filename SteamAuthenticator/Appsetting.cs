@@ -35,6 +35,9 @@ namespace Steam_Authenticator
         public List<EcoClient> EcoClients { get; private set; } = new List<EcoClient>();
 
         [JsonIgnore]
+        public List<YouPinClient> YouPinClients { get; private set; } = new List<YouPinClient>();
+
+        [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
 
         [JsonIgnore]
@@ -364,6 +367,74 @@ namespace Steam_Authenticator
         }
 
         public EcoClient WithEndLogin(Action<bool, bool> action)
+        {
+            endLogin = action;
+            return this;
+        }
+    }
+
+    public class YouPinClient : Client
+    {
+        public static YouPinClient None = new YouPinClient(new YouPinUser());
+
+        private Action<bool> startLogin = null;
+        private Action<bool, bool> endLogin = null;
+
+        public YouPinClient(YouPinUser user)
+        {
+            User = user;
+        }
+
+        public YouPinUser User { get; private set; }
+
+        public string Key => User?.UserId;
+
+        public bool LoggedIn { get; set; }
+
+        public async Task RefreshAsync(bool relogin, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                startLogin?.Invoke(relogin);
+
+                var userRespnse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
+                if (string.IsNullOrWhiteSpace(userRespnse.Body?.GetData()?.UserId))
+                {
+                    LoggedIn = false;
+                    return;
+                }
+
+                LoggedIn = true;
+
+                var user = userRespnse.Body.GetData();
+                User.Nickname = user.NickName;
+                User.Avatar = user.Avatar;
+                User.SteamId = user.SteamId;
+
+                Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+            }
+            finally
+            {
+                endLogin?.Invoke(relogin, LoggedIn);
+            }
+        }
+
+        public Task LogoutAsync()
+        {
+            User.Token = null;
+            Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+
+            endLogin?.Invoke(false, false);
+            return Task.CompletedTask;
+        }
+
+        public YouPinClient WithStartLogin(Action<bool> action)
+        {
+            startLogin = action;
+            return this;
+        }
+
+        public YouPinClient WithEndLogin(Action<bool, bool> action)
         {
             endLogin = action;
             return this;

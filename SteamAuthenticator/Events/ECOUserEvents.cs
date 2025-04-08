@@ -8,8 +8,12 @@ namespace Steam_Authenticator
     public partial class MainForm
     {
         private const double RefreshEcoUserInterval = 1 * 60;
+        private void ecoUsersPanel_SizeChanged(object sender, EventArgs e)
+        {
+            ecoUsersPanel.Reset();
+        }
 
-        private async void ecoBuffUser_Click(object sender, MouseEventArgs e)
+        private async void ecoUser_Click(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
             {
@@ -163,11 +167,8 @@ namespace Steam_Authenticator
         {
             EcoUserPanel panel = ecoUsersPanel.AddItemPanel(true, client);
 
-            panel.ItemIcon.MouseClick += ecoBuffUser_Click;
+            panel.ItemIcon.MouseClick += ecoUser_Click;
             panel.ItemIcon.ContextMenuStrip = ecoUserContextMenuStrip;
-
-            panel.ItemName.MouseClick += ecoBuffUser_Click;
-            panel.ItemName.ContextMenuStrip = ecoUserContextMenuStrip;
 
             panel.Client
                 .WithStartLogin((relogin) =>

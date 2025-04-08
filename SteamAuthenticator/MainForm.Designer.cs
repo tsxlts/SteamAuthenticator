@@ -69,6 +69,9 @@ namespace Steam_Authenticator
             ecoPage = new TabPage();
             ecoUsersPanel = new EcoUserCollectionPanel();
             pictureBox6 = new PictureBox();
+            youpinPage = new TabPage();
+            youpinUsersPanel = new YouPinUserCollectionPanel();
+            pictureBox8 = new PictureBox();
             statusPanel = new Panel();
             label11 = new Label();
             pictureBox7 = new PictureBox();
@@ -93,6 +96,9 @@ namespace Steam_Authenticator
             ecoPage.SuspendLayout();
             ecoUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
+            youpinPage.SuspendLayout();
+            youpinUsersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox8).BeginInit();
             statusPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
@@ -224,21 +230,21 @@ namespace Steam_Authenticator
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(180, 22);
+            submitRequirementsMenuItem.Size = new Size(124, 22);
             submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // submitBugMenuItem
             // 
             submitBugMenuItem.Name = "submitBugMenuItem";
-            submitBugMenuItem.Size = new Size(180, 22);
+            submitBugMenuItem.Size = new Size(124, 22);
             submitBugMenuItem.Text = "问题反馈";
             submitBugMenuItem.Click += submitBugMenuItem_Click;
             // 
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new Size(180, 22);
+            aboutMenuItem.Size = new Size(124, 22);
             aboutMenuItem.Text = "关于我们";
             aboutMenuItem.Click += aboutMenuItem_Click;
             // 
@@ -515,6 +521,7 @@ namespace Steam_Authenticator
             tabControl.Controls.Add(steamPage);
             tabControl.Controls.Add(buffPage);
             tabControl.Controls.Add(ecoPage);
+            tabControl.Controls.Add(youpinPage);
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -587,6 +594,7 @@ namespace Steam_Authenticator
             ecoUsersPanel.Name = "ecoUsersPanel";
             ecoUsersPanel.Size = new Size(785, 298);
             ecoUsersPanel.TabIndex = 8;
+            ecoUsersPanel.SizeChanged += ecoUsersPanel_SizeChanged;
             // 
             // pictureBox6
             // 
@@ -598,6 +606,40 @@ namespace Steam_Authenticator
             pictureBox6.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox6.TabIndex = 0;
             pictureBox6.TabStop = false;
+            // 
+            // youpinPage
+            // 
+            youpinPage.Controls.Add(youpinUsersPanel);
+            youpinPage.Location = new Point(4, 26);
+            youpinPage.Name = "youpinPage";
+            youpinPage.Padding = new Padding(3);
+            youpinPage.Size = new Size(791, 304);
+            youpinPage.TabIndex = 3;
+            youpinPage.Text = "悠悠有品 帐号";
+            youpinPage.UseVisualStyleBackColor = true;
+            // 
+            // youpinUsersPanel
+            // 
+            youpinUsersPanel.AutoScroll = true;
+            youpinUsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            youpinUsersPanel.Controls.Add(pictureBox8);
+            youpinUsersPanel.Dock = DockStyle.Fill;
+            youpinUsersPanel.Location = new Point(3, 3);
+            youpinUsersPanel.Name = "youpinUsersPanel";
+            youpinUsersPanel.Size = new Size(785, 298);
+            youpinUsersPanel.TabIndex = 9;
+            youpinUsersPanel.SizeChanged += youpinUsersPanel_SizeChanged;
+            // 
+            // pictureBox8
+            // 
+            pictureBox8.Anchor = AnchorStyles.None;
+            pictureBox8.Image = Properties.Resources.loading;
+            pictureBox8.Location = new Point(340, 87);
+            pictureBox8.Name = "pictureBox8";
+            pictureBox8.Size = new Size(100, 100);
+            pictureBox8.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox8.TabIndex = 0;
+            pictureBox8.TabStop = false;
             // 
             // statusPanel
             // 
@@ -759,6 +801,9 @@ namespace Steam_Authenticator
             ecoPage.ResumeLayout(false);
             ecoUsersPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
+            youpinPage.ResumeLayout(false);
+            youpinUsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox8).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
@@ -832,5 +877,8 @@ namespace Steam_Authenticator
         private ToolStripMenuItem submitRequirementsMenuItem;
         private ToolStripMenuItem submitBugMenuItem;
         private ToolStripMenuItem aboutMenuItem;
+        private TabPage youpinPage;
+        private YouPinUserCollectionPanel youpinUsersPanel;
+        private PictureBox pictureBox8;
     }
 }

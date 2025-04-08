@@ -400,9 +400,6 @@ namespace Steam_Authenticator
             panel.ItemIcon.MouseClick += btnUser_Click;
             panel.ItemIcon.ContextMenuStrip = userContextMenuStrip;
 
-            panel.ItemName.MouseClick += btnUser_Click;
-            panel.ItemName.ContextMenuStrip = userContextMenuStrip;
-
             panel.Offer.Click += offersNumberBtn_Click;
 
             panel.Confirmation.Click += confirmationNumberBtn_Click;
