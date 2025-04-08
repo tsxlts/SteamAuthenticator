@@ -19,11 +19,11 @@ namespace Steam_Authenticator.Forms
 
             autoAcceptGiveOfferBoxs = new List<CheckBox>
             {
-                autoAcceptGiveOffer,autoAcceptGiveOffer_Buff,autoAcceptGiveOffer_Eco,autoAcceptGiveOffer_Other,autoAcceptGiveOffer_Custom
+                autoAcceptGiveOffer,autoAcceptGiveOffer_Buff,autoAcceptGiveOffer_Eco,autoAcceptGiveOffer_YouPin,autoAcceptGiveOffer_Other,autoAcceptGiveOffer_Custom
             };
             autoConfirmOfferBoxs = new List<CheckBox>
             {
-                autoConfirmTrade,autoConfirmTrade_Buff,autoConfirmTrade_Eco,autoConfirmTrade_Other,autoConfirmTrade_Custom
+                autoConfirmTrade,autoConfirmTrade_Buff,autoConfirmTrade_Eco,autoConfirmTrade_YouPin,autoConfirmTrade_Other,autoConfirmTrade_Custom
             };
         }
 
@@ -41,6 +41,9 @@ namespace Steam_Authenticator.Forms
 
             autoAcceptGiveOffer_Eco.Checked = user.Setting.AutoAcceptGiveOffer_Eco;
             autoConfirmTrade_Eco.Checked = user.Setting.AutoConfirmTrade_Eco;
+
+            autoAcceptGiveOffer_YouPin.Checked = user.Setting.AutoAcceptGiveOffer_YouPin;
+            autoConfirmTrade_YouPin.Checked = user.Setting.AutoConfirmTrade_YouPin;
 
             autoAcceptGiveOffer_Other.Checked = user.Setting.AutoAcceptGiveOffer_Other;
             autoConfirmTrade_Other.Checked = user.Setting.AutoConfirmTrade_Other;
@@ -125,6 +128,9 @@ namespace Steam_Authenticator.Forms
 
             user.Setting.AutoAcceptGiveOffer_Eco = autoAcceptGiveOffer_Eco.Checked;
             user.Setting.AutoConfirmTrade_Eco = autoConfirmTrade_Eco.Checked;
+
+            user.Setting.AutoAcceptGiveOffer_YouPin = autoAcceptGiveOffer_YouPin.Checked;
+            user.Setting.AutoConfirmTrade_YouPin = autoConfirmTrade_YouPin.Checked;
 
             user.Setting.AutoAcceptGiveOffer_Other = autoAcceptGiveOffer_Other.Checked;
             user.Setting.AutoConfirmTrade_Other = autoConfirmTrade_Other.Checked;

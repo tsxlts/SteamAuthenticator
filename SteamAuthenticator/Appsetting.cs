@@ -3,6 +3,7 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
 using Steam_Authenticator.Model.ECO;
+using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
@@ -417,6 +418,11 @@ namespace Steam_Authenticator
             {
                 endLogin?.Invoke(relogin, LoggedIn);
             }
+        }
+
+        public async Task<IWebResponse<YouPin898Response<GetOfferListResponse>>> GetOfferList(CancellationToken cancellationToken = default)
+        {
+            return await YouPin898Api.GetOfferList(User?.Token, cancellationToken);
         }
 
         public Task LogoutAsync()

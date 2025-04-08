@@ -113,7 +113,7 @@ namespace Steam_Authenticator.Internal
                 itemContent,
                 headers: InitDefaultHeaders(token: token), cancellationToken: cancellationToken);
 
-                data.orderInfoList.AddRange(itemResponse.Body?.GetData()?.orderInfoList ?? new List<OrderInfo>());
+                data.orderInfoList.AddRange(itemResponse.Body?.GetData()?.orderInfoList?.Where(c => !data.orderInfoList.Any(o => o.offerId == c.offerId)) ?? new List<OrderInfo>());
             }
 
             response.Body.data = null;

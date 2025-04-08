@@ -350,6 +350,7 @@ namespace Steam_Authenticator
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
                 var buffClients = Appsetting.Instance.BuffClients;
                 var ecoClients = Appsetting.Instance.EcoClients;
+                var youpinClinets = Appsetting.Instance.YouPinClients;
                 foreach (var client in checkClients)
                 {
                     if (client == null)
@@ -363,16 +364,19 @@ namespace Steam_Authenticator
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
                         var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
+                        var youpinClient = youpinClinets.FirstOrDefault(c => c.User.SteamId == user.SteamId);
 
                         bool acceptAll = user.Setting.AutoAcceptGiveOffer;
                         bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
                         bool accectEco = acceptAll || user.Setting.AutoAcceptGiveOffer_Eco;
+                        bool accectYouPin = acceptAll || user.Setting.AutoAcceptGiveOffer_YouPin;
                         bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
                         bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
 
                         bool confirmAll = user.Setting.AutoConfirmTrade;
                         bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
                         bool confirmEco = confirmAll || user.Setting.AutoConfirmTrade_Eco;
+                        bool confirmYouPin = confirmAll || user.Setting.AutoConfirmTrade_YouPin;
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
@@ -382,6 +386,7 @@ namespace Steam_Authenticator
 
                         int? buffOfferCount = null;
                         int? ecoOfferCount = null;
+                        int? youpinOfferCount = null;
                         try
                         {
                             if (!webClient.LoggedIn)
@@ -410,6 +415,7 @@ namespace Steam_Authenticator
                             var customGiveOffers = new List<Offer>();
                             var buffGiveOffers = new List<Offer>();
                             var ecoGiveOffers = new List<Offer>();
+                            var youpinGiveOffers = new List<Offer>();
                             var otherGiveOffers = giveOffers.ToList();
 
                             #region 自定义报价
@@ -524,6 +530,28 @@ namespace Steam_Authenticator
                             }
                             #endregion
 
+                            #region 悠悠报价
+                            youpinOfferCount = 0;
+                            if (giveOffers.Any() && youpinClient != null)
+                            {
+                                youpinOfferCount = null;
+                                var youpinOffer = youpinClient.GetOfferList().Result;
+                                if (youpinOffer.Body?.IsSuccess() ?? false)
+                                {
+                                    var youpinOfferIds = youpinOffer.Body.GetData()?.orderInfoList?.Select(c => c.offerId)?.ToList() ?? new List<string>();
+                                    youpinGiveOffers = giveOffers.Where(c => youpinOfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => youpinOfferIds.Contains(c.TradeOfferId));
+
+                                    youpinOfferCount = receivedOffers.Count(c => youpinOfferIds.Any(offerId => c.TradeOfferId == offerId));
+                                }
+                                else
+                                {
+                                    otherGiveOffers = new List<Offer>();
+                                }
+                            }
+                            #endregion
+
                             List<Offer> acceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
@@ -543,6 +571,11 @@ namespace Steam_Authenticator
                             if (!acceptAll && accectEco)
                             {
                                 var acceptItemOffers = ecoGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                                acceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accectYouPin)
+                            {
+                                var acceptItemOffers = youpinGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
                                 acceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
@@ -570,6 +603,10 @@ namespace Steam_Authenticator
                             {
                                 autoConfirmOffers.AddRange(ecoGiveOffers);
                             }
+                            if (!confirmAll && confirmYouPin)
+                            {
+                                autoConfirmOffers.AddRange(youpinGiveOffers);
+                            }
                             if (!confirmAll && confirmOther)
                             {
                                 autoConfirmOffers.AddRange(otherGiveOffers);
@@ -588,6 +625,7 @@ namespace Steam_Authenticator
                             usersPanel.SetOffer(client, receivedOffers.Count);
                             buffUsersPanel.SetOffer(buffClinet, buffOfferCount);
                             ecoUsersPanel.SetOffer(ecoClient, ecoOfferCount);
+                            youpinUsersPanel.SetOffer(youpinClient, youpinOfferCount);
 
                             if (user.SteamId == currentClient?.User.SteamId)
                             {
