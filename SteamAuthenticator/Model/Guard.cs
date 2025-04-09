@@ -12,6 +12,7 @@ namespace Steam_Authenticator.Model
         public SteamGuardScheme GuardScheme { get; set; }
         public string URI { get; set; }
         public string AccountName { get; set; }
+        public string SteamId { get; set; }
         public string TokenGID { get; set; }
         public string Secret1 { get; set; }
     }

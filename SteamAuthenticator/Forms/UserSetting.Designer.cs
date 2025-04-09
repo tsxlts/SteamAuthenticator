@@ -37,6 +37,10 @@
             periodicChecking = new CheckBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            autoConfirmTrade_YouPin = new CheckBox();
+            label13 = new Label();
+            label14 = new Label();
+            autoAcceptGiveOffer_YouPin = new CheckBox();
             label12 = new Label();
             autoConfirmTrade_Eco = new CheckBox();
             label10 = new Label();
@@ -59,10 +63,10 @@
             autoAcceptGiveOffer_Buff = new CheckBox();
             groupBox3 = new GroupBox();
             label9 = new Label();
-            autoConfirmTrade_YouPin = new CheckBox();
-            label13 = new Label();
-            label14 = new Label();
-            autoAcceptGiveOffer_YouPin = new CheckBox();
+            label15 = new Label();
+            label16 = new Label();
+            label17 = new Label();
+            label18 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -184,6 +188,48 @@
             groupBox2.TabIndex = 17;
             groupBox2.TabStop = false;
             groupBox2.Text = "自动发货 设置（发送的/收到的 发货报价）";
+            // 
+            // autoConfirmTrade_YouPin
+            // 
+            autoConfirmTrade_YouPin.AutoSize = true;
+            autoConfirmTrade_YouPin.ForeColor = Color.Red;
+            autoConfirmTrade_YouPin.Location = new Point(167, 158);
+            autoConfirmTrade_YouPin.Name = "autoConfirmTrade_YouPin";
+            autoConfirmTrade_YouPin.Size = new Size(75, 21);
+            autoConfirmTrade_YouPin.TabIndex = 39;
+            autoConfirmTrade_YouPin.Text = "自动确认";
+            autoConfirmTrade_YouPin.UseVisualStyleBackColor = true;
+            // 
+            // label13
+            // 
+            label13.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
+            label13.Location = new Point(6, 159);
+            label13.Name = "label13";
+            label13.Size = new Size(74, 17);
+            label13.TabIndex = 38;
+            label13.Text = "悠悠 报价";
+            label13.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label14.ForeColor = Color.Gray;
+            label14.Location = new Point(249, 159);
+            label14.Name = "label14";
+            label14.Size = new Size(303, 17);
+            label14.TabIndex = 37;
+            label14.Text = "悠悠有品平台产生的报价, 仅在登录悠悠有品帐号后生效";
+            // 
+            // autoAcceptGiveOffer_YouPin
+            // 
+            autoAcceptGiveOffer_YouPin.AutoSize = true;
+            autoAcceptGiveOffer_YouPin.Location = new Point(86, 158);
+            autoAcceptGiveOffer_YouPin.Name = "autoAcceptGiveOffer_YouPin";
+            autoAcceptGiveOffer_YouPin.Size = new Size(75, 21);
+            autoAcceptGiveOffer_YouPin.TabIndex = 36;
+            autoAcceptGiveOffer_YouPin.Text = "自动接受";
+            autoAcceptGiveOffer_YouPin.UseVisualStyleBackColor = true;
             // 
             // label12
             // 
@@ -418,53 +464,55 @@
             label9.Text = "全部 报价";
             label9.TextAlign = ContentAlignment.TopRight;
             // 
-            // autoConfirmTrade_YouPin
+            // label15
             // 
-            autoConfirmTrade_YouPin.AutoSize = true;
-            autoConfirmTrade_YouPin.ForeColor = Color.Red;
-            autoConfirmTrade_YouPin.Location = new Point(167, 158);
-            autoConfirmTrade_YouPin.Name = "autoConfirmTrade_YouPin";
-            autoConfirmTrade_YouPin.Size = new Size(75, 21);
-            autoConfirmTrade_YouPin.TabIndex = 39;
-            autoConfirmTrade_YouPin.Text = "自动确认";
-            autoConfirmTrade_YouPin.UseVisualStyleBackColor = true;
+            label15.AutoSize = true;
+            label15.ForeColor = Color.Gray;
+            label15.Location = new Point(184, 13);
+            label15.Name = "label15";
+            label15.Size = new Size(68, 17);
+            label15.TabIndex = 19;
+            label15.Text = "请确保已在";
             // 
-            // label13
+            // label16
             // 
-            label13.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label13.Location = new Point(6, 159);
-            label13.Name = "label13";
-            label13.Size = new Size(74, 17);
-            label13.TabIndex = 38;
-            label13.Text = "悠悠 报价";
-            label13.TextAlign = ContentAlignment.TopRight;
+            label16.AutoSize = true;
+            label16.ForeColor = Color.Red;
+            label16.Location = new Point(392, 13);
+            label16.Name = "label16";
+            label16.Size = new Size(141, 17);
+            label16.TabIndex = 20;
+            label16.Text = "自动刷新 报价/确认 信息";
             // 
-            // label14
+            // label17
             // 
-            label14.AutoSize = true;
-            label14.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            label14.ForeColor = Color.Gray;
-            label14.Location = new Point(249, 159);
-            label14.Name = "label14";
-            label14.Size = new Size(303, 17);
-            label14.TabIndex = 37;
-            label14.Text = "悠悠有品平台产生的报价, 仅在登录悠悠有品帐号后生效";
+            label17.AutoSize = true;
+            label17.ForeColor = Color.Red;
+            label17.Location = new Point(258, 13);
+            label17.Name = "label17";
+            label17.Size = new Size(56, 17);
+            label17.TabIndex = 21;
+            label17.Text = "全局设置";
             // 
-            // autoAcceptGiveOffer_YouPin
+            // label18
             // 
-            autoAcceptGiveOffer_YouPin.AutoSize = true;
-            autoAcceptGiveOffer_YouPin.Location = new Point(86, 158);
-            autoAcceptGiveOffer_YouPin.Name = "autoAcceptGiveOffer_YouPin";
-            autoAcceptGiveOffer_YouPin.Size = new Size(75, 21);
-            autoAcceptGiveOffer_YouPin.TabIndex = 36;
-            autoAcceptGiveOffer_YouPin.Text = "自动接受";
-            autoAcceptGiveOffer_YouPin.UseVisualStyleBackColor = true;
+            label18.AutoSize = true;
+            label18.ForeColor = Color.Gray;
+            label18.Location = new Point(320, 13);
+            label18.Name = "label18";
+            label18.Size = new Size(68, 17);
+            label18.TabIndex = 21;
+            label18.Text = "菜单下开启";
             // 
             // UserSetting
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(596, 466);
+            Controls.Add(label18);
+            Controls.Add(label16);
+            Controls.Add(label17);
+            Controls.Add(label15);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -524,5 +572,9 @@
         private Label label13;
         private Label label14;
         private CheckBox autoAcceptGiveOffer_YouPin;
+        private Label label15;
+        private Label label16;
+        private Label label17;
+        private Label label18;
     }
 }
