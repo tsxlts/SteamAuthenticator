@@ -28,7 +28,7 @@ namespace Steam_Authenticator.Internal
             RequestTag = Guid.NewGuid().ToString();
         }
 
-        public static async Task<IWebResponse<YouPin898Response<SendSmsCodeResponse>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
+        public static async Task<IWebResponse<YouPin898Response<object>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(new
             {
@@ -37,7 +37,7 @@ namespace Steam_Authenticator.Internal
                 Mobile = phone,
                 Code = ""
             });
-            var response = await SteamApi.PostAsync<YouPin898Response<SendSmsCodeResponse>>($"{Api}/api/user/Auth/SendSignInSmsCode",
+            var response = await SteamApi.PostAsync<YouPin898Response<object>>($"{Api}/api/user/Auth/SendSignInSmsCode",
                 content,
                 headers: InitDefaultHeaders(), cancellationToken: cancellationToken);
             return response;
@@ -71,6 +71,55 @@ namespace Steam_Authenticator.Internal
             return response;
         }
 
+        public static async Task<IWebResponse<YouPin898Response<PcSendSmsCodeResponse>>> PcSendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
+        {
+            var content = JsonContent.Create(new
+            {
+                sessionId = sessionId,
+                area = area,
+                mobile = phone,
+                code = ""
+            });
+
+            var headers = new Dictionary<string, string>
+            {
+                {"AppType","1" },
+                {"App-Version","5.26.0" },
+                {"AppVersion","5.26.0" }
+            };
+
+            var response = await SteamApi.PostAsync<YouPin898Response<PcSendSmsCodeResponse>>($"{Api}/api/youpin/userAuth/smsLogin/sendSmsCode",
+                content,
+                headers: InitDefaultHeaders(headers), cancellationToken: cancellationToken);
+            return response;
+        }
+
+        public static async Task<IWebResponse<YouPin898Response<PcSmsCodeLoginResponse>>> PcSmsCodeLogin(string sessionId, string area, string phone, string smsCode, string loginReqTicket, CancellationToken cancellationToken = default)
+        {
+            var content = JsonContent.Create(new
+            {
+                sessionId = sessionId,
+                loginReqTicket = loginReqTicket,
+                area = area,
+                mobile = phone,
+                code = smsCode,
+                agreement = true,
+                tenDayFreeSignIn = 1
+            });
+
+            var headers = new Dictionary<string, string>
+            {
+                {"AppType","1" },
+                {"App-Version","5.26.0" },
+                {"AppVersion","5.26.0" }
+            };
+
+            var response = await SteamApi.PostAsync<YouPin898Response<PcSmsCodeLoginResponse>>($"{Api}/api/youpin/userAuth/smsLogin/doLogin",
+                content,
+                headers: InitDefaultHeaders(headers), cancellationToken: cancellationToken);
+            return response;
+        }
+
         public static async Task<IWebResponse<YouPin898Response<GetUserInfoResponse>>> GetUserInfo(string token, CancellationToken cancellationToken = default)
         {
             var response = await SteamApi.GetAsync<YouPin898Response<GetUserInfoResponse>>($"{Api}/api/user/Account/getUserInfo",
@@ -96,7 +145,7 @@ namespace Steam_Authenticator.Internal
             var data = response.Body?.GetData();
             foreach (var item in data?.menuCodeInfoList ?? new List<MenuCodeInfo>())
             {
-                if (item.code == subCode)
+                if (item.code == subCode || item.quantity <= 0)
                 {
                     continue;
                 }

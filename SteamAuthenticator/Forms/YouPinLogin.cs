@@ -6,12 +6,14 @@ namespace Steam_Authenticator.Forms
     public partial class YouPinLogin : Form
     {
         private readonly string SessionId;
+        private PcSendSmsCodeResponse pcSendSmsCodeResponse;
 
         public YouPinLogin(string tips)
         {
             InitializeComponent();
 
             msg.Text = tips;
+            appLogin.Checked = true;
 
             SessionId = Guid.NewGuid().ToString();
         }
@@ -30,6 +32,30 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
+                if (pcLogin.Checked)
+                {
+                    var pcSendSmsCode = await YouPin898Api.PcSendSmsCode(SessionId, area, phone, default);
+                    if (pcSendSmsCode.Body == null)
+                    {
+                        MessageBox.Show($"发送验证码失败", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    var pcSendSmsCodeBody = pcSendSmsCode.Body;
+                    if (pcSendSmsCodeBody.IsSuccess())
+                    {
+                        pcSendSmsCodeResponse = pcSendSmsCodeBody.GetData();
+
+                        MessageBox.Show($"验证码发送成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    MessageBox.Show($"发送验证码失败" +
+                        $"{Environment.NewLine}" +
+                        $"{pcSendSmsCodeBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 var sendSmsCode = await YouPin898Api.SendSmsCode(SessionId, area, phone, default);
                 if (sendSmsCode.Body == null)
                 {
@@ -38,9 +64,9 @@ namespace Steam_Authenticator.Forms
                 }
 
                 var sendSmsCodeBody = sendSmsCode.Body;
-
                 if (sendSmsCodeBody.IsSuccess())
                 {
+                    MessageBox.Show($"验证码发送成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
@@ -65,9 +91,11 @@ namespace Steam_Authenticator.Forms
 
                     MessageBox.Show($"该手机号需要手动发送短信进行验证" +
                            $"{Environment.NewLine}" +
-                           $"请编辑发送短信 {smsConfigData.SmsUpContent} 到号码 {smsConfigData.SmsUpNumber} 完成登录" +
+                           $"请使用手机号 {phone} " +
+                           $"{Environment.NewLine}编辑发送短信 {smsConfigData.SmsUpContent} " +
+                           $"{Environment.NewLine}到号码 {smsConfigData.SmsUpNumber} 完成登录" +
                            $"{Environment.NewLine}" +
-                           $"发送完成后直接点击 登录 即可", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                           $"发送完成后直接点击 登录 即可", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     return;
                 }
@@ -103,6 +131,29 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
+                string token;
+                if (pcLogin.Checked)
+                {
+                    var pcSmsLogin = await YouPin898Api.PcSmsCodeLogin(SessionId, area, phone, code, pcSendSmsCodeResponse?.loginReqTicket, default);
+                    if (pcSmsLogin.Body == null)
+                    {
+                        MessageBox.Show($"登录失败", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    var pcSmsLoginBody = pcSmsLogin.Body;
+                    var pcSmsLoginData = pcSmsLoginBody.GetData();
+                    if (!pcSmsLoginBody.IsSuccess() || string.IsNullOrWhiteSpace(pcSmsLoginData.token))
+                    {
+                        MessageBox.Show($"登录失败" +
+                            $"{Environment.NewLine}" +
+                            $"{pcSmsLoginBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    token = pcSmsLoginData.token;
+                    goto LoginSuccess;
+                }
+
                 var smsLogin = await YouPin898Api.SmsCodeLogin(SessionId, area, phone, code, default);
                 if (smsLogin.Body == null)
                 {
@@ -119,8 +170,10 @@ namespace Steam_Authenticator.Forms
                         $"{smsLoginBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                token = smsLoginData.Token;     
 
-                Token = smsLoginData.Token;
+            LoginSuccess:
+                Token = token;
 
                 var userInfo = await YouPin898Api.GetUserInfo(Token, default);
                 var userData = userInfo.Body.GetData();
