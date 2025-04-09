@@ -160,6 +160,7 @@ namespace Steam_Authenticator.Forms
                     maFile = new MaFile
                     {
                         account_name = guard.AccountName,
+                        steamid = guard.SteamId,
                         device_id = guard.DeviceId,
                         shared_secret = guard.SharedSecret,
                         identity_secret = guard.IdentitySecret,

@@ -233,6 +233,7 @@ namespace Steam_Authenticator
 
                             guard = new Guard
                             {
+                                SteamId = webClient.SteamId,
                                 AccountName = addAuthenticatorResponse.AccountName,
                                 IdentitySecret = addAuthenticatorResponse.IdentitySecret,
                                 SharedSecret = addAuthenticatorResponse.SharedSecret,
@@ -286,6 +287,7 @@ namespace Steam_Authenticator
                                     authenticatorStatusResponse = authenticatorStatus.Body;
                                     guard = new Guard
                                     {
+                                        SteamId = webClient.SteamId,
                                         AccountName = guard.AccountName,
                                         IdentitySecret = guard.IdentitySecret,
                                         SharedSecret = guard.SharedSecret,
@@ -543,6 +545,7 @@ namespace Steam_Authenticator
                             var authenticatorResponse = finalizeMoveAuthenticator.Body.ReplacementToken;
                             guard = new Guard
                             {
+                                SteamId = webClient.SteamId,
                                 AccountName = authenticatorResponse.AccountName,
                                 IdentitySecret = authenticatorResponse.IdentitySecret,
                                 SharedSecret = authenticatorResponse.SharedSecret,
@@ -785,6 +788,7 @@ namespace Steam_Authenticator
 
                             Guard guard = new Guard
                             {
+                                SteamId = maFile.steamid,
                                 AccountName = maFile.account_name,
                                 DeviceId = maFile.device_id,
                                 SharedSecret = maFile.shared_secret,
@@ -868,6 +872,7 @@ namespace Steam_Authenticator
 
                 guard = new Guard
                 {
+                    SteamId = webClient.SteamId,
                     AccountName = currentClient.GetAccount(),
                     DeviceId = authenticatorStatusResponse.DeviceId,
                     TokenGID = authenticatorStatusResponse.TokenGID,

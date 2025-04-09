@@ -147,6 +147,21 @@ namespace Steam_Authenticator
             return User?.Account;
         }
 
+        public async ValueTask<string> GetAccountAsync()
+        {
+            if (User == null)
+            {
+                return null;
+            }
+            if (!string.IsNullOrWhiteSpace(User.Account))
+            {
+                return User.Account;
+            }
+
+            string account = await RefreshAccountAsync();
+            return account;
+        }
+
         public async Task<bool> LoginAsync()
         {
             bool result = false;
@@ -161,13 +176,11 @@ namespace Steam_Authenticator
                 }
 
                 result = await Client.LoginAsync(User.RefreshToken);
-                var account = await Client.GetAccountNameAsync();
-                if (string.IsNullOrWhiteSpace(User.Account) && account != User.Account)
+                if (string.IsNullOrWhiteSpace(User.Account))
                 {
-                    User.Account = account;
+                    await RefreshAccountAsync();
                 }
 
-                Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
                 return result;
             }
             finally
@@ -189,6 +202,25 @@ namespace Steam_Authenticator
             catch
             {
             }
+        }
+
+        public async Task<string> RefreshAccountAsync()
+        {
+            if (Client == null || !Client.LoggedIn)
+            {
+                return null;
+            }
+
+            string account = await Client.GetAccountNameAsync();
+            if (string.IsNullOrWhiteSpace(account))
+            {
+                return null;
+            }
+
+            User.Account = account;
+            Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
+
+            return account;
         }
     }
 

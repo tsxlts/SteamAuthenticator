@@ -13,6 +13,8 @@ namespace Steam_Authenticator.Model.Other
 
         public string account_name { get; set; }
 
+        public string steamid { get; set; }
+
         public string token_gid { get; set; }
 
         public string identity_secret { get; set; }
