@@ -560,7 +560,6 @@ namespace Steam_Authenticator
             buffUsersPanel.Name = "buffUsersPanel";
             buffUsersPanel.Size = new Size(785, 298);
             buffUsersPanel.TabIndex = 8;
-            buffUsersPanel.SizeChanged += buffUserPanel_SizeChanged;
             // 
             // pictureBox2
             // 
@@ -594,7 +593,6 @@ namespace Steam_Authenticator
             ecoUsersPanel.Name = "ecoUsersPanel";
             ecoUsersPanel.Size = new Size(785, 298);
             ecoUsersPanel.TabIndex = 8;
-            ecoUsersPanel.SizeChanged += ecoUsersPanel_SizeChanged;
             // 
             // pictureBox6
             // 
@@ -628,7 +626,6 @@ namespace Steam_Authenticator
             youpinUsersPanel.Name = "youpinUsersPanel";
             youpinUsersPanel.Size = new Size(785, 298);
             youpinUsersPanel.TabIndex = 9;
-            youpinUsersPanel.SizeChanged += youpinUsersPanel_SizeChanged;
             // 
             // pictureBox8
             // 

@@ -170,7 +170,7 @@ namespace Steam_Authenticator.Forms
                         $"{smsLoginBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                token = smsLoginData.Token;     
+                token = smsLoginData.Token;
 
             LoginSuccess:
                 Token = token;
