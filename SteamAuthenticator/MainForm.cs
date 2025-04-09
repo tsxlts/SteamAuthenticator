@@ -1,3 +1,4 @@
+using CefSharp.DevTools.IO;
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
@@ -6,6 +7,7 @@ using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
 
@@ -14,6 +16,7 @@ namespace Steam_Authenticator
     public partial class MainForm : Form
     {
         private readonly Version currentVersion;
+        private readonly TaskFactory taskFactory;
         private readonly System.Threading.Timer refreshMsgTimer;
         private readonly System.Threading.Timer refreshClientInfoTimer;
         private readonly System.Threading.Timer refreshUserTimer;
@@ -51,6 +54,8 @@ namespace Steam_Authenticator
             var match = Regex.Match(Application.ProductVersion, @"^[\d.]+");
             currentVersion = new Version(match.Value);
             versionLabel.Text = $"v{currentVersion}";
+
+            taskFactory = new TaskFactory();
 
             refreshMsgTimer = new System.Threading.Timer(RefreshMsg, null, -1, -1);
             refreshClientInfoTimer = new System.Threading.Timer(RefreshClientInfo, null, -1, -1);
@@ -256,59 +261,77 @@ namespace Steam_Authenticator
 
         private async Task QueryAuthSessionsForAccount(CancellationToken cancellationToken)
         {
-            if (currentClient == null || !currentClient.LoginConfirmLocker.Wait(0))
-            {
-                return;
-            }
-            try
-            {
-                var webClient = currentClient.Client;
+            List<Task> tasks = new List<Task>();
 
-                Guard guard = Appsetting.Instance.Manifest.GetGuard(currentClient.GetAccount());
-                if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
+            var userClients = Appsetting.Instance.Clients;
+            foreach (var itemClient in userClients)
+            {
+                if (itemClient == null)
                 {
-                    return;
+                    continue;
+                }
+                if (!itemClient.LoginConfirmLocker.Wait(0))
+                {
+                    continue;
                 }
 
-                var queryAuthSessions = await SteamAuthentication.QueryAuthSessionsForAccountAsync(webClient.WebApiToken, cancellationToken);
-                var clients = queryAuthSessions.Body?.ClientIds;
-                if (clients?.Count > 0)
+                var task = taskFactory.StartNew((obj) =>
                 {
-                    var querySession = await SteamAuthentication.QueryAuthSessionInfoAsync(webClient.WebApiToken, clients[0], cancellationToken);
-                    var sessionInfo = querySession.Body;
-                    if (sessionInfo == null)
+                    var userClient = obj as UserClient;
+                    try
                     {
-                        return;
-                    }
+                        var webClient = userClient.Client;
 
-                    this.Invoke(() =>
-                    {
-                        string clientType = sessionInfo.PlatformType switch
+                        Guard guard = Appsetting.Instance.Manifest.GetGuard(userClient.GetAccount());
+                        if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
                         {
-                            var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
-                            var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
-                            var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
-                            _ => "未知设备"
-                        };
-                        var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
+                            return;
+                        }
 
-                        MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(currentClient, (ulong)clients[0], sessionInfo.Version);
-                        mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{currentClient.GetAccount()} 有新的登录请求";
-                        mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
-                        mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
-                        mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
+                        var queryAuthSessions = SteamAuthentication.QueryAuthSessionsForAccountAsync(webClient.WebApiToken, cancellationToken).GetAwaiter().GetResult();
+                        var clients = queryAuthSessions.Body?.ClientIds;
+                        if (clients?.Count > 0)
+                        {
+                            var querySession = SteamAuthentication.QueryAuthSessionInfoAsync(webClient.WebApiToken, clients[0], cancellationToken).GetAwaiter().GetResult();
+                            var sessionInfo = querySession.Body;
+                            if (sessionInfo == null)
+                            {
+                                return;
+                            }
 
-                        mobileConfirmationLogin.ShowDialog();
-                    });
-                }
+                            this.Invoke(() =>
+                            {
+                                string clientType = sessionInfo.PlatformType switch
+                                {
+                                    var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
+                                    var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
+                                    var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
+                                    _ => "未知设备"
+                                };
+                                var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
+
+                                MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(userClient, (ulong)clients[0], sessionInfo.Version);
+                                mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{userClient.GetAccount()} 有新的登录请求";
+                                mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
+                                mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
+                                mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
+
+                                mobileConfirmationLogin.ShowDialog();
+                            });
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    finally
+                    {
+                        userClient?.LoginConfirmLocker.Release();
+                    }
+                }, itemClient);
+                tasks.Add(task);
             }
-            catch
-            {
-            }
-            finally
-            {
-                currentClient?.LoginConfirmLocker.Release();
-            }
+
+            await Task.WhenAll(tasks);
         }
 
         private async Task QueryWalletDetails(CancellationToken cancellationToken)
@@ -354,15 +377,16 @@ namespace Steam_Authenticator
                 var buffClients = Appsetting.Instance.BuffClients;
                 var ecoClients = Appsetting.Instance.EcoClients;
                 var youpinClinets = Appsetting.Instance.YouPinClients;
-                foreach (var client in checkClients)
+                foreach (var itemClient in checkClients)
                 {
-                    if (client == null)
+                    if (itemClient == null)
                     {
                         continue;
                     }
 
-                    var task = Task.Run(() =>
+                    var task = taskFactory.StartNew((obj) =>
                     {
+                        var client = obj as UserClient;
                         var webClient = client.Client;
                         var user = client.User;
                         var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
@@ -635,7 +659,7 @@ namespace Steam_Authenticator
                                 OfferCountLabel.Text = $"{receivedOffers.Count}";
                             }
                         }
-                    });
+                    }, itemClient);
                     tasks.Add(task);
                 }
 
@@ -688,20 +712,21 @@ namespace Steam_Authenticator
 
             List<Task> tasks = new List<Task>();
             var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
-            foreach (var client in checkClients)
+            foreach (var itemClient in checkClients)
             {
-                if (client == null)
+                if (itemClient == null)
                 {
                     continue;
                 }
-
-                var task = Task.Run(async () =>
+               
+                if (!itemClient.ConfirmationPopupLocker.Wait(0))
                 {
-                    if (!client.ConfirmationPopupLocker.Wait(0))
-                    {
-                        return;
-                    }
+                    return;
+                }
 
+                var task = taskFactory.StartNew((obj) =>
+                {
+                    var client = obj as UserClient;
                     int? confirmationCount = null;
                     try
                     {
@@ -713,12 +738,12 @@ namespace Steam_Authenticator
                             return;
                         }
 
-                        var steamNotifications = await SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
+                        var steamNotifications = SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
                             includeConfirmation: true,
                             includePinned: false,
                             includeRead: false,
                             countOnly: false,
-                            language: webClient.Language);
+                            language: webClient.Language).GetAwaiter().GetResult();
                         var steamNotificationsBody = steamNotifications.Body;
 
                         confirmationCount = steamNotificationsBody?.ConfirmationCount;
@@ -809,7 +834,7 @@ namespace Steam_Authenticator
                             ConfirmationCountLable.Text = $"{confirmationCount ?? 0}";
                         }
                     }
-                });
+                }, itemClient);
                 tasks.Add(task);
             }
 

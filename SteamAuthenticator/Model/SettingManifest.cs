@@ -109,7 +109,7 @@ namespace Steam_Authenticator.Model
             /// 是否自动检测确认信息
             /// </summary>
             [JsonProperty("periodic_checking_confirmation")]
-            public bool PeriodicCheckingConfirmation { get; set; }
+            public bool PeriodicCheckingConfirmation { get; set; } = true;
 
             /// <summary>
             /// 检测频率
@@ -122,7 +122,7 @@ namespace Steam_Authenticator.Model
             /// 自动弹出确认
             /// </summary>
             [JsonProperty("confirmation_auto_popup")]
-            public bool ConfirmationAutoPopup { get; set; }
+            public bool ConfirmationAutoPopup { get; set; } = true;
         }
     }
 }

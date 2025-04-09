@@ -43,9 +43,9 @@
             periodicChecking.Font = new Font("Microsoft YaHei UI", 9F);
             periodicChecking.Location = new Point(12, 12);
             periodicChecking.Name = "periodicChecking";
-            periodicChecking.Size = new Size(147, 21);
+            periodicChecking.Size = new Size(160, 21);
             periodicChecking.TabIndex = 0;
-            periodicChecking.Text = "自动刷新报价确认信息";
+            periodicChecking.Text = "自动刷新 报价/确认 信息";
             periodicChecking.UseVisualStyleBackColor = true;
             periodicChecking.CheckedChanged += periodicChecking_CheckedChanged;
             // 
