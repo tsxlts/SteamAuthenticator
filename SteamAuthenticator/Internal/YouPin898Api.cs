@@ -28,7 +28,7 @@ namespace Steam_Authenticator.Internal
             RequestTag = Guid.NewGuid().ToString();
         }
 
-        public static async Task<IWebResponse<YouPin898Response<object>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
+        public static async Task<IWebResponse<YouPin898Response<SendSmsCodeResponse>>> SendSmsCode(string sessionId, string area, string phone, CancellationToken cancellationToken = default)
         {
             var content = JsonContent.Create(new
             {
@@ -37,7 +37,7 @@ namespace Steam_Authenticator.Internal
                 Mobile = phone,
                 Code = ""
             });
-            var response = await SteamApi.PostAsync<YouPin898Response<object>>($"{Api}/api/user/Auth/SendSignInSmsCode",
+            var response = await SteamApi.PostAsync<YouPin898Response<SendSmsCodeResponse>>($"{Api}/api/user/Auth/SendSignInSmsCode",
                 content,
                 headers: InitDefaultHeaders(), cancellationToken: cancellationToken);
             return response;
