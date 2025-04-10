@@ -24,6 +24,8 @@ namespace Steam_Authenticator
         private readonly TimeSpan refreshClientInfoTimerMinPeriod = TimeSpan.FromSeconds(60);
 
         private readonly System.Threading.Timer refreshUserTimer;
+        private readonly TimeSpan refreshUserTimerMinPeriod = TimeSpan.FromSeconds(60);
+
         private readonly System.Threading.Timer checkVersionTimer;
 
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
@@ -890,7 +892,7 @@ namespace Steam_Authenticator
             }
             finally
             {
-                ResetRefreshUserTimer(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(10));
+                ResetRefreshUserTimer(refreshUserTimerMinPeriod, refreshUserTimerMinPeriod * 1.5);
             }
         }
 
