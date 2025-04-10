@@ -85,14 +85,14 @@ namespace Steam_Authenticator.Model
 
         #region 悠悠报价
         /// <summary>
-        /// 是否自动接受 ECO 索取报价
+        /// 是否自动接受 悠悠 索取报价
         /// 别人索取我的
         /// </summary>
         [JsonProperty("auto_accept_give_offer_youpin")]
         public bool AutoAcceptGiveOffer_YouPin { get; set; }
 
         /// <summary>
-        /// 是否自动确认 ECO 报价
+        /// 是否自动确认 悠悠 报价
         /// </summary>
         [JsonProperty("auto_confirm_trade_youpin")]
         public bool AutoConfirmTrade_YouPin { get; set; }

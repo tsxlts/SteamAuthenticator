@@ -166,7 +166,7 @@ namespace Steam_Authenticator
 
             await userClient.LogoutAsync();
 
-            ResetRefreshUserTimer(TimeSpan.FromMinutes(0), TimeSpan.FromMinutes(10));
+            ResetRefreshUserTimer(TimeSpan.Zero, refreshUserTimerMinPeriod);
         }
 
         private void removeUserMenuItem_Click(object sender, EventArgs e)
@@ -271,7 +271,7 @@ namespace Steam_Authenticator
             {
                 ResetRefreshMsgTimer(TimeSpan.Zero, refreshMsgTimerMinPeriod);
                 ResetRefreshClientInfoTimer(TimeSpan.Zero, refreshClientInfoTimerMinPeriod);
-                ResetRefreshUserTimer(TimeSpan.Zero, TimeSpan.FromMinutes(10));
+                ResetRefreshUserTimer(TimeSpan.Zero, refreshUserTimerMinPeriod);
             }
         }
 
