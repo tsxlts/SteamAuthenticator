@@ -44,7 +44,7 @@ namespace Steam_Authenticator.Internal
                         success = false;
                     }
 
-                    _ = AppLogger.Instance.Debug("handleOffer", webClient.SteamId, $"###{(accept ? "接受报价" : "拒绝报价")}###" +
+                    AppLogger.Instance.Debug("handleOffer", webClient.SteamId, $"###{(accept ? "接受报价" : "拒绝报价")}###" +
                         $"{Environment.NewLine}{offer.TradeOfferId}: {success}");
 
                     return success;
@@ -76,7 +76,7 @@ namespace Steam_Authenticator.Internal
                 success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
             }
 
-            _ = AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
+            AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
                 $"{Environment.NewLine}[{string.Join(",", confirmations.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]: {success}");
 
             if (success)
@@ -106,8 +106,8 @@ namespace Steam_Authenticator.Internal
                     success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
                 }
 
-                _ = AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
-                $"{Environment.NewLine}{$"{confirmation.ConfTypeName}#{confirmation.CreatorId}#{confirmation.Id}"}: {success}");
+                AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
+                    $"{Environment.NewLine}{$"{confirmation.ConfTypeName}#{confirmation.CreatorId}#{confirmation.Id}"}: {success}");
 
                 if (cancellationToken.IsCancellationRequested || success)
                 {

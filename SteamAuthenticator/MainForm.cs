@@ -409,7 +409,7 @@ namespace Steam_Authenticator
                             giveOffers.AddRange(reveiceGiveOffers);
                             giveOffers.AddRange(sentGiveOffers);
 
-                            _ = AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 Steam 报价###" +
+                            AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 Steam 报价###" +
                                 $"{Environment.NewLine}发货报价: [{string.Join(",", giveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}收货报价: [{string.Join(",", receiveOffers.Select(c => c.TradeOfferId))}]");
 
@@ -487,7 +487,7 @@ namespace Steam_Authenticator
                                     otherGiveOffers = new List<Offer>();
                                 }
 
-                                _ = AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 BUFF 报价###" +
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 BUFF 报价###" +
                                     $"{Environment.NewLine}BUFF响应: httpStatusCode:{buffOffer.HttpStatusCode}, code:{buffOffer.Body?.code}, msg:{buffOffer.Body?.msg}, error:{buffOffer.Body?.error}" +
                                     $"{Environment.NewLine}订单报价信息: [{string.Join(",", buffOffer.Body?.data?.Select(c => $"{c.id}#{c.tradeofferid}") ?? new List<string>())}]" +
                                     $"{Environment.NewLine}发货报价: [{string.Join(",", buffGiveOffers.Select(c => c.TradeOfferId))}]");
@@ -539,7 +539,7 @@ namespace Steam_Authenticator
                                     otherGiveOffers = new List<Offer>();
                                 }
 
-                                _ = AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 ECO 报价###" +
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 ECO 报价###" +
                                     $"{Environment.NewLine}ECO响应: code:{ecoOffer?.StatusData?.ResultCode}, msg:{ecoOffer?.StatusData?.ResultMsg}" +
                                     $"{Environment.NewLine}订单报价信息: [{string.Join(",", ecoOffer?.StatusData?.ResultData?.Select(c => $"{c.OrderNum}#{c.OfferId}") ?? new List<string>())}]" +
                                     $"{Environment.NewLine}发货报价: [{string.Join(",", ecoGiveOffers.Select(c => c.TradeOfferId))}]");
@@ -566,7 +566,7 @@ namespace Steam_Authenticator
                                     otherGiveOffers = new List<Offer>();
                                 }
 
-                                _ = AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 悠悠 报价###" +
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 悠悠 报价###" +
                                    $"{Environment.NewLine}悠悠响应: httpStatusCode:{youpinOffer.HttpStatusCode}, code:{youpinOffer.Body?.GetCode()}, msg:{youpinOffer.Body?.GetMsg()}" +
                                    $"{Environment.NewLine}订单报价信息: [{string.Join(",", youpinOffer.Body?.GetData()?.orderInfoList?.Select(c => $"{c.orderNo}#{c.offerId}") ?? new List<string>())}]" +
                                    $"{Environment.NewLine}发货报价: [{string.Join(",", youpinGiveOffers.Select(c => c.TradeOfferId))}]");
@@ -636,7 +636,7 @@ namespace Steam_Authenticator
 
                             autoConfirmOffers = autoConfirmOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
 
-                            _ = AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###发货报价结果###" +
+                            AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###发货报价结果###" +
                                 $"{Environment.NewLine}自定义发货报价: [{string.Join(",", customGiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}BUFF发货报价: [{string.Join(",", buffGiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}ECO发货报价: [{string.Join(",", ecoGiveOffers.Select(c => c.TradeOfferId))}]" +
@@ -654,7 +654,7 @@ namespace Steam_Authenticator
                         catch (Exception ex)
                         {
                             AppLogger.Instance.Error(ex);
-                            _ = AppLogger.Instance.Debug("queryOffer", client.User.SteamId, $"###查询报价信息失败###" +
+                            AppLogger.Instance.Debug("queryOffer", client.User.SteamId, $"###查询报价信息失败###" +
                                 $"{Environment.NewLine}异常信息: {ex.Message}");
                         }
                         finally
@@ -761,7 +761,7 @@ namespace Steam_Authenticator
                         var steamNotificationsBody = steamNotifications.Body;
                         confirmationCount = steamNotificationsBody?.ConfirmationCount;
 
-                        _ = AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息###" +
+                        AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息###" +
                             $"{Environment.NewLine}Steam响应: httpStatusCode:{steamNotifications.HttpStatusCode}" +
                             $"{Environment.NewLine}待确认事项数量: {confirmationCount}");
 
@@ -784,7 +784,7 @@ namespace Steam_Authenticator
                         var queryConfirmations = webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, cancellationToken).Result;
                         if (!(queryConfirmations?.Success ?? false))
                         {
-                            _ = AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息失败###" +
+                            AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息失败###" +
                                 $"{Environment.NewLine}Steam响应: {JsonConvert.SerializeObject(queryConfirmations)}");
                             return;
                         }
@@ -854,7 +854,7 @@ namespace Steam_Authenticator
                             });
                         }
 
-                        _ = AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息结果###" +
+                        AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息结果###" +
                             $"{Environment.NewLine}已开启自动确认数据: [{string.Join(",", autoConfirm.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]" +
                             $"{Environment.NewLine}未开启自动确认数据: [{string.Join(",", waitConfirm.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]");
                     }
@@ -868,7 +868,7 @@ namespace Steam_Authenticator
                     catch (Exception ex)
                     {
                         AppLogger.Instance.Error(ex);
-                        _ = AppLogger.Instance.Debug("queryConfirmation", client.User.SteamId, $"###查询待确认信息失败###" +
+                        AppLogger.Instance.Debug("queryConfirmation", client.User.SteamId, $"###查询待确认信息失败###" +
                             $"{Environment.NewLine}异常信息: {ex.Message}");
                     }
                     finally

@@ -87,11 +87,11 @@ namespace Steam_Authenticator.Factory
             }
         }
 
-        public async Task Debug(string type, string path, string msg)
+        public void Debug(string type, string path, string msg)
         {
             try
             {
-                using (await asyncLocker.LockAsync(TimeSpan.FromSeconds(1)))
+                using (asyncLocker.Lock(TimeSpan.FromSeconds(1)))
                 {
                     DateTime current = DateTime.Now;
                     var directory = Path.Combine(debugLogPath, path, type);
