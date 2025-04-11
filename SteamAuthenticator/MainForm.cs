@@ -8,6 +8,7 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
@@ -18,6 +19,8 @@ namespace Steam_Authenticator
     {
         private readonly Version currentVersion;
         private readonly TaskFactory taskFactory;
+
+        private readonly ConcurrentDictionary<string, ConfirmationsPopup> confirmationsPopupDialogs;
 
         private readonly System.Threading.Timer refreshMsgTimer;
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
@@ -58,6 +61,8 @@ namespace Steam_Authenticator
             versionLabel.Text = $"v{currentVersion}";
 
             taskFactory = new TaskFactory();
+
+            confirmationsPopupDialogs = new ConcurrentDictionary<string, ConfirmationsPopup>();
 
             refreshMsgTimer = new System.Threading.Timer(RefreshMsg, null, -1, -1);
             refreshClientInfoTimer = new System.Threading.Timer(RefreshClientInfo, null, -1, -1);
@@ -727,11 +732,6 @@ namespace Steam_Authenticator
                     continue;
                 }
 
-                if (!itemClient.ConfirmationPopupLocker.Wait(0))
-                {
-                    return;
-                }
-
                 var task = taskFactory.StartNew((obj) =>
                 {
                     var client = obj as UserClient;
@@ -745,6 +745,11 @@ namespace Steam_Authenticator
                         {
                             return;
                         }
+
+                        var confirmationPopup = confirmationsPopupDialogs.GetOrAdd(client.User.SteamId, new ConfirmationsPopup(client, [])
+                        {
+                            StartPosition = FormStartPosition.CenterScreen
+                        });
 
                         var steamNotifications = SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
                             includeConfirmation: true,
@@ -762,6 +767,11 @@ namespace Steam_Authenticator
 
                         if (steamNotificationsBody != null && confirmationCount == 0)
                         {
+                            this.Invoke(() =>
+                            {
+                                confirmationPopup.SetConfirmations([]);
+                                confirmationPopup.Hide();
+                            });
                             return;
                         }
 
@@ -830,8 +840,17 @@ namespace Steam_Authenticator
                         {
                             this.Invoke(() =>
                             {
-                                ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
-                                confirmationPopup.ShowDialog();
+                                confirmationPopup.SetConfirmations(waitConfirm);
+                                confirmationPopup.Show();
+                            });
+                        }
+
+                        if (!waitConfirm.Any())
+                        {
+                            this.Invoke(() =>
+                            {
+                                confirmationPopup.SetConfirmations([]);
+                                confirmationPopup.Hide();
                             });
                         }
 
@@ -854,8 +873,6 @@ namespace Steam_Authenticator
                     }
                     finally
                     {
-                        client.ConfirmationPopupLocker.Release();
-
                         usersPanel.SetConfirmation(client, confirmationCount);
 
                         if (client.User.SteamId == currentClient?.User.SteamId)
