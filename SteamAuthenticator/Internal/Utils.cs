@@ -1,4 +1,5 @@
-﻿using Steam_Authenticator.Model;
+﻿using Steam_Authenticator.Factory;
+using Steam_Authenticator.Model;
 using SteamKit.Model;
 using SteamKit.WebClient;
 
@@ -6,7 +7,7 @@ namespace Steam_Authenticator.Internal
 {
     internal class Utils
     {
-        public static async Task HandleOffer(SteamCommunityClient webClient, IEnumerable<Offer> offers, bool accpet, CancellationToken cancellationToken)
+        public static async Task HandleOffer(SteamCommunityClient webClient, IEnumerable<Offer> offers, bool accept, CancellationToken cancellationToken)
         {
             if (!webClient.LoggedIn)
             {
@@ -23,10 +24,11 @@ namespace Steam_Authenticator.Internal
             {
                 tasks.Add(taskFactory.StartNew((arg) =>
                 {
+                    bool success = false;
+                    Offer offer = arg as Offer;
                     try
                     {
-                        Offer offer = arg as Offer;
-                        if (accpet)
+                        if (accept)
                         {
                             webClient.TradeOffer.AcceptOfferAsync(offer.TradeOfferId, cancellationToken).GetAwaiter().GetResult();
                         }
@@ -35,12 +37,17 @@ namespace Steam_Authenticator.Internal
                             webClient.TradeOffer.DeclineOfferAsync(offer.TradeOfferId, cancellationToken).GetAwaiter().GetResult();
                         }
 
-                        return true;
+                        success = true;
                     }
                     catch
                     {
-                        return false;
+                        success = false;
                     }
+
+                    _ = AppLogger.Instance.Debug("handleOffer", webClient.SteamId, $"###{(accept ? "接受报价" : "拒绝报价")}###" +
+                        $"{Environment.NewLine}{offer.TradeOfferId}: {success}");
+
+                    return success;
                 }, item));
             }
 
@@ -68,6 +75,10 @@ namespace Steam_Authenticator.Internal
             {
                 success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
             }
+
+            _ = AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
+                $"{Environment.NewLine}[{string.Join(",", confirmations.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]: {success}");
+
             if (success)
             {
                 return true;
@@ -94,6 +105,9 @@ namespace Steam_Authenticator.Internal
                 {
                     success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
                 }
+
+                _ = AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
+                $"{Environment.NewLine}{$"{confirmation.ConfTypeName}#{confirmation.CreatorId}#{confirmation.Id}"}: {success}");
 
                 if (cancellationToken.IsCancellationRequested || success)
                 {
