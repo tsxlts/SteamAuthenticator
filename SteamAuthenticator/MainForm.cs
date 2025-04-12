@@ -129,6 +129,8 @@ namespace Steam_Authenticator
             var loadUsers = new List<Task> { LoadUsers() };
             loadUsers.AddRange(userPanelHandlers.Select(c => c.LoadUsersAsync()));
 
+            await CheckNetwork();
+
             await Task.WhenAll(loadUsers);
 
             await Task.Run(() =>
@@ -1091,6 +1093,36 @@ namespace Steam_Authenticator
             }
 
             return Task.CompletedTask;
+        }
+
+        private async Task<bool> CheckNetwork()
+        {
+            try
+            {
+                await SteamApi.GetSteamIdAsync(new CookieCollection());
+            }
+            catch (HttpRequestException ex)
+            {
+                this.Invoke(() =>
+                {
+                    MessageBox.Show($"访问Steam网络失败" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”" +
+                    $"{Environment.NewLine}" +
+                    $"如果你已经设置了代理, 请确保代理服务器可用" +
+                    $"{Environment.NewLine}" +
+                    $"{Environment.NewLine}" +
+                    $"错误信息：" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                });
+                return false;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Instance.Error(ex);
+            }
+            return true;
         }
 
         protected override void Dispose(bool disposing)
