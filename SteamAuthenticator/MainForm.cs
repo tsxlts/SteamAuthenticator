@@ -1,11 +1,14 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
+using Steam_Authenticator.Factory;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Handler;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
@@ -16,6 +19,8 @@ namespace Steam_Authenticator
     {
         private readonly Version currentVersion;
         private readonly TaskFactory taskFactory;
+
+        private readonly ConcurrentDictionary<string, ConfirmationsPopup> confirmationsPopupDialogs;
 
         private readonly System.Threading.Timer refreshMsgTimer;
         private readonly TimeSpan refreshMsgTimerMinPeriod = TimeSpan.FromSeconds(10);
@@ -56,6 +61,8 @@ namespace Steam_Authenticator
             versionLabel.Text = $"v{currentVersion}";
 
             taskFactory = new TaskFactory();
+
+            confirmationsPopupDialogs = new ConcurrentDictionary<string, ConfirmationsPopup>();
 
             refreshMsgTimer = new System.Threading.Timer(RefreshMsg, null, -1, -1);
             refreshClientInfoTimer = new System.Threading.Timer(RefreshClientInfo, null, -1, -1);
@@ -121,6 +128,8 @@ namespace Steam_Authenticator
 
             var loadUsers = new List<Task> { LoadUsers() };
             loadUsers.AddRange(userPanelHandlers.Select(c => c.LoadUsersAsync()));
+
+            await CheckNetwork();
 
             await Task.WhenAll(loadUsers);
 
@@ -357,7 +366,7 @@ namespace Steam_Authenticator
                         var client = obj as UserClient;
                         var webClient = client.Client;
                         var user = client.User;
-                        var buffClinet = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
+                        var buffClient = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
                         var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
                         var youpinClient = youpinClinets.FirstOrDefault(c => c.User.SteamId == user.SteamId);
 
@@ -395,17 +404,21 @@ namespace Steam_Authenticator
                             sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
 
                             var receiveOffers = receivedOffers.Where(c => !(c.ItemsToGive?.Any() ?? false));
+
+                            var giveOffers = new List<Offer>();
+                            var reveiceGiveOffers = receivedOffers.Where(c => c.ItemsToGive?.Any() ?? false);
+                            var sentGiveOffers = sentOffer.Where(c => c.ItemsToGive?.Any() ?? false);
+                            giveOffers.AddRange(reveiceGiveOffers);
+                            giveOffers.AddRange(sentGiveOffers);
+
+                            AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 Steam 报价###" +
+                                $"{Environment.NewLine}发货报价: [{string.Join(",", giveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}收货报价: [{string.Join(",", receiveOffers.Select(c => c.TradeOfferId))}]");
+
                             if (receiveOffers.Any() && user.Setting.AutoAcceptReceiveOffer)
                             {
                                 HandleOffer(webClient, receiveOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
                             }
-
-                            var reveiceGiveOffers = receivedOffers.Where(c => c.ItemsToGive?.Any() ?? false);
-                            var sentGiveOffers = sentOffer.Where(c => c.ItemsToGive?.Any() ?? false);
-
-                            var giveOffers = new List<Offer>();
-                            giveOffers.AddRange(reveiceGiveOffers);
-                            giveOffers.AddRange(sentGiveOffers);
 
                             var customGiveOffers = new List<Offer>();
                             var buffGiveOffers = new List<Offer>();
@@ -458,10 +471,10 @@ namespace Steam_Authenticator
 
                             #region BUFF 报价
                             buffOfferCount = 0;
-                            if (giveOffers.Any() && buffClinet != null)
+                            if (giveOffers.Any() && buffClient != null)
                             {
                                 buffOfferCount = null;
-                                var buffOffer = buffClinet.QuerySteamTrade().Result;
+                                var buffOffer = buffClient.QuerySteamTrade().Result;
                                 if (buffOffer.Body?.IsSuccess ?? false)
                                 {
                                     var buffOfferIds = buffOffer.Body.data?.Select(c => c.tradeofferid)?.ToList() ?? new List<string>();
@@ -475,6 +488,11 @@ namespace Steam_Authenticator
                                 {
                                     otherGiveOffers = new List<Offer>();
                                 }
+
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 BUFF 报价###" +
+                                    $"{Environment.NewLine}BUFF响应: httpStatusCode:{buffOffer.HttpStatusCode}, code:{buffOffer.Body?.code}, msg:{buffOffer.Body?.msg}, error:{buffOffer.Body?.error}" +
+                                    $"{Environment.NewLine}订单报价信息: [{string.Join(",", buffOffer.Body?.data?.Select(c => $"{c.id}#{c.tradeofferid}") ?? new List<string>())}]" +
+                                    $"{Environment.NewLine}发货报价: [{string.Join(",", buffGiveOffers.Select(c => c.TradeOfferId))}]");
                             }
                             #endregion
 
@@ -522,6 +540,11 @@ namespace Steam_Authenticator
                                 {
                                     otherGiveOffers = new List<Offer>();
                                 }
+
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 ECO 报价###" +
+                                    $"{Environment.NewLine}ECO响应: code:{ecoOffer?.StatusData?.ResultCode}, msg:{ecoOffer?.StatusData?.ResultMsg}" +
+                                    $"{Environment.NewLine}订单报价信息: [{string.Join(",", ecoOffer?.StatusData?.ResultData?.Select(c => $"{c.OrderNum}#{c.OfferId}") ?? new List<string>())}]" +
+                                    $"{Environment.NewLine}发货报价: [{string.Join(",", ecoGiveOffers.Select(c => c.TradeOfferId))}]");
                             }
                             #endregion
 
@@ -544,43 +567,49 @@ namespace Steam_Authenticator
                                 {
                                     otherGiveOffers = new List<Offer>();
                                 }
+
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 悠悠 报价###" +
+                                   $"{Environment.NewLine}悠悠响应: httpStatusCode:{youpinOffer.HttpStatusCode}, code:{youpinOffer.Body?.GetCode()}, msg:{youpinOffer.Body?.GetMsg()}" +
+                                   $"{Environment.NewLine}订单报价信息: [{string.Join(",", youpinOffer.Body?.GetData()?.orderInfoList?.Select(c => $"{c.orderNo}#{c.offerId}") ?? new List<string>())}]" +
+                                   $"{Environment.NewLine}发货报价: [{string.Join(",", youpinGiveOffers.Select(c => c.TradeOfferId))}]");
                             }
                             #endregion
 
-                            List<Offer> acceptOffers = new List<Offer>();
+                            List<Offer> autoAcceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
-                                var acceptItemOffers = giveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = giveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && acceptCustom)
                             {
-                                var acceptItemOffers = customGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = customGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetBuff)
                             {
-                                var acceptItemOffers = buffGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = buffGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accectEco)
                             {
-                                var acceptItemOffers = ecoGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = ecoGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accectYouPin)
                             {
-                                var acceptItemOffers = youpinGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = youpinGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
                             {
-                                var acceptItemOffers = otherGiveOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
-                                acceptOffers.AddRange(acceptItemOffers);
+                                var acceptItemOffers = otherGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
                             }
+                            autoAcceptOffers = autoAcceptOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
 
-                            acceptOffers = acceptOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
-                            HandleOffer(webClient, acceptOffers, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
+                            var acceptOffes = autoAcceptOffers.Where(c => !c.IsOurOffer && c.ConfirmationMethod == TradeOfferConfirmationMethod.Invalid).ToList();
+                            HandleOffer(webClient, acceptOffes, true, new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token).GetAwaiter().GetResult();
 
                             if (confirmAll)
                             {
@@ -608,9 +637,27 @@ namespace Steam_Authenticator
                             }
 
                             autoConfirmOffers = autoConfirmOffers.GroupBy(c => c.TradeOfferId).Select(c => c.First()).ToList();
+
+                            AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###发货报价结果###" +
+                                $"{Environment.NewLine}自定义发货报价: [{string.Join(",", customGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}BUFF发货报价: [{string.Join(",", buffGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}ECO发货报价: [{string.Join(",", ecoGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}悠悠发货报价: [{string.Join(",", youpinGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}其他发货报价: [{string.Join(",", otherGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}自动接受报价: [{string.Join(",", autoAcceptOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}自动确认报价: [{string.Join(",", autoConfirmOffers.Select(c => c.TradeOfferId))}]");
                         }
-                        catch
+                        catch (OperationCanceledException)
                         {
+                        }
+                        catch (AggregateException)
+                        {
+                        }
+                        catch (Exception ex)
+                        {
+                            AppLogger.Instance.Error(ex);
+                            AppLogger.Instance.Debug("queryOffer", client.User.SteamId, $"###查询报价信息失败###" +
+                                $"{Environment.NewLine}异常信息: {ex.Message}");
                         }
                         finally
                         {
@@ -618,7 +665,7 @@ namespace Steam_Authenticator
                             client.SetReceivedOffers(receivedOffers);
 
                             usersPanel.SetOffer(client, receivedOffers.Count);
-                            buffUsersPanel.SetOffer(buffClinet, buffOfferCount);
+                            buffUsersPanel.SetOffer(buffClient, buffOfferCount);
                             ecoUsersPanel.SetOffer(ecoClient, ecoOfferCount);
                             youpinUsersPanel.SetOffer(youpinClient, youpinOfferCount);
 
@@ -687,11 +734,6 @@ namespace Steam_Authenticator
                     continue;
                 }
 
-                if (!itemClient.ConfirmationPopupLocker.Wait(0))
-                {
-                    return;
-                }
-
                 var task = taskFactory.StartNew((obj) =>
                 {
                     var client = obj as UserClient;
@@ -706,17 +748,32 @@ namespace Steam_Authenticator
                             return;
                         }
 
+                        var confirmationPopup = confirmationsPopupDialogs.GetOrAdd(client.User.SteamId, new ConfirmationsPopup(client, [])
+                        {
+                            StartPosition = FormStartPosition.CenterScreen
+                        });
+
                         var steamNotifications = SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
                             includeConfirmation: true,
                             includePinned: false,
                             includeRead: false,
                             countOnly: false,
                             language: webClient.Language).GetAwaiter().GetResult();
-                        var steamNotificationsBody = steamNotifications.Body;
 
+                        var steamNotificationsBody = steamNotifications.Body;
                         confirmationCount = steamNotificationsBody?.ConfirmationCount;
+
+                        AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息###" +
+                            $"{Environment.NewLine}Steam响应: httpStatusCode:{steamNotifications.HttpStatusCode}" +
+                            $"{Environment.NewLine}待确认事项数量: {confirmationCount}");
+
                         if (steamNotificationsBody != null && confirmationCount == 0)
                         {
+                            this.Invoke(() =>
+                            {
+                                confirmationPopup.SetConfirmations([]);
+                                confirmationPopup.Hide();
+                            });
                             return;
                         }
 
@@ -729,6 +786,8 @@ namespace Steam_Authenticator
                         var queryConfirmations = webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, cancellationToken).Result;
                         if (!(queryConfirmations?.Success ?? false))
                         {
+                            AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息失败###" +
+                                $"{Environment.NewLine}Steam响应: {JsonConvert.SerializeObject(queryConfirmations)}");
                             return;
                         }
 
@@ -783,18 +842,39 @@ namespace Steam_Authenticator
                         {
                             this.Invoke(() =>
                             {
-                                ConfirmationsPopup confirmationPopup = new ConfirmationsPopup(client, waitConfirm);
-                                confirmationPopup.ShowDialog();
+                                confirmationPopup.SetConfirmations(waitConfirm);
+                                confirmationPopup.Show();
                             });
                         }
+
+                        if (!waitConfirm.Any())
+                        {
+                            this.Invoke(() =>
+                            {
+                                confirmationPopup.SetConfirmations([]);
+                                confirmationPopup.Hide();
+                            });
+                        }
+
+                        AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息结果###" +
+                            $"{Environment.NewLine}已开启自动确认数据: [{string.Join(",", autoConfirm.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]" +
+                            $"{Environment.NewLine}未开启自动确认数据: [{string.Join(",", waitConfirm.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]");
                     }
-                    catch
+                    catch (OperationCanceledException)
                     {
+
+                    }
+                    catch (AggregateException)
+                    {
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Instance.Error(ex);
+                        AppLogger.Instance.Debug("queryConfirmation", client.User.SteamId, $"###查询待确认信息失败###" +
+                            $"{Environment.NewLine}异常信息: {ex.Message}");
                     }
                     finally
                     {
-                        client.ConfirmationPopupLocker.Release();
-
                         usersPanel.SetConfirmation(client, confirmationCount);
 
                         if (client.User.SteamId == currentClient?.User.SteamId)
@@ -1013,6 +1093,36 @@ namespace Steam_Authenticator
             }
 
             return Task.CompletedTask;
+        }
+
+        private async Task<bool> CheckNetwork()
+        {
+            try
+            {
+                await SteamApi.GetSteamIdAsync(new CookieCollection());
+            }
+            catch (HttpRequestException ex)
+            {
+                this.Invoke(() =>
+                {
+                    MessageBox.Show($"访问Steam网络失败" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”" +
+                    $"{Environment.NewLine}" +
+                    $"如果你已经设置了代理, 请确保代理服务器可用" +
+                    $"{Environment.NewLine}" +
+                    $"{Environment.NewLine}" +
+                    $"错误信息：" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                });
+                return false;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Instance.Error(ex);
+            }
+            return true;
         }
 
         protected override void Dispose(bool disposing)

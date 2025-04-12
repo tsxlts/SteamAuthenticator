@@ -185,6 +185,12 @@ namespace Steam_Authenticator.Forms
                     MessageBox.Show($"登录失败{Environment.NewLine}{error}", "登录", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"{ex.Message}" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
                 if (closed)
@@ -232,6 +238,12 @@ namespace Steam_Authenticator.Forms
                 Client = steamWebClient;
                 DialogResult = DialogResult.OK;
             }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"{ex.Message}" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
                 if (closed)
@@ -276,6 +288,12 @@ namespace Steam_Authenticator.Forms
 
                 Client = steamWebClient;
                 DialogResult = DialogResult.OK;
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"{ex.Message}" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {

@@ -72,6 +72,12 @@ namespace Steam_Authenticator.Forms
                     }
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"{ex.Message}" +
+                    $"{Environment.NewLine}" +
+                    $"请确保你已经开启加速器, 并将加速器设置为“路由模式”", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show($"二维码加载失败" +

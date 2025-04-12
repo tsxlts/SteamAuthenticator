@@ -8,9 +8,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Steam_Authenticator</RootNamespace>
     <AssemblyName>SteamAuthenticator</AssemblyName>
-    <AssemblyVersion>2.0.5.1</AssemblyVersion>
-    <FileVersion>2.0.5.1</FileVersion>
-    <Version>2.0.5.1</Version>
+    <AssemblyVersion>2.0.5.2</AssemblyVersion>
+    <FileVersion>2.0.5.2</FileVersion>
+    <Version>2.0.5.2</Version>
     <ApplicationIcon>File\steam.ico</ApplicationIcon>
   </PropertyGroup>
 

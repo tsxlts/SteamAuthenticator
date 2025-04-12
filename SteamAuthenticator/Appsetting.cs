@@ -90,7 +90,6 @@ namespace Steam_Authenticator
         public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
-        public readonly SemaphoreSlim ConfirmationPopupLocker = new SemaphoreSlim(1, 1);
 
         private List<Offer> receivedOffers = new List<Offer>();
         private List<Offer> autoConfirmOffers = new List<Offer>();

@@ -145,6 +145,7 @@
             Name = "ConfirmationsPopup";
             StartPosition = FormStartPosition.CenterParent;
             Text = "令牌确认";
+            FormClosing += ConfirmationsPopup_FormClosing;
             Load += ConfirmationsPopup_Load;
             panel1.ResumeLayout(false);
             panel2.ResumeLayout(false);

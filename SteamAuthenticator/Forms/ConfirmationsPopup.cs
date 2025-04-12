@@ -11,44 +11,32 @@ namespace Steam_Authenticator.Forms
     {
         private readonly UserClient client;
         private readonly SteamCommunityClient webClient;
+
+        private readonly SemaphoreSlim locker;
         private readonly List<SteamKit.Model.Confirmation> confirmations;
 
         public ConfirmationsPopup(UserClient client, IEnumerable<SteamKit.Model.Confirmation> confirmations)
         {
             InitializeComponent();
 
+            CheckForIllegalCrossThreadCalls = false;
+
             this.client = client;
             this.webClient = client.Client;
+
+            this.locker = new SemaphoreSlim(1, 1);
             this.confirmations = confirmations.ToList();
         }
 
         private void ConfirmationsPopup_Load(object sender, EventArgs e)
         {
-            int tradeCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.Trade);
-            int marketCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.MarketListing);
-            var otherConfirms = confirmations.Where(c => !new[]
-            {
-                SteamEnum.ConfirmationType.Trade, SteamEnum.ConfirmationType.MarketListing
-            }.Contains(c.ConfType)).ToList();
+            Init();
+        }
 
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"你有");
-            if (tradeCount > 0)
-            {
-                stringBuilder.AppendLine($"{tradeCount}个报价");
-            }
-            if (marketCount > 0)
-            {
-                stringBuilder.AppendLine($"{marketCount}个市场上架");
-            }
-            if (otherConfirms.Count > 0)
-            {
-                stringBuilder.AppendLine($"{otherConfirms.Count}个{otherConfirms.First().Headline}等其他事项");
-            }
-            stringBuilder.AppendLine("待确认");
-
-            userLabel.Text = client.GetAccount();
-            tipsLabel.Text = stringBuilder.ToString();
+        private void ConfirmationsPopup_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
         }
 
         private async void accept_decline_Click(object sender, EventArgs e)
@@ -83,7 +71,7 @@ namespace Steam_Authenticator.Forms
                     if (success)
                     {
                         confirmations.Clear();
-                        Close();
+                        Hide();
                     }
                     else
                     {
@@ -111,6 +99,65 @@ namespace Steam_Authenticator.Forms
                 Height = 400
             };
             confirmation.ShowDialog();
+        }
+
+        private void Init()
+        {
+            try
+            {
+                int tradeCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.Trade);
+                int marketCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.MarketListing);
+                var otherConfirms = confirmations.Where(c => !new[]
+                {
+                    SteamEnum.ConfirmationType.Trade, SteamEnum.ConfirmationType.MarketListing
+                }.Contains(c.ConfType)).ToList();
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine($"你有");
+                if (tradeCount > 0)
+                {
+                    stringBuilder.AppendLine($"{tradeCount}个报价");
+                }
+                if (marketCount > 0)
+                {
+                    stringBuilder.AppendLine($"{marketCount}个市场上架");
+                }
+                if (otherConfirms.Count > 0)
+                {
+                    stringBuilder.AppendLine($"{otherConfirms.Count}个{otherConfirms.First().Headline}等其他事项");
+                }
+                stringBuilder.AppendLine("待确认");
+
+                userLabel.Text = client.GetAccount();
+                tipsLabel.Text = stringBuilder.ToString();
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void SetConfirmations(IEnumerable<SteamKit.Model.Confirmation> confirmations)
+        {
+            if (!locker.Wait(0))
+            {
+                return;
+            }
+
+            try
+            {
+                this.confirmations.Clear();
+                this.confirmations.AddRange(confirmations);
+                Init();
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                locker.Release();
+            }
         }
     }
 }
