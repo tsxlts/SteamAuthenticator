@@ -34,11 +34,13 @@
             allAssets = new RadioButton();
             label6 = new Label();
             panel2 = new Panel();
+            cs2Game = new RadioButton();
+            label7 = new Label();
+            panel1 = new Panel();
             autoConfirm = new CheckBox();
+            receiverSendOffer = new RadioButton();
             autoAccept = new CheckBox();
             label2 = new Label();
-            panel1 = new Panel();
-            receiverSendOffer = new RadioButton();
             label1 = new Label();
             groupBox2 = new GroupBox();
             selectReceiverBtn = new LinkLabel();
@@ -88,7 +90,7 @@
             // allAssets
             // 
             allAssets.AutoSize = true;
-            allAssets.Location = new Point(120, 4);
+            allAssets.Location = new Point(86, 4);
             allAssets.Name = "allAssets";
             allAssets.Size = new Size(122, 21);
             allAssets.TabIndex = 2;
@@ -101,63 +103,65 @@
             label6.ForeColor = Color.FromArgb(127, 127, 127);
             label6.Location = new Point(3, 5);
             label6.Name = "label6";
-            label6.Size = new Size(111, 17);
+            label6.Size = new Size(77, 17);
             label6.TabIndex = 1;
-            label6.Text = "需要转移的库存：";
+            label6.Text = "库存：";
             label6.TextAlign = ContentAlignment.TopRight;
             // 
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel2.Controls.Add(autoConfirm);
-            panel2.Controls.Add(autoAccept);
-            panel2.Controls.Add(label2);
+            panel2.Controls.Add(cs2Game);
+            panel2.Controls.Add(label7);
             panel2.Location = new Point(6, 56);
             panel2.Name = "panel2";
             panel2.Size = new Size(300, 28);
             panel2.TabIndex = 2;
             // 
+            // cs2Game
+            // 
+            cs2Game.AutoSize = true;
+            cs2Game.Location = new Point(89, 4);
+            cs2Game.Name = "cs2Game";
+            cs2Game.Size = new Size(48, 21);
+            cs2Game.TabIndex = 3;
+            cs2Game.TabStop = true;
+            cs2Game.Text = "CS2";
+            cs2Game.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            label7.ForeColor = Color.FromArgb(127, 127, 127);
+            label7.Location = new Point(3, 5);
+            label7.Name = "label7";
+            label7.Size = new Size(80, 17);
+            label7.TabIndex = 2;
+            label7.Text = "游戏：";
+            label7.TextAlign = ContentAlignment.TopRight;
+            // 
+            // panel1
+            // 
+            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel1.Controls.Add(autoConfirm);
+            panel1.Controls.Add(receiverSendOffer);
+            panel1.Controls.Add(autoAccept);
+            panel1.Controls.Add(label2);
+            panel1.Controls.Add(label1);
+            panel1.Location = new Point(6, 22);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(665, 28);
+            panel1.TabIndex = 1;
+            // 
             // autoConfirm
             // 
             autoConfirm.AutoSize = true;
-            autoConfirm.Location = new Point(194, 4);
+            autoConfirm.Location = new Point(497, 5);
             autoConfirm.Name = "autoConfirm";
             autoConfirm.Size = new Size(99, 21);
             autoConfirm.TabIndex = 3;
             autoConfirm.Text = "自动令牌确认";
             autoConfirm.UseVisualStyleBackColor = true;
             autoConfirm.CheckedChanged += autoConfirm_CheckedChanged;
-            // 
-            // autoAccept
-            // 
-            autoAccept.AutoSize = true;
-            autoAccept.Location = new Point(89, 4);
-            autoAccept.Name = "autoAccept";
-            autoAccept.Size = new Size(99, 21);
-            autoAccept.TabIndex = 2;
-            autoAccept.Text = "自动接受报价";
-            autoAccept.UseVisualStyleBackColor = true;
-            autoAccept.CheckedChanged += autoAccept_CheckedChanged;
-            // 
-            // label2
-            // 
-            label2.ForeColor = Color.FromArgb(127, 127, 127);
-            label2.Location = new Point(3, 5);
-            label2.Name = "label2";
-            label2.Size = new Size(80, 17);
-            label2.TabIndex = 1;
-            label2.Text = "报价处理：";
-            label2.TextAlign = ContentAlignment.TopRight;
-            // 
-            // panel1
-            // 
-            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(receiverSendOffer);
-            panel1.Controls.Add(label1);
-            panel1.Location = new Point(6, 22);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(665, 28);
-            panel1.TabIndex = 1;
             // 
             // receiverSendOffer
             // 
@@ -169,6 +173,27 @@
             receiverSendOffer.TabStop = true;
             receiverSendOffer.Text = "库存转入方（收货方）发送报价";
             receiverSendOffer.UseVisualStyleBackColor = true;
+            // 
+            // autoAccept
+            // 
+            autoAccept.AutoSize = true;
+            autoAccept.Location = new Point(392, 5);
+            autoAccept.Name = "autoAccept";
+            autoAccept.Size = new Size(99, 21);
+            autoAccept.TabIndex = 2;
+            autoAccept.Text = "自动接受报价";
+            autoAccept.UseVisualStyleBackColor = true;
+            autoAccept.CheckedChanged += autoAccept_CheckedChanged;
+            // 
+            // label2
+            // 
+            label2.ForeColor = Color.FromArgb(127, 127, 127);
+            label2.Location = new Point(306, 6);
+            label2.Name = "label2";
+            label2.Size = new Size(80, 17);
+            label2.TabIndex = 1;
+            label2.Text = "报价处理：";
+            label2.TextAlign = ContentAlignment.TopRight;
             // 
             // label1
             // 
@@ -370,5 +395,7 @@
         private Panel panel5;
         private Label label6;
         private RadioButton allAssets;
+        private RadioButton cs2Game;
+        private Label label7;
     }
 }

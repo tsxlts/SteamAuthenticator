@@ -68,17 +68,27 @@ namespace Steam_Authenticator.Internal
             }
 
             bool success = false;
-            if (accept)
+            while (true)
             {
-                success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-            }
-            else
-            {
-                success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
-            }
+                if (accept)
+                {
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+                }
+                else
+                {
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+                }
 
-            AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
-                $"{Environment.NewLine}[{string.Join(",", confirmations.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]: {success}");
+                AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
+                    $"{Environment.NewLine}[{string.Join(",", confirmations.Select(c => $"{c.ConfTypeName}#{c.CreatorId}#{c.Id}"))}]: {success}");
+
+                if (cancellationToken.IsCancellationRequested || success)
+                {
+                    break;
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
 
             if (success)
             {
@@ -115,7 +125,7 @@ namespace Steam_Authenticator.Internal
                     break;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
             return success;
         }
