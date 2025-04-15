@@ -32,6 +32,7 @@ namespace Steam_Authenticator
         private readonly TimeSpan refreshUserTimerMinPeriod = TimeSpan.FromSeconds(60);
 
         private readonly System.Threading.Timer checkVersionTimer;
+        private readonly System.Threading.Timer reportTimer;
 
         private readonly SemaphoreSlim checkVersionLocker = new SemaphoreSlim(1, 1);
 
@@ -78,6 +79,17 @@ namespace Steam_Authenticator
 
                 }
             }, null, -1, -1);
+            reportTimer = new System.Threading.Timer((obj) =>
+            {
+                try
+                {
+                    Report().GetAwaiter().GetResult();
+                }
+                catch
+                {
+
+                }
+            }, null, -1, -1);
 
             var usersPanelContextMenuStrip = new ContextMenuStrip();
             usersPanelContextMenuStrip.Items.Add("Ë¢ÐÂ").Click += (send, e) =>
@@ -117,8 +129,6 @@ namespace Steam_Authenticator
         {
             mainNotifyIcon.ContextMenuStrip = mainNotifyMenuStrip;
 
-            var report = Report();
-
             IEnumerable<IUserPanelHandler> userPanelHandlers = new List<IUserPanelHandler>
             {
                 new BUFFUserPanelHandler(buffUsersPanel),
@@ -156,6 +166,7 @@ namespace Steam_Authenticator
             });
 
             checkVersionTimer.Change(TimeSpan.Zero, TimeSpan.FromHours(3));
+            reportTimer.Change(TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
             await ShowTips().ConfigureAwait(false);
         }
@@ -1049,7 +1060,11 @@ namespace Steam_Authenticator
                 {
                     machineId = Helper.GetMachineUniqueId();
                 }
-                var response = await AuthenticatorApi.Report(version: currentVersion, machineId);
+                var steamIds = Appsetting.Instance.Clients.Select(c => c.User.SteamId);
+                var buffIds = Appsetting.Instance.BuffClients.Select(c => c.User.UserId);
+                var ecoIds = Appsetting.Instance.EcoClients.Select(c => c.User.UserId);
+                var youpinIds = Appsetting.Instance.YouPinClients.Select(c => c.User.UserId);
+                var response = await AuthenticatorApi.Report(version: currentVersion, machineId, steamIds, buffIds, ecoIds, youpinIds);
             }
             catch
             {

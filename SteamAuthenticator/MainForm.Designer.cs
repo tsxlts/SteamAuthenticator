@@ -83,6 +83,8 @@ namespace Steam_Authenticator
             pictureBox3 = new PictureBox();
             aboutLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
+            其他工具ToolStripMenuItem = new ToolStripMenuItem();
+            transferAssetsMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -108,7 +110,7 @@ namespace Steam_Authenticator
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, contactUsMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, 其他工具ToolStripMenuItem, contactUsMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(819, 25);
@@ -167,21 +169,21 @@ namespace Steam_Authenticator
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(124, 22);
+            guardMenuItem.Size = new Size(180, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(124, 22);
+            addAuthenticatorMenuItem.Size = new Size(180, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(124, 22);
+            moveAuthenticatorMenuItem.Size = new Size(180, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -189,7 +191,7 @@ namespace Steam_Authenticator
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(124, 22);
+            importAuthenticatorMenuItem.Size = new Size(180, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
@@ -209,14 +211,14 @@ namespace Steam_Authenticator
             // exportAuthenticatorMenuItem
             // 
             exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
-            exportAuthenticatorMenuItem.Size = new Size(124, 22);
+            exportAuthenticatorMenuItem.Size = new Size(180, 22);
             exportAuthenticatorMenuItem.Text = "导出令牌";
             exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(124, 22);
+            removeAuthenticatorMenuItem.Size = new Size(180, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
             // 
@@ -763,6 +765,20 @@ namespace Steam_Authenticator
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 
+            // 其他工具ToolStripMenuItem
+            // 
+            其他工具ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { transferAssetsMenuItem });
+            其他工具ToolStripMenuItem.Name = "其他工具ToolStripMenuItem";
+            其他工具ToolStripMenuItem.Size = new Size(68, 21);
+            其他工具ToolStripMenuItem.Text = "其他工具";
+            // 
+            // transferAssetsMenuItem
+            // 
+            transferAssetsMenuItem.Name = "transferAssetsMenuItem";
+            transferAssetsMenuItem.Size = new Size(180, 22);
+            transferAssetsMenuItem.Text = "库存转移";
+            transferAssetsMenuItem.Click += transferAssetsMenuItem_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -877,5 +893,7 @@ namespace Steam_Authenticator
         private TabPage youpinPage;
         private YouPinUserCollectionPanel youpinUsersPanel;
         private PictureBox pictureBox8;
+        private ToolStripMenuItem 其他工具ToolStripMenuItem;
+        private ToolStripMenuItem transferAssetsMenuItem;
     }
 }

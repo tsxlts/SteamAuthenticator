@@ -969,6 +969,12 @@ namespace Steam_Authenticator
             about.ShowDialog();
         }
 
+        private void transferAssetsMenuItem_Click(object sender, EventArgs e)
+        {
+            var transferAssets = new TransferAssets();
+            transferAssets.ShowDialog();
+        }
+
         private void confirmationBtn_Click(object sender, EventArgs e)
         {
             var webClient = currentClient?.Client;

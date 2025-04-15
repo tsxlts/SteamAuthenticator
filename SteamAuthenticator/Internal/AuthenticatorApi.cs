@@ -48,14 +48,18 @@ namespace Steam_Authenticator.Internal
             return await Post<MsgResult>(url, data);
         }
 
-        public static async Task<Result<MsgResult>> Report(Version version, string machineId)
+        public static async Task<Result<MsgResult>> Report(Version version, string machineId, IEnumerable<string> steamIds, IEnumerable<string> buffIds, IEnumerable<string> ecoIds, IEnumerable<string> youpinIds)
         {
             string url = $"{Api}/steam/Api/SteamAuthenticator/Report";
             var data = new
             {
                 Project = "SteamAuthenticator",
                 Version = version.ToString(),
-                MachineId = machineId
+                MachineId = machineId,
+                SteamIds = steamIds,
+                BuffIds = buffIds,
+                EcoIds = ecoIds,
+                YouPinIds = youpinIds
             };
 
             return await Post<MsgResult>(url, data);
