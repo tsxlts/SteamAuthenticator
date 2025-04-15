@@ -1,4 +1,5 @@
 ﻿
+using Steam_Authenticator.Factory;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
@@ -377,9 +378,11 @@ namespace Steam_Authenticator.Forms
 
                                     return string.Empty;
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
-                                    msgLabel.Text = "处理异常";
+                                    AppLogger.Instance.Error(ex);
+
+                                    msgLabel.Text = $"处理异常, {ex.Message}";
 
                                     return string.Empty;
                                 }
