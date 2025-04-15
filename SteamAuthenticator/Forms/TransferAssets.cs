@@ -250,9 +250,46 @@ namespace Steam_Authenticator.Forms
                                         appId: gameId,
                                         contextId: contextId,
                                         receiver.Client.WebCookie).GetAwaiter().GetResult();
-                                    if (!(inventoryResponse.Body?.Inventories?.Any()) ?? false)
+                                    if (inventoryResponse.Body == null || !inventoryResponse.Body.Success)
                                     {
-                                        msgLabel.Text = "未查询到可交易的库存, 跳过处理";
+                                        msgLabel.Text = "检测到可能未公开库存, 正在公开库存...";
+                                        var setPrivacySettingResponse = SteamApi.SetAccountPrivacySettingAsync(deliverer.Client.SessionId, deliverer.Client.SteamId, new AccountPrivacy
+                                        {
+                                            PrivacySettings = new AccountPrivacySettings
+                                            {
+                                                PrivacyProfile = SteamEnum.CommunityVisibilityState.公开,
+                                                PrivacyInventory = SteamEnum.CommunityVisibilityState.公开,
+                                                PrivacyFriendsList = SteamEnum.CommunityVisibilityState.私密,
+                                                PrivacyInventoryGifts = SteamEnum.CommunityVisibilityState.私密,
+                                                PrivacyOwnedGames = SteamEnum.CommunityVisibilityState.私密,
+                                                PrivacyPlaytime = SteamEnum.CommunityVisibilityState.私密,
+                                            },
+                                            CommentPermission = SteamEnum.CommentPermission.私密,
+                                        }, deliverer.Client.WebCookie).GetAwaiter().GetResult();
+                                        if (setPrivacySettingResponse.Body?.Privacy?.PrivacySettings?.PrivacyInventory != SteamEnum.CommunityVisibilityState.公开)
+                                        {
+                                            msgLabel.Text = $"公开库存失败, 需要你手动公开库存";
+                                            msgLabel.ForeColor = Color.Red;
+                                            return string.Empty;
+                                        }
+
+                                        msgLabel.Text = "正在重新查询库存...";
+                                        inventoryResponse = SteamApi.QueryPartnerInventoryAsync(receiver.Client.SessionId, partnerSteamId: deliverer.User.SteamId,
+                                           partnerToken: "",
+                                           appId: gameId,
+                                           contextId: contextId,
+                                           receiver.Client.WebCookie).GetAwaiter().GetResult();
+                                        if (inventoryResponse.Body == null || !inventoryResponse.Body.Success)
+                                        {
+                                            msgLabel.Text = $"查询库存失败, 请确认是否已正常公开库存, {inventoryResponse.HttpStatusCode}";
+                                            msgLabel.ForeColor = Color.Red;
+                                            return string.Empty;
+                                        }
+                                    }
+
+                                    if (!(inventoryResponse.Body.Inventories?.Any() ?? false))
+                                    {
+                                        msgLabel.Text = $"未查询到可交易的库存, 跳过处理";
                                         return string.Empty;
                                     }
 
@@ -260,7 +297,7 @@ namespace Steam_Authenticator.Forms
                                     var tradeLinkResponse = SteamApi.GetTradeLinkAsync(deliverer.Client.SteamId, deliverer.Client.WebCookie).GetAwaiter().GetResult();
                                     if (string.IsNullOrWhiteSpace(tradeLinkResponse.Body))
                                     {
-                                        msgLabel.Text = "未获取到交易链接, 跳过处理";
+                                        msgLabel.Text = $"未获取到交易链接, 跳过处理, {tradeLinkResponse.HttpStatusCode}";
                                         msgLabel.ForeColor = Color.Red;
                                         return string.Empty;
                                     }
