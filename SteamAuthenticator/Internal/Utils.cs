@@ -2,6 +2,7 @@
 using Steam_Authenticator.Model;
 using SteamKit.Model;
 using SteamKit.WebClient;
+using System.Text.RegularExpressions;
 
 namespace Steam_Authenticator.Internal
 {
@@ -128,5 +129,24 @@ namespace Steam_Authenticator.Internal
 
             Clipboard.SetText(value);
         }
+
+        public static bool CheckTradeLink(string link, out string partner, out string token)
+        {
+            partner = null;
+            token = null;
+
+            Regex regex = new Regex(@"partner=(.+?)&token=(.+?)$");
+            Match match = regex.Match(link);
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            partner = match.Groups[1].Value;
+            token = match.Groups[2].Value;
+
+            return true;
+        }
+
     }
 }
