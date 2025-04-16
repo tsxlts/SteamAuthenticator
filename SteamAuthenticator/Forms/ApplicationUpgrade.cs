@@ -1,8 +1,8 @@
 ﻿
+using System.Diagnostics;
 using Newtonsoft.Json;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
-using System.Diagnostics;
 
 namespace Steam_Authenticator.Forms
 {

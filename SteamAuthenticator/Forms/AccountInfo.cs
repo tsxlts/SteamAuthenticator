@@ -1,10 +1,10 @@
 ﻿
-using Steam_Authenticator.Internal;
-using SteamKit;
-using SteamKit.WebClient;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Steam_Authenticator.Internal;
+using SteamKit;
+using SteamKit.WebClient;
 using static Steam_Authenticator.Internal.Configuration;
 
 namespace Steam_Authenticator.Forms

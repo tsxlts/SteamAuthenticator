@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
 using QRCoder;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model.BUFF;
 using SteamKit;
 using SteamKit.Model;
-using System.Net.Http.Json;
 
 namespace Steam_Authenticator.Forms
 {

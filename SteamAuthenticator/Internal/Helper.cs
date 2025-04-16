@@ -1,7 +1,7 @@
-﻿using Microsoft.Win32;
-using System.Management;
+﻿using System.Management;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Win32;
 
 namespace Steam_Authenticator.Internal
 {

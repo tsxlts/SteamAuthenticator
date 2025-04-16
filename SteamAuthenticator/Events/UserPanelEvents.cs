@@ -1,11 +1,11 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Text;
+using System.Web;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
-using System.Text;
-using System.Web;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator

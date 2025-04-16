@@ -1,7 +1,7 @@
 ﻿
-using Steam_Authenticator.Properties;
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
+using Steam_Authenticator.Properties;
 
 namespace Steam_Authenticator.Controls
 {

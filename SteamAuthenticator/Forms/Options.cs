@@ -84,6 +84,11 @@ namespace Steam_Authenticator.Forms
         {
             try
             {
+                if (!Multiselect)
+                {
+                    return;
+                }
+
                 selectAllBtn.Enabled = false;
 
                 bool selectAll = !(bool)selectAllBtn.Tag;
@@ -110,6 +115,11 @@ namespace Steam_Authenticator.Forms
         {
             try
             {
+                if (!Multiselect)
+                {
+                    return;
+                }
+
                 reverseSelectBtn.Enabled = false;
 
                 selectAllBtn.Text = "全选";

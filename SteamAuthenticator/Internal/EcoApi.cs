@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Model.ECO;
 using SteamKit;
 using SteamKit.Model;
-using System.Net.Http.Json;
 
 namespace Steam_Authenticator.Internal
 {

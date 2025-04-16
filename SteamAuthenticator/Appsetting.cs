@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.RegularExpressions;
+using System.Web;
+using Newtonsoft.Json;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
@@ -7,8 +9,6 @@ using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
-using System.Text.RegularExpressions;
-using System.Web;
 
 namespace Steam_Authenticator
 {

@@ -1,6 +1,6 @@
 ﻿
-using ProtoBuf;
 using System.Text;
+using ProtoBuf;
 
 namespace Steam_Authenticator.Internal
 {

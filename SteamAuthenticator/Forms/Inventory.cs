@@ -1,8 +1,8 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Diagnostics;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Model.Steam;
 using SteamKit;
 using SteamKit.Model;
-using System.Diagnostics;
 
 namespace Steam_Authenticator.Forms
 {

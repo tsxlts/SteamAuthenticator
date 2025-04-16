@@ -1,7 +1,7 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Web;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
-using System.Web;
 
 namespace Steam_Authenticator.Handler
 {

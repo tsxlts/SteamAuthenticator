@@ -1,5 +1,5 @@
-﻿using Steam_Authenticator.Internal;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Steam_Authenticator.Internal;
 
 namespace Steam_Authenticator.Forms
 {

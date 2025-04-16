@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Controls;
@@ -8,8 +10,6 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
-using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
 using static Steam_Authenticator.Internal.Utils;
 using static SteamKit.SteamEnum;
 

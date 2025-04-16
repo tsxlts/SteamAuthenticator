@@ -1,5 +1,5 @@
-﻿using SteamKit;
-using System.Text;
+﻿using System.Text;
+using SteamKit;
 
 namespace Steam_Authenticator.Factory
 {

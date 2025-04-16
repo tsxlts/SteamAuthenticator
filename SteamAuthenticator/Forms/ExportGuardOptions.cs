@@ -1,28 +1,54 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics;
+using Newtonsoft.Json;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.Other;
-using System.Diagnostics;
 
 namespace Steam_Authenticator.Forms
 {
     public partial class ExportGuardOptions : Form
     {
         private readonly string current;
+        private readonly List<string> selected;
 
         public ExportGuardOptions(string current)
         {
             InitializeComponent();
 
-            currentName.Text = current;
-            this.current = current;
+            selected = new List<string>();
+        }
+        private void selectAccountBtn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            List<SelectOption> selectOptions = new List<SelectOption>();
 
-            exportCurrent.Checked = true;
-            if (Appsetting.Instance.Manifest.GetGuard(current) == null)
+            var users = Appsetting.Instance.Manifest.GetGuards();
+            foreach (var user in users)
             {
-                exportCurrent.Enabled = false;
-                exportAll.Checked = true;
+                selectOptions.Add(new SelectOption
+                {
+                    Value = user,
+                    Text = $"{user}",
+                    Checked = selected.Contains(user)
+                });
             }
+
+            var options = new Options("选择令牌", $"请选择你需要导出的令牌")
+            {
+                Width = this.Width - 20,
+                Height = this.Height - 20,
+                ItemSize = new Size(100, 20),
+                Multiselect = true,
+                Datas = selectOptions.OrderBy(c => c.Text).ToList(),
+            };
+            if (options.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            selected.Clear();
+            selected.AddRange(options.Selected.Select(c => c.Value));
+
+            ReloadAccounts();
         }
 
         private void saveBtn_Click(object sender, EventArgs e)
@@ -50,18 +76,9 @@ namespace Steam_Authenticator.Forms
             }
 
             List<Guard> guards = new List<Guard>();
-
-            if (exportAll.Checked)
+            foreach (var item in selected)
             {
-                var accounts = Appsetting.Instance.Manifest.GetGuards();
-                foreach (var item in accounts)
-                {
-                    guards.Add(Appsetting.Instance.Manifest.GetGuard(item));
-                }
-            }
-            else
-            {
-                guards.Add(Appsetting.Instance.Manifest.GetGuard(current));
+                guards.Add(Appsetting.Instance.Manifest.GetGuard(item));
             }
 
             if (guards.Count == 0)
@@ -180,6 +197,62 @@ namespace Steam_Authenticator.Forms
             }
 
             Close();
+        }
+
+        private void ReloadAccounts()
+        {
+            accountPanel.Controls.Clear();
+            int lineWith = accountPanel.Width - 25;
+            Color[] colors = [Color.PaleTurquoise, Color.Wheat];
+            int y = 0;
+            int index = 0;
+            foreach (var account in selected)
+            {
+                var line = new Panel
+                {
+                    Name = account,
+                    Location = new Point(5, y),
+                    Width = lineWith,
+                    Height = 23,
+                    BackColor = colors[(index++) % colors.Length]
+                };
+
+                var userLabel = new Label
+                {
+                    Name = "user",
+                    Text = $"{account}",
+                    AutoSize = false,
+                    AutoEllipsis = true,
+                    Size = new Size(250, 16),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Location = new Point(5, 3),
+                    Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right,
+                };
+                line.Controls.Add(userLabel);
+
+                var deleteBtn = new Label
+                {
+                    Name = $"{account}",
+                    Text = $"删除",
+                    AutoSize = false,
+                    Size = new Size(40, 16),
+                    TextAlign = ContentAlignment.MiddleRight,
+                    Location = new Point(line.Width - 45, 3),
+                    Cursor = Cursors.Hand,
+                    ForeColor = Color.Gray,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                };
+                deleteBtn.Click += (object sender, EventArgs e) =>
+                {
+                    selected.Remove(account);
+                    ReloadAccounts();
+                };
+                line.Controls.Add(deleteBtn);
+
+                accountPanel.Controls.Add(line);
+
+                y = y + 25;
+            }
         }
     }
 }
