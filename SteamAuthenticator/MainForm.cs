@@ -933,47 +933,8 @@ namespace Steam_Authenticator
                             continue;
                         }
 
-                        var userClinet = userPanel.Client;
-                        var client = userClinet.Client;
-                        var user = userClinet.User;
-
-                        var palyerSummaries = SteamApi.QueryPlayerSummariesAsync(null, client.WebApiToken, new[] { client.SteamId }, cancellationToken: tokenSource.Token).GetAwaiter().GetResult();
-                        if (palyerSummaries.HttpStatusCode == System.Net.HttpStatusCode.Forbidden)
-                        {
-                            userClinet.LogoutAsync().GetAwaiter().GetResult();
-                        }
-
-                        bool reloadCurrent = false;
-                        if (client.LoggedIn)
-                        {
-                            userPanel.SetItemName(userPanel.ItemDisplayName, Color.Green);
-                        }
-                        else
-                        {
-                            userPanel.SetItemName(userPanel.ItemDisplayName, Color.Red);
-
-                            reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
-                        }
-
-                        var player = palyerSummaries.Body?.Players?.FirstOrDefault();
-                        if (player != null)
-                        {
-                            if (player.SteamName != user.NickName || player.AvatarFull != user.Avatar)
-                            {
-                                user.NickName = player.SteamName;
-                                user.Avatar = player.AvatarFull;
-                                Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
-
-                                userPanel.SetItemIcon(user.Avatar);
-
-                                reloadCurrent = user.SteamId == currentClient?.User?.SteamId;
-                            }
-                        }
-
-                        if (reloadCurrent)
-                        {
-                            SetCurrentClient(userClinet, true);
-                        }
+                        var userClient = userPanel.Client;
+                        userClient.RefreshClientAsync(tokenSource.Token).GetAwaiter().GetResult();
                     }
                 }
             }
