@@ -1,6 +1,6 @@
 ﻿namespace Steam_Authenticator.Controls
 {
-    internal abstract class ItemCollectionPanel<TItemPanel, TClient> : Panel where TItemPanel : ClientItemPanel<TClient> where TClient : Client
+    internal abstract class ItemCollectionPanel<TItemPanel, TClient> : Panel where TItemPanel : ClientItemPanel<TClient> where TClient : IClient
     {
         protected int ItemStartX;
         protected int ItemCells;

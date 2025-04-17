@@ -88,7 +88,7 @@ namespace Steam_Authenticator.Internal
             var response = await SteamApi.GetAsync<EcoResponse<JToken>>(url, headers: InitHeaders(null, client.Token), cancellationToken: cancellationToken);
             if (response.Body?.StatusCode == "4001" || response.Body?.StatusData?.ResultCode == "4001")
             {
-                var refreshTokenResponse = await client.RefreshTokenAsync(false, cancellationToken);
+                var refreshTokenResponse = await client.RefreshTokenAsync(cancellationToken);
                 if (!refreshTokenResponse)
                 {
                     return ToResponse<TResponse>(response);
@@ -105,7 +105,7 @@ namespace Steam_Authenticator.Internal
             var response = await SteamApi.PostAsync<EcoResponse<JToken>>(url, JsonContent.Create(@params), headers: InitHeaders(null, client.Token), cancellationToken: cancellationToken);
             if (response.Body?.StatusCode == "4001" || response.Body?.StatusData?.ResultCode == "4001")
             {
-                var refreshTokenResponse = await client.RefreshTokenAsync(false, cancellationToken);
+                var refreshTokenResponse = await client.RefreshTokenAsync(cancellationToken);
                 if (!refreshTokenResponse)
                 {
                     return ToResponse<TResponse>(response);

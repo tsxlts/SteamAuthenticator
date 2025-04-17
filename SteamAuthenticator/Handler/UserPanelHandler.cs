@@ -2,7 +2,7 @@
 
 namespace Steam_Authenticator.Handler
 {
-    internal abstract class UserPanelHandler<TItemPanel, TClient> : IUserPanelHandler where TItemPanel : ClientItemPanel<TClient> where TClient : Client
+    internal abstract class UserPanelHandler<TItemPanel, TClient> : IUserPanelHandler where TItemPanel : ClientItemPanel<TClient> where TClient : IUserClient
     {
         private readonly System.Threading.Timer refreshUserTimer;
 
@@ -95,7 +95,23 @@ namespace Steam_Authenticator.Handler
             return panel;
         }
 
-        protected abstract Task RefreshUserInternal();
+        protected virtual async Task RefreshUserInternal()
+        {
+            using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
+            {
+                var controlCollection = UsersPanel.ItemPanels;
+                foreach (var userPanel in controlCollection)
+                {
+                    if (!userPanel.HasItem)
+                    {
+                        continue;
+                    }
+
+                    var buffClient = userPanel.Client;
+                    await buffClient.RefreshClientAsync(tokenSource.Token);
+                }
+            }
+        }
 
         protected abstract Task<List<TItemPanel>> LoadUsersAsyncInternal(CancellationToken cancellationToken = default);
 
@@ -105,7 +121,10 @@ namespace Steam_Authenticator.Handler
 
         protected abstract Task ReloginInternal(TItemPanel panel, TClient client);
 
-        protected abstract Task LogoutInternal(TItemPanel panel, TClient client);
+        protected virtual Task LogoutInternal(TItemPanel panel, TClient client)
+        {
+            return client.LogoutAsync();
+        }
 
         private (TItemPanel Panel, TClient Client) GetClient(ToolStripMenuItem menuItem)
         {

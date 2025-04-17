@@ -1,6 +1,6 @@
 ﻿namespace Steam_Authenticator.Controls
 {
-    internal abstract class ClientItemPanel<TClient> : ItemPanel where TClient : Client
+    internal abstract class ClientItemPanel<TClient> : ItemPanel where TClient : IClient
     {
 
         public ClientItemPanel(bool hasItem) : base(hasItem)
