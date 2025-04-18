@@ -1,7 +1,7 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Web;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Model;
-using System.Web;
 
 namespace Steam_Authenticator.Handler
 {
@@ -19,7 +19,7 @@ namespace Steam_Authenticator.Handler
             foreach (string account in accounts)
             {
                 BuffUser user = Appsetting.Instance.Manifest.GetBuffUser(account);
-                BuffClient client = new BuffClient(user);
+                BuffClient client = new BuffClient(user, false);
                 Appsetting.Instance.BuffClients.Add(client);
 
                 panels.Add(AddUserPanel(client));
@@ -44,7 +44,7 @@ namespace Steam_Authenticator.Handler
                 panel.Offer.Hide();
             }
 
-            var tasks = Appsetting.Instance.BuffClients.Select(c => c.RefreshAsync(true));
+            var tasks = Appsetting.Instance.BuffClients.Select(c => c.LoginAsync());
             await Task.WhenAll(tasks);
 
             return panels;
@@ -62,40 +62,15 @@ namespace Steam_Authenticator.Handler
             return Task.CompletedTask;
         }
 
-        protected override async Task LogoutInternal(BuffUserPanel panel, BuffClient client)
-        {
-            await client.LogoutAsync();
-        }
-
         protected override async Task ReloginInternal(BuffUserPanel panel, BuffClient client)
         {
-            await client.RefreshAsync(true);
+            await client.LoginAsync();
             if (client.LoggedIn)
             {
                 return;
             }
 
             Login($"登录信息已失效{Environment.NewLine}请重新扫码登录 BUFF 帐号");
-        }
-
-        protected override async Task RefreshUserInternal()
-        {
-            using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
-            {
-                var controlCollection = UsersPanel.ItemPanels;
-                foreach (BuffUserPanel userPanel in controlCollection)
-                {
-                    if (!userPanel.HasItem)
-                    {
-                        continue;
-                    }
-
-                    var buffClient = userPanel.Client;
-                    var user = buffClient.User;
-
-                    await buffClient.RefreshAsync(false, tokenSource.Token);
-                }
-            }
         }
 
         private BuffUserPanel Login(string tips)
@@ -114,9 +89,8 @@ namespace Steam_Authenticator.Handler
                 Avatar = buffAuth.Result.Body.data.avatar,
                 BuffCookies = string.Join("; ", buffAuth.Result.Cookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"))
             };
-            var buffClient = new BuffClient(buffUser)
+            var buffClient = new BuffClient(buffUser, true)
             {
-                LoggedIn = true
             };
 
             Appsetting.Instance.Manifest.SaveBuffUser(buffClient.User.UserId, buffClient.User);
@@ -133,16 +107,11 @@ namespace Steam_Authenticator.Handler
             panel.ItemIcon.ContextMenuStrip = UserMenu;
 
             panel.Client
-                .WithStartLogin((relogin) =>
+                .WithStartLogin(() =>
                 {
-                    if (!relogin)
-                    {
-                        return;
-                    }
-
                     panel.ItemName.ForeColor = Color.FromArgb(128, 128, 128);
                 })
-                .WithEndLogin((relogin, loggined) =>
+                .WithEndLogin((loggined) =>
                 {
                     panel.ItemName.ForeColor = loggined ? Color.Green : Color.Red;
                 });

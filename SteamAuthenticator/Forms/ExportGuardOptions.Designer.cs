@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportGuardOptions));
-            exportAll = new RadioButton();
-            exportCurrent = new RadioButton();
-            currentName = new Label();
             saveBtn = new Button();
             maFile = new RadioButton();
             saFile = new RadioButton();
             groupBox1 = new GroupBox();
+            accountPanel = new Panel();
+            label3 = new Label();
+            selectAccountBtn = new LinkLabel();
             groupBox2 = new GroupBox();
             panel1 = new Panel();
             groupBox1.SuspendLayout();
@@ -43,44 +43,12 @@
             panel1.SuspendLayout();
             SuspendLayout();
             // 
-            // exportAll
-            // 
-            exportAll.AutoSize = true;
-            exportAll.Location = new Point(6, 22);
-            exportAll.Name = "exportAll";
-            exportAll.Size = new Size(98, 21);
-            exportAll.TabIndex = 0;
-            exportAll.TabStop = true;
-            exportAll.Text = "所有帐号令牌";
-            exportAll.UseVisualStyleBackColor = true;
-            // 
-            // exportCurrent
-            // 
-            exportCurrent.AutoSize = true;
-            exportCurrent.Location = new Point(6, 49);
-            exportCurrent.Name = "exportCurrent";
-            exportCurrent.Size = new Size(98, 21);
-            exportCurrent.TabIndex = 1;
-            exportCurrent.TabStop = true;
-            exportCurrent.Text = "当前帐号令牌";
-            exportCurrent.UseVisualStyleBackColor = true;
-            // 
-            // currentName
-            // 
-            currentName.AutoEllipsis = true;
-            currentName.ForeColor = Color.FromArgb(102, 162, 183);
-            currentName.Location = new Point(110, 51);
-            currentName.Name = "currentName";
-            currentName.Size = new Size(100, 17);
-            currentName.TabIndex = 2;
-            currentName.Text = "            ";
-            // 
             // saveBtn
             // 
             saveBtn.Dock = DockStyle.Fill;
             saveBtn.Location = new Point(0, 0);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(221, 33);
+            saveBtn.Size = new Size(368, 33);
             saveBtn.TabIndex = 6;
             saveBtn.Text = "导出令牌";
             saveBtn.UseVisualStyleBackColor = true;
@@ -111,40 +79,75 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(currentName);
-            groupBox1.Controls.Add(exportAll);
-            groupBox1.Controls.Add(exportCurrent);
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(accountPanel);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Controls.Add(selectAccountBtn);
             groupBox1.Location = new Point(12, 10);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(221, 82);
+            groupBox1.Size = new Size(368, 170);
             groupBox1.TabIndex = 8;
             groupBox1.TabStop = false;
             groupBox1.Text = "选择帐号";
             // 
+            // accountPanel
+            // 
+            accountPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            accountPanel.AutoScroll = true;
+            accountPanel.BackColor = Color.White;
+            accountPanel.Location = new Point(6, 39);
+            accountPanel.Name = "accountPanel";
+            accountPanel.Size = new Size(356, 125);
+            accountPanel.TabIndex = 7;
+            // 
+            // label3
+            // 
+            label3.ForeColor = Color.FromArgb(127, 127, 127);
+            label3.Location = new Point(6, 19);
+            label3.Name = "label3";
+            label3.Size = new Size(80, 17);
+            label3.TabIndex = 6;
+            label3.Text = "导出帐号：";
+            // 
+            // selectAccountBtn
+            // 
+            selectAccountBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            selectAccountBtn.AutoSize = true;
+            selectAccountBtn.Location = new Point(306, 19);
+            selectAccountBtn.Name = "selectAccountBtn";
+            selectAccountBtn.Size = new Size(56, 17);
+            selectAccountBtn.TabIndex = 5;
+            selectAccountBtn.TabStop = true;
+            selectAccountBtn.Text = "选择帐号";
+            selectAccountBtn.VisitedLinkColor = Color.Blue;
+            selectAccountBtn.LinkClicked += selectAccountBtn_LinkClicked;
+            // 
             // groupBox2
             // 
+            groupBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox2.Controls.Add(maFile);
             groupBox2.Controls.Add(saFile);
-            groupBox2.Location = new Point(12, 99);
+            groupBox2.Location = new Point(12, 186);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(221, 84);
+            groupBox2.Size = new Size(368, 84);
             groupBox2.TabIndex = 9;
             groupBox2.TabStop = false;
             groupBox2.Text = "文件选格式";
             // 
             // panel1
             // 
+            panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel1.Controls.Add(saveBtn);
-            panel1.Location = new Point(12, 189);
+            panel1.Location = new Point(12, 276);
             panel1.Name = "panel1";
-            panel1.Size = new Size(221, 33);
+            panel1.Size = new Size(368, 33);
             panel1.TabIndex = 10;
             // 
             // ExportGuardOptions
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(243, 227);
+            ClientSize = new Size(390, 314);
             Controls.Add(panel1);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -164,15 +167,14 @@
         }
 
         #endregion
-
-        private RadioButton exportAll;
-        private RadioButton exportCurrent;
-        private Label currentName;
         private Button saveBtn;
         private RadioButton maFile;
         private RadioButton saFile;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
         private Panel panel1;
+        private LinkLabel selectAccountBtn;
+        private Label label3;
+        private Panel accountPanel;
     }
 }

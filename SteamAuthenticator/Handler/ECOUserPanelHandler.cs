@@ -19,7 +19,7 @@ namespace Steam_Authenticator.Handler
             foreach (string account in accounts)
             {
                 EcoUser user = Appsetting.Instance.Manifest.GetEcoUser(account);
-                EcoClient client = new EcoClient(user);
+                EcoClient client = new EcoClient(user, false);
                 Appsetting.Instance.EcoClients.Add(client);
 
                 panels.Add(AddUserPanel(client));
@@ -44,7 +44,7 @@ namespace Steam_Authenticator.Handler
                 panel.Offer.Hide();
             }
 
-            var tasks = Appsetting.Instance.EcoClients.Select(c => c.RefreshTokenAsync(true));
+            var tasks = Appsetting.Instance.EcoClients.Select(c => c.LoginAsync());
             await Task.WhenAll(tasks);
 
             return panels;
@@ -62,40 +62,15 @@ namespace Steam_Authenticator.Handler
             return Task.CompletedTask;
         }
 
-        protected override async Task LogoutInternal(EcoUserPanel panel, EcoClient client)
-        {
-            await client.LogoutAsync();
-        }
-
         protected override async Task ReloginInternal(EcoUserPanel panel, EcoClient client)
         {
-            await client.RefreshTokenAsync(true);
+            await client.LoginAsync();
             if (client.LoggedIn)
             {
                 return;
             }
 
             await EcoLogin($"登录信息已失效{Environment.NewLine}请重新扫码登录 ECO 帐号");
-        }
-
-        protected override async Task RefreshUserInternal()
-        {
-            using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
-            {
-                var controlCollection = UsersPanel.ItemPanels;
-                foreach (EcoUserPanel userPanel in controlCollection)
-                {
-                    if (!userPanel.HasItem)
-                    {
-                        continue;
-                    }
-
-                    var buffClient = userPanel.Client;
-                    var user = buffClient.User;
-
-                    await buffClient.RefreshClientAsync(tokenSource.Token);
-                }
-            }
         }
 
         private async Task<EcoUserPanel> EcoLogin(string tips)
@@ -122,7 +97,7 @@ namespace Steam_Authenticator.Handler
                 RefreshToken = authResponse.RefreshToken,
                 RefreshTokenExpireTime = authResponse.RefreshTokenExpireDate
             };
-            var client = new EcoClient(user)
+            var client = new EcoClient(user, true)
             {
                 Token = authResponse.Token
             };
@@ -141,16 +116,11 @@ namespace Steam_Authenticator.Handler
             panel.ItemIcon.ContextMenuStrip = UserMenu;
 
             panel.Client
-                .WithStartLogin((relogin) =>
+                .WithStartLogin(() =>
                 {
-                    if (!relogin)
-                    {
-                        return;
-                    }
-
                     panel.ItemName.ForeColor = Color.FromArgb(128, 128, 128);
                 })
-                .WithEndLogin((relogin, loggined) =>
+                .WithEndLogin((loggined) =>
                 {
                     panel.ItemName.ForeColor = loggined ? Color.Green : Color.Red;
                 });

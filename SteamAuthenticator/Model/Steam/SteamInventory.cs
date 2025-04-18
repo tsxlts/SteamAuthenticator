@@ -2,7 +2,7 @@
 
 namespace Steam_Authenticator.Model.Steam
 {
-    public class SteamInventory : Client
+    public class SteamInventory : IClient
     {
         private readonly Inventory inventory;
         private readonly InventoryDescription description;

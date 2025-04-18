@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net.Http.Json;
+using Newtonsoft.Json;
 using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
 using SteamKit.Model;
-using System.Net.Http.Json;
 
 namespace Steam_Authenticator.Internal
 {

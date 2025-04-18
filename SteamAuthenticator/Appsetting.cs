@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.RegularExpressions;
+using System.Web;
+using Newtonsoft.Json;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
+using Steam_Authenticator.Model.C5;
 using Steam_Authenticator.Model.ECO;
 using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
-using System.Text.RegularExpressions;
-using System.Web;
 
 namespace Steam_Authenticator
 {
@@ -37,6 +38,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public List<YouPinClient> YouPinClients { get; private set; } = new List<YouPinClient>();
+
+        [JsonIgnore]
+        public List<C5Client> C5Clients { get; private set; } = new List<C5Client>();
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
@@ -80,23 +84,119 @@ namespace Steam_Authenticator
         public int Port { get; set; }
     }
 
-    public interface Client
+    public interface IClient
     {
         public string Key { get; }
     }
 
-    public class UserClient : Client
+    public interface IUserClient : IClient
     {
-        public static UserClient None = new UserClient(new User(), new SteamCommunityClient());
+        public bool LoggedIn { get; }
+
+        public Task<bool> LoginAsync(CancellationToken cancellationToken = default);
+
+        public Task<bool> RefreshClientAsync(CancellationToken cancellationToken = default);
+
+        public Task LogoutAsync(CancellationToken cancellationToken = default);
+
+        public IUserClient WithStartLogin(Action action);
+
+        public IUserClient WithEndLogin(Action<bool> action);
+    }
+
+    public abstract class BaseUserClient : IUserClient
+    {
+        protected Action startLogin = null;
+        protected Action<bool> endLogin = null;
+
+        public BaseUserClient(bool logged)
+        {
+            LoggedIn = logged;
+        }
+
+        public IUserClient WithStartLogin(Action action)
+        {
+            startLogin = action;
+            return this;
+        }
+
+        public IUserClient WithEndLogin(Action<bool> action)
+        {
+            endLogin = action;
+            return this;
+        }
+
+        public async Task<bool> LoginAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                startLogin?.Invoke();
+
+                var logged = await InternalLoginAsync(cancellationToken);
+                LoggedIn = logged;
+
+                await RefreshClientAsync(cancellationToken);
+                return logged;
+            }
+            finally
+            {
+                endLogin?.Invoke(LoggedIn);
+            }
+        }
+
+        public async Task<bool> RefreshClientAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var refresh = await InternalRefreshClientAsync(cancellationToken);
+                var logged = refresh.LoggedIn;
+                LoggedIn = logged;
+
+                ClientRefreshed?.Invoke(this, new ClientRefreshedArgs
+                {
+                    Client = this,
+                    Changed = refresh.Changed
+                });
+                return logged;
+            }
+            finally
+            {
+                endLogin?.Invoke(LoggedIn);
+            }
+        }
+
+        public async Task LogoutAsync(CancellationToken cancellationToken = default)
+        {
+            LoggedIn = false;
+
+            await InternalLogoutAsync(cancellationToken);
+
+            endLogin?.Invoke(false);
+        }
+
+        protected abstract Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default);
+
+        protected abstract Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default);
+
+        protected abstract Task InternalLogoutAsync(CancellationToken cancellationToken = default);
+
+        public abstract string Key { get; }
+
+        public bool LoggedIn { get; private set; }
+
+        public event EventHandler<ClientRefreshedArgs> ClientRefreshed;
+    }
+
+    public class UserClient : BaseUserClient
+    {
+        public static UserClient None = new UserClient(new User(), new SteamCommunityClient(), false);
 
         public readonly SemaphoreSlim LoginConfirmLocker = new SemaphoreSlim(1, 1);
 
         private List<Offer> receivedOffers = new List<Offer>();
         private List<Offer> autoConfirmOffers = new List<Offer>();
-        private Action startLogin = null;
-        private Action<bool> endLogin = null;
 
-        public UserClient(User user, SteamCommunityClient client)
+        public UserClient(User user, SteamCommunityClient client, bool logged) : base(logged)
         {
             User = user;
             Client = client;
@@ -106,7 +206,7 @@ namespace Steam_Authenticator
 
         public User User { get; set; }
 
-        public string Key => User?.SteamId;
+        public override string Key => User?.SteamId;
 
         public List<Offer> AutoConfirmOffers => autoConfirmOffers ?? new List<Offer>();
 
@@ -115,16 +215,66 @@ namespace Steam_Authenticator
         /// </summary>
         public List<Offer> ReceivedOffers => receivedOffers ?? new List<Offer>();
 
-        public UserClient WithStartLogin(Action action)
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
         {
-            startLogin = action;
-            return this;
+            if (string.IsNullOrWhiteSpace(User?.RefreshToken))
+            {
+                return false;
+            }
+
+            var logged = await Client.LoginAsync(User.RefreshToken);
+            if (logged && string.IsNullOrWhiteSpace(User.Account))
+            {
+                await RefreshAccountAsync();
+            }
+
+            return logged;
         }
 
-        public UserClient WithEndLogin(Action<bool> action)
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
         {
-            endLogin = action;
-            return this;
+            var palyerSummaries = await SteamApi.QueryPlayerSummariesAsync(null, Client.WebApiToken, new[] { Client.SteamId }, cancellationToken: cancellationToken);
+            if (palyerSummaries.HttpStatusCode == System.Net.HttpStatusCode.Forbidden || palyerSummaries.ResultCode == ErrorCodes.AccessDenied)
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = false,
+                    Changed = true,
+                };
+            }
+
+            var player = palyerSummaries.Body?.Players?.FirstOrDefault();
+            if (player == null)
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = LoggedIn,
+                    Changed = false
+                };
+            }
+
+            var changed = player.SteamName != User.NickName
+                || player.AvatarFull != User.Avatar;
+            if (changed)
+            {
+                User.NickName = player.SteamName;
+                User.Avatar = player.AvatarFull;
+                Appsetting.Instance.Manifest.SaveSteamUser(Client.SteamId, User);
+            }
+
+            return new ClientRefreshResponse
+            {
+                LoggedIn = true,
+                Changed = changed
+            };
+        }
+
+        protected override async Task InternalLogoutAsync(CancellationToken cancellationToken = default)
+        {
+            await Client.LogoutAsync();
+
+            User.RefreshToken = string.Empty;
+            Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
         }
 
         public void SetAutoConfirmOffers(List<Offer> offers)
@@ -161,48 +311,6 @@ namespace Steam_Authenticator
             return account;
         }
 
-        public async Task<bool> LoginAsync()
-        {
-            bool result = false;
-            try
-            {
-                startLogin?.Invoke();
-
-                if (string.IsNullOrWhiteSpace(User?.RefreshToken))
-                {
-                    result = false;
-                    return result;
-                }
-
-                result = await Client.LoginAsync(User.RefreshToken);
-                if (string.IsNullOrWhiteSpace(User.Account))
-                {
-                    await RefreshAccountAsync();
-                }
-
-                return result;
-            }
-            finally
-            {
-                endLogin?.Invoke(result);
-            }
-        }
-
-        public async Task LogoutAsync()
-        {
-            try
-            {
-                endLogin?.Invoke(false);
-                await Client.LogoutAsync();
-
-                User.RefreshToken = string.Empty;
-                Appsetting.Instance.Manifest.SaveSteamUser(User.SteamId, User);
-            }
-            catch
-            {
-            }
-        }
-
         public async Task<string> RefreshAccountAsync()
         {
             if (Client == null || !Client.LoggedIn)
@@ -223,78 +331,69 @@ namespace Steam_Authenticator
         }
     }
 
-    public class BuffClient : Client
+    public class BuffClient : BaseUserClient
     {
-        public static BuffClient None = new BuffClient(new BuffUser());
+        public static BuffClient None = new BuffClient(new BuffUser(), false);
 
-        private Action<bool> startLogin = null;
-        private Action<bool, bool> endLogin = null;
-
-        public BuffClient(BuffUser user)
+        public BuffClient(BuffUser user, bool logged) : base(logged)
         {
             User = user;
         }
 
         public BuffUser User { get; private set; }
 
-        public string Key => User?.UserId;
-
         public CookieCollection Cookies => Extension.GetCookies(User?.BuffCookies ?? "");
 
-        public bool LoggedIn { get; set; }
+        public override string Key => User?.UserId;
 
-        public BuffClient WithStartLogin(Action<bool> action)
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
         {
-            startLogin = action;
-            return this;
+            var refresh = await InternalRefreshClientAsync(cancellationToken);
+            return refresh.LoggedIn;
         }
 
-        public BuffClient WithEndLogin(Action<bool, bool> action)
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
         {
-            endLogin = action;
-            return this;
-        }
-
-        public async Task RefreshAsync(bool relogin, CancellationToken cancellationToken = default)
-        {
-            try
+            var buffResponse = await BuffApi.QueryUserInfo(cookies: Cookies, cancellationToken);
+            if (string.IsNullOrWhiteSpace(buffResponse.Body?.data?.id))
             {
-                startLogin?.Invoke(relogin);
-
-                var buffResponse = await BuffApi.QueryUserInfo(cookies: Cookies, cancellationToken);
-
-                if (string.IsNullOrWhiteSpace(buffResponse.Body?.data?.id))
+                return new ClientRefreshResponse
                 {
-                    LoggedIn = false;
-                    return;
-                }
-
-                LoggedIn = true;
-
-                var newCookies = this.Cookies;
-                newCookies.Add(buffResponse.Cookies);
-
-                var buffUser = buffResponse.Body.data;
-                User.SteamId = buffUser.steamid;
-                User.Nickname = buffUser.nickname;
-                User.Avatar = buffUser.avatar;
-                User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
-
-                Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
+                    LoggedIn = false,
+                    Changed = true,
+                };
             }
-            finally
+
+            var newCookies = this.Cookies;
+            newCookies.Add(buffResponse.Cookies);
+
+            var user = buffResponse.Body.data;
+
+            bool changed = User.Nickname != user.nickname
+                || User.Avatar != user.avatar
+                || User.SteamId != user.steamid;
+            if (changed)
             {
-                endLogin?.Invoke(relogin, LoggedIn);
+                User.SteamId = user.steamid;
+                User.Nickname = user.nickname;
+                User.Avatar = user.avatar;
             }
+
+            User.BuffCookies = string.Join("; ", newCookies.Select(cookie => $"{cookie.Name}={HttpUtility.UrlEncode(cookie.Value)}"));
+
+            Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
+
+            return new ClientRefreshResponse
+            {
+                LoggedIn = true,
+                Changed = changed,
+            };
         }
 
-        public Task LogoutAsync()
+        protected override Task InternalLogoutAsync(CancellationToken cancellationToken = default)
         {
             User.BuffCookies = string.Empty;
             Appsetting.Instance.Manifest.SaveBuffUser(User.UserId, User);
-
-            LoggedIn = false;
-            endLogin?.Invoke(false, false);
             return Task.CompletedTask;
         }
 
@@ -304,177 +403,245 @@ namespace Steam_Authenticator
         }
     }
 
-    public class EcoClient : Client
+    public class EcoClient : BaseUserClient
     {
-        public static EcoClient None = new EcoClient(new EcoUser());
+        public static EcoClient None = new EcoClient(new EcoUser(), false);
 
-        private Action<bool> startLogin = null;
-        private Action<bool, bool> endLogin = null;
-
-        public EcoClient(EcoUser user)
+        public EcoClient(EcoUser user, bool logged) : base(logged)
         {
             User = user;
         }
 
         public EcoUser User { get; private set; }
 
-        public string Key => User?.UserId;
-
-        public bool LoggedIn => !string.IsNullOrWhiteSpace(Token);
+        public override string Key => User?.UserId;
 
         public string Token { get; set; }
 
-        public async Task<bool> RefreshTokenAsync(bool relogin, CancellationToken cancellationToken = default)
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                startLogin?.Invoke(relogin);
-
-                var refreshToken = await EcoApi.RefreshTokenAsync(User.ClientId, User.RefreshToken, cancellationToken);
-                var refreshTokenData = refreshToken.Body?.StatusData?.ResultData;
-                if (string.IsNullOrWhiteSpace(refreshTokenData?.Token))
-                {
-                    Token = null;
-                    return false;
-                }
-
-                User.RefreshToken = refreshTokenData.RefreshToken;
-                User.RefreshTokenExpireTime = refreshTokenData.RefreshTokenExpireDate;
-                Token = refreshTokenData.Token;
-
-                Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
-                return true;
-            }
-            finally
-            {
-                endLogin?.Invoke(relogin, LoggedIn);
-            }
+            return await RefreshTokenAsync(cancellationToken);
         }
 
-        public async Task RefreshClientAsync(CancellationToken cancellationToken = default)
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
         {
             var refreshTokenExpire = User.RefreshTokenExpireTime - DateTime.Now;
             if (TimeSpan.Zero < refreshTokenExpire && refreshTokenExpire < TimeSpan.FromMinutes(30) && !string.IsNullOrWhiteSpace(User.RefreshToken))
             {
-                await RefreshTokenAsync(false, cancellationToken);
+                await RefreshTokenAsync(cancellationToken);
             }
 
             var userResponse = await EcoApi.QueryUserAsync(this, cancellationToken);
-            var userData = userResponse?.StatusData?.ResultData;
+            if (userResponse?.StatusCode == "4001" || userResponse?.StatusData?.ResultCode == "4001")
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = false,
+                    Changed = true
+                };
+            }
 
+            var userData = userResponse?.StatusData?.ResultData;
             if (string.IsNullOrWhiteSpace(userData?.UserId))
             {
-                return;
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = LoggedIn,
+                    Changed = false
+                };
             }
 
             var steamUserResponse = await EcoApi.QuerySteamUserAsync(this, cancellationToken);
             var steamUserData = steamUserResponse?.StatusData?.ResultData;
+            var steamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
 
-            User.Nickname = userData.UserName;
-            User.Avatar = userData.UserHead;
-            User.SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
+            bool changed = User.Nickname != userData.UserName
+                || User.Avatar != userData.UserHead
+                || string.Join(",", User.SteamIds.OrderBy(c => c)) != string.Join(",", steamIds.OrderBy(c => c));
+            if (changed)
+            {
+                User.Nickname = userData.UserName;
+                User.Avatar = userData.UserHead;
+                User.SteamIds = steamIds;
+                Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+            }
+
+            return new ClientRefreshResponse
+            {
+                LoggedIn = true,
+                Changed = changed
+            };
+        }
+
+        protected override Task InternalLogoutAsync(CancellationToken cancellationToken = default)
+        {
+            User.RefreshToken = null;
+            Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+
+            Token = null;
+            return Task.CompletedTask;
+        }
+
+        public async Task<bool> RefreshTokenAsync(CancellationToken cancellationToken = default)
+        {
+            var refreshToken = await EcoApi.RefreshTokenAsync(User.ClientId, User.RefreshToken, cancellationToken);
+            var refreshTokenData = refreshToken.Body?.StatusData?.ResultData;
+            if (string.IsNullOrWhiteSpace(refreshTokenData?.Token))
+            {
+                Token = null;
+                return false;
+            }
+
+            User.RefreshToken = refreshTokenData.RefreshToken;
+            User.RefreshTokenExpireTime = refreshTokenData.RefreshTokenExpireDate;
+            Token = refreshTokenData.Token;
 
             Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
+            return true;
         }
 
         public async Task<EcoResponse<List<QueryOffersResponse>>> QueryOffers(string gameId = "730", CancellationToken cancellationToken = default)
         {
             return await EcoApi.QueryOffers(this, gameId, cancellationToken);
         }
-
-        public Task LogoutAsync()
-        {
-            User.RefreshToken = null;
-            Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
-
-            Token = null;
-            endLogin?.Invoke(false, false);
-            return Task.CompletedTask;
-        }
-
-        public EcoClient WithStartLogin(Action<bool> action)
-        {
-            startLogin = action;
-            return this;
-        }
-
-        public EcoClient WithEndLogin(Action<bool, bool> action)
-        {
-            endLogin = action;
-            return this;
-        }
     }
 
-    public class YouPinClient : Client
+    public class YouPinClient : BaseUserClient
     {
-        public static YouPinClient None = new YouPinClient(new YouPinUser());
+        public static YouPinClient None = new YouPinClient(new YouPinUser(), false);
 
-        private Action<bool> startLogin = null;
-        private Action<bool, bool> endLogin = null;
-
-        public YouPinClient(YouPinUser user)
+        public YouPinClient(YouPinUser user, bool logged) : base(logged)
         {
             User = user;
         }
 
         public YouPinUser User { get; private set; }
 
-        public string Key => User?.UserId;
+        public override string Key => User?.UserId;
 
-        public bool LoggedIn { get; set; }
-
-        public async Task RefreshAsync(bool relogin, CancellationToken cancellationToken = default)
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
         {
-            try
+            var refresh = await InternalRefreshClientAsync(cancellationToken);
+            return refresh.LoggedIn;
+        }
+
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
+        {
+            var userResponse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
+            if (string.IsNullOrWhiteSpace(userResponse.Body?.GetData()?.UserId))
             {
-                startLogin?.Invoke(relogin);
-
-                var userRespnse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
-                if (string.IsNullOrWhiteSpace(userRespnse.Body?.GetData()?.UserId))
+                return new ClientRefreshResponse
                 {
-                    LoggedIn = false;
-                    return;
-                }
+                    LoggedIn = false,
+                    Changed = true,
+                };
+            }
 
-                LoggedIn = true;
+            var user = userResponse.Body.GetData();
 
-                var user = userRespnse.Body.GetData();
+            bool changed = User.Nickname != user.NickName
+                || User.Avatar != user.Avatar
+                || User.SteamId != user.SteamId;
+            if (changed)
+            {
                 User.Nickname = user.NickName;
                 User.Avatar = user.Avatar;
                 User.SteamId = user.SteamId;
 
                 Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
             }
-            finally
+
+            return new ClientRefreshResponse
             {
-                endLogin?.Invoke(relogin, LoggedIn);
-            }
+                LoggedIn = true,
+                Changed = changed,
+            };
+        }
+
+        protected override Task InternalLogoutAsync(CancellationToken cancellationToken = default)
+        {
+            User.Token = null;
+            Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+            return Task.CompletedTask;
         }
 
         public async Task<IWebResponse<YouPin898Response<GetOfferListResponse>>> GetOfferList(CancellationToken cancellationToken = default)
         {
             return await YouPin898Api.GetOfferList(User?.Token, cancellationToken);
         }
+    }
 
-        public Task LogoutAsync()
+    public class C5Client : BaseUserClient
+    {
+        public static C5Client None = new C5Client(new C5User(), false);
+
+        public C5Client(C5User user, bool logged) : base(logged)
         {
-            User.Token = null;
-            Appsetting.Instance.Manifest.SaveYouPinUser(User.UserId, User);
+            User = user;
+        }
 
-            endLogin?.Invoke(false, false);
+        public C5User User { get; private set; }
+
+        public override string Key => User?.UserId;
+
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
+        {
+            var refresh = await InternalRefreshClientAsync(cancellationToken);
+            return refresh.LoggedIn;
+        }
+
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
+        {
+            var userResponse = await C5Api.QueryUserInfo(User?.AppKey, cancellationToken);
+            if (userResponse.Body?.errorCode == 400001)
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = false,
+                    Changed = true
+                };
+            }
+
+            var userData = userResponse.Body.data;
+            if (string.IsNullOrWhiteSpace(userData?.uid))
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = LoggedIn,
+                    Changed = false
+                };
+            }
+
+            var steamIds = userData.steamList?.Select(c => c.steamId).ToList() ?? new List<string>();
+
+            bool changed = User.Nickname != userData.nickname
+                || User.Avatar != userData.avatar
+                || string.Join(",", User.SteamIds.OrderBy(c => c)) != string.Join(",", steamIds.OrderBy(c => c));
+            if (changed)
+            {
+                User.Nickname = userData.nickname;
+                User.Avatar = userData.avatar;
+                User.SteamIds = steamIds ?? new List<string>();
+                Appsetting.Instance.Manifest.SaveC5User(User.UserId, User);
+            }
+
+            return new ClientRefreshResponse
+            {
+                LoggedIn = true,
+                Changed = changed
+            };
+        }
+
+        protected override Task InternalLogoutAsync(CancellationToken cancellationToken = default)
+        {
+            User.AppKey = null;
+            Appsetting.Instance.Manifest.SaveC5User(User.UserId, User);
             return Task.CompletedTask;
         }
 
-        public YouPinClient WithStartLogin(Action<bool> action)
+        public async Task<IWebResponse<C5Response<List<string>>>> CheckOffers(IEnumerable<string> offers, CancellationToken cancellationToken = default)
         {
-            startLogin = action;
-            return this;
-        }
-
-        public YouPinClient WithEndLogin(Action<bool, bool> action)
-        {
-            endLogin = action;
-            return this;
+            return await C5Api.CheckOffers(User?.AppKey, offers.ToList(), cancellationToken);
         }
     }
 

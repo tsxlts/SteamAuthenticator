@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using Steam_Authenticator.Internal;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
+using Steam_Authenticator.Internal;
 
 namespace Steam_Authenticator.Model
 {

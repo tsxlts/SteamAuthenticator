@@ -1,5 +1,5 @@
-﻿using SteamKit.Model;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using SteamKit.Model;
 
 namespace Steam_Authenticator.Forms
 {

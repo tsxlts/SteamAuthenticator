@@ -52,7 +52,7 @@ namespace Steam_Authenticator.Forms
 
                     MessageBox.Show($"发送验证码失败" +
                         $"{Environment.NewLine}" +
-                        $"{pcSendSmsCodeBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        $"悠悠返回错误消息：{pcSendSmsCodeBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -84,7 +84,7 @@ namespace Steam_Authenticator.Forms
                     {
                         MessageBox.Show($"发送验证码失败" +
                             $"{Environment.NewLine}" +
-                            $"{smsConfigBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            $"悠悠返回错误消息：{smsConfigBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
                     var smsConfigData = smsConfigBody.GetData();
@@ -102,7 +102,7 @@ namespace Steam_Authenticator.Forms
 
                 MessageBox.Show($"发送验证码失败" +
                     $"{Environment.NewLine}" +
-                    $"{sendSmsCodeBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    $"悠悠返回错误消息：{sendSmsCodeBody.GetMsg()}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {

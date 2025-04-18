@@ -1,8 +1,8 @@
+using System.Diagnostics;
+using System.Net;
 using Steam_Authenticator.Factory;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
-using System.Diagnostics;
-using System.Net;
 using static SteamKit.HttpBulider;
 using static SteamKit.SteamBulider;
 

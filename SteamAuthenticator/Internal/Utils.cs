@@ -1,8 +1,8 @@
-﻿using Steam_Authenticator.Factory;
+﻿using System.Text.RegularExpressions;
+using Steam_Authenticator.Factory;
 using Steam_Authenticator.Model;
 using SteamKit.Model;
 using SteamKit.WebClient;
-using System.Text.RegularExpressions;
 
 namespace Steam_Authenticator.Internal
 {

@@ -37,6 +37,10 @@
             periodicChecking = new CheckBox();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            autoConfirmTrade_C5 = new CheckBox();
+            label19 = new Label();
+            label20 = new Label();
+            autoAcceptGiveOffer_C5 = new CheckBox();
             autoConfirmTrade_YouPin = new CheckBox();
             label13 = new Label();
             label14 = new Label();
@@ -97,9 +101,9 @@
             // 
             saveBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             saveBtn.Font = new Font("Microsoft YaHei UI", 12F);
-            saveBtn.Location = new Point(1, 432);
+            saveBtn.Location = new Point(1, 445);
             saveBtn.Name = "saveBtn";
-            saveBtn.Size = new Size(595, 33);
+            saveBtn.Size = new Size(754, 33);
             saveBtn.TabIndex = 12;
             saveBtn.Text = "保存设置";
             saveBtn.UseVisualStyleBackColor = true;
@@ -148,7 +152,7 @@
             groupBox1.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             groupBox1.Location = new Point(12, 39);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(572, 66);
+            groupBox1.Size = new Size(731, 66);
             groupBox1.TabIndex = 16;
             groupBox1.TabStop = false;
             groupBox1.Text = "自动令牌确认";
@@ -156,6 +160,10 @@
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(autoConfirmTrade_C5);
+            groupBox2.Controls.Add(label19);
+            groupBox2.Controls.Add(label20);
+            groupBox2.Controls.Add(autoAcceptGiveOffer_C5);
             groupBox2.Controls.Add(autoConfirmTrade_YouPin);
             groupBox2.Controls.Add(label13);
             groupBox2.Controls.Add(label14);
@@ -184,10 +192,52 @@
             groupBox2.Controls.Add(autoAcceptGiveOffer);
             groupBox2.Location = new Point(12, 111);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(572, 233);
+            groupBox2.Size = new Size(731, 246);
             groupBox2.TabIndex = 17;
             groupBox2.TabStop = false;
             groupBox2.Text = "自动发货 设置（发送的/收到的 发货报价）";
+            // 
+            // autoConfirmTrade_C5
+            // 
+            autoConfirmTrade_C5.AutoSize = true;
+            autoConfirmTrade_C5.ForeColor = Color.Red;
+            autoConfirmTrade_C5.Location = new Point(167, 185);
+            autoConfirmTrade_C5.Name = "autoConfirmTrade_C5";
+            autoConfirmTrade_C5.Size = new Size(75, 21);
+            autoConfirmTrade_C5.TabIndex = 43;
+            autoConfirmTrade_C5.Text = "自动确认";
+            autoConfirmTrade_C5.UseVisualStyleBackColor = true;
+            // 
+            // label19
+            // 
+            label19.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
+            label19.Location = new Point(6, 186);
+            label19.Name = "label19";
+            label19.Size = new Size(74, 17);
+            label19.TabIndex = 42;
+            label19.Text = "C5GAME 报价";
+            label19.TextAlign = ContentAlignment.TopRight;
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            label20.ForeColor = Color.Gray;
+            label20.Location = new Point(249, 186);
+            label20.Name = "label20";
+            label20.Size = new Size(376, 17);
+            label20.TabIndex = 41;
+            label20.Text = "C5Game平台产生的报价, 仅在设置C5GAME开放平台AppKey后生效";
+            // 
+            // autoAcceptGiveOffer_C5
+            // 
+            autoAcceptGiveOffer_C5.AutoSize = true;
+            autoAcceptGiveOffer_C5.Location = new Point(86, 185);
+            autoAcceptGiveOffer_C5.Name = "autoAcceptGiveOffer_C5";
+            autoAcceptGiveOffer_C5.Size = new Size(75, 21);
+            autoAcceptGiveOffer_C5.TabIndex = 40;
+            autoAcceptGiveOffer_C5.Text = "自动接受";
+            autoAcceptGiveOffer_C5.UseVisualStyleBackColor = true;
             // 
             // autoConfirmTrade_YouPin
             // 
@@ -299,7 +349,7 @@
             // 
             autoConfirmTrade_Other.AutoSize = true;
             autoConfirmTrade_Other.ForeColor = Color.Red;
-            autoConfirmTrade_Other.Location = new Point(167, 185);
+            autoConfirmTrade_Other.Location = new Point(167, 212);
             autoConfirmTrade_Other.Name = "autoConfirmTrade_Other";
             autoConfirmTrade_Other.Size = new Size(75, 21);
             autoConfirmTrade_Other.TabIndex = 29;
@@ -340,7 +390,7 @@
             // label6
             // 
             label6.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
-            label6.Location = new Point(6, 186);
+            label6.Location = new Point(6, 213);
             label6.Name = "label6";
             label6.Size = new Size(74, 17);
             label6.TabIndex = 24;
@@ -362,7 +412,7 @@
             label4.AutoSize = true;
             label4.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             label4.ForeColor = Color.Gray;
-            label4.Location = new Point(249, 186);
+            label4.Location = new Point(249, 213);
             label4.Name = "label4";
             label4.Size = new Size(272, 17);
             label4.TabIndex = 22;
@@ -425,7 +475,7 @@
             // autoAcceptGiveOffer_Other
             // 
             autoAcceptGiveOffer_Other.AutoSize = true;
-            autoAcceptGiveOffer_Other.Location = new Point(86, 185);
+            autoAcceptGiveOffer_Other.Location = new Point(86, 212);
             autoAcceptGiveOffer_Other.Name = "autoAcceptGiveOffer_Other";
             autoAcceptGiveOffer_Other.Size = new Size(75, 21);
             autoAcceptGiveOffer_Other.TabIndex = 16;
@@ -447,9 +497,9 @@
             groupBox3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox3.Controls.Add(label9);
             groupBox3.Controls.Add(autoAcceptReceiveOffer);
-            groupBox3.Location = new Point(12, 350);
+            groupBox3.Location = new Point(12, 363);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(572, 66);
+            groupBox3.Size = new Size(731, 66);
             groupBox3.TabIndex = 18;
             groupBox3.TabStop = false;
             groupBox3.Text = "自动收货 设置（收到的 收货报价）";
@@ -508,7 +558,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(596, 466);
+            ClientSize = new Size(755, 479);
             Controls.Add(label18);
             Controls.Add(label16);
             Controls.Add(label17);
@@ -576,5 +626,9 @@
         private Label label16;
         private Label label17;
         private Label label18;
+        private CheckBox autoConfirmTrade_C5;
+        private Label label19;
+        private Label label20;
+        private CheckBox autoAcceptGiveOffer_C5;
     }
 }

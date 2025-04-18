@@ -18,7 +18,7 @@ namespace Steam_Authenticator.Handler
             foreach (string account in accounts)
             {
                 YouPinUser user = Appsetting.Instance.Manifest.GetYouPinUser(account);
-                YouPinClient client = new YouPinClient(user);
+                YouPinClient client = new YouPinClient(user, false);
                 Appsetting.Instance.YouPinClients.Add(client);
 
                 panels.Add(AddUserPanel(client));
@@ -43,7 +43,7 @@ namespace Steam_Authenticator.Handler
                 panel.Offer.Hide();
             }
 
-            var tasks = Appsetting.Instance.YouPinClients.Select(c => c.RefreshAsync(true));
+            var tasks = Appsetting.Instance.YouPinClients.Select(c => c.LoginAsync());
             await Task.WhenAll(tasks);
 
             return panels;
@@ -61,40 +61,15 @@ namespace Steam_Authenticator.Handler
             return Task.CompletedTask;
         }
 
-        protected override async Task LogoutInternal(YouPinUserPanel panel, YouPinClient client)
-        {
-            await client.LogoutAsync();
-        }
-
         protected override async Task ReloginInternal(YouPinUserPanel panel, YouPinClient client)
         {
-            await client.RefreshAsync(true);
+            await client.LoginAsync();
             if (client.LoggedIn)
             {
                 return;
             }
 
             YouPinLogin($"登录信息已失效{Environment.NewLine}请重新登录 悠悠有品 帐号");
-        }
-
-        protected override async Task RefreshUserInternal()
-        {
-            using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
-            {
-                var controlCollection = UsersPanel.ItemPanels;
-                foreach (var userPanel in controlCollection)
-                {
-                    if (!userPanel.HasItem)
-                    {
-                        continue;
-                    }
-
-                    var clinet = userPanel.Client;
-                    var user = clinet.User;
-
-                    await clinet.RefreshAsync(false, tokenSource.Token);
-                }
-            }
         }
 
         private YouPinUserPanel AddUserPanel(YouPinClient client)
@@ -104,16 +79,11 @@ namespace Steam_Authenticator.Handler
             panel.ItemIcon.ContextMenuStrip = UserMenu;
 
             panel.Client
-                .WithStartLogin((relogin) =>
+                .WithStartLogin(() =>
                 {
-                    if (!relogin)
-                    {
-                        return;
-                    }
-
                     panel.ItemName.ForeColor = Color.FromArgb(128, 128, 128);
                 })
-                .WithEndLogin((relogin, loggined) =>
+                .WithEndLogin((loggined) =>
                 {
                     panel.ItemName.ForeColor = loggined ? Color.Green : Color.Red;
                 });
@@ -137,9 +107,8 @@ namespace Steam_Authenticator.Handler
                 SteamId = auth.Result.SteamId,
                 Token = auth.Token
             };
-            var client = new YouPinClient(user)
+            var client = new YouPinClient(user, true)
             {
-                LoggedIn = true
             };
 
             Appsetting.Instance.Manifest.SaveYouPinUser(client.User.UserId, client.User);

@@ -1,8 +1,8 @@
 ﻿
+using System.Text;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
-using System.Text;
 using static Steam_Authenticator.Internal.Utils;
 
 namespace Steam_Authenticator.Forms

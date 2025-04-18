@@ -1,10 +1,10 @@
 ﻿
+using System.Text;
 using Steam_Authenticator.Factory;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
-using System.Text;
 
 namespace Steam_Authenticator.Forms
 {

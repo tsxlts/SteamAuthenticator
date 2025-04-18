@@ -1,11 +1,11 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Text;
+using System.Web;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.WebClient;
-using System.Text;
-using System.Web;
 using static SteamKit.SteamEnum;
 
 namespace Steam_Authenticator
@@ -233,7 +233,7 @@ namespace Steam_Authenticator
                 foreach (string account in accounts)
                 {
                     User user = Appsetting.Instance.Manifest.GetSteamUser(account);
-                    UserClient client = new UserClient(user, new SteamCommunityClient());
+                    UserClient client = new UserClient(user, new SteamCommunityClient(), false);
                     Appsetting.Instance.Clients.Add(client);
 
                     AddUserPanel(client);
@@ -329,7 +329,7 @@ namespace Steam_Authenticator
                     Setting = localUser?.Setting ?? new Model.UserSetting()
                 };
 
-                UserClient userClient = new UserClient(user, client);
+                UserClient userClient = new UserClient(user, client, true);
 
                 Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
 
@@ -396,6 +396,24 @@ namespace Steam_Authenticator
         {
             userClient.Client.SetLanguage(Language.Schinese);
             SteamUserPanel panel = usersPanel.AddItemPanel(true, userClient);
+
+            userClient.ClientRefreshed += (sender, e) =>
+            {
+                if (!e.Changed)
+                {
+                    return;
+                }
+
+                var client = e.Client as UserClient;
+
+                usersPanel.SetItemName(client, client.GetAccount(), client.LoggedIn ? Color.Green : Color.Red);
+                usersPanel.SetItemIcon(client, client.User.Avatar);
+
+                if (client.User.SteamId == currentClient?.User?.SteamId)
+                {
+                    SetCurrentClient(client, true);
+                }
+            };
 
             panel.ItemIcon.MouseClick += btnUser_Click;
             panel.ItemIcon.ContextMenuStrip = userContextMenuStrip;

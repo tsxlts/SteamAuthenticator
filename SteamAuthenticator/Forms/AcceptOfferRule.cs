@@ -1,5 +1,5 @@
-﻿using Steam_Authenticator.Model;
-using System.Data;
+﻿using System.Data;
+using Steam_Authenticator.Model;
 
 namespace Steam_Authenticator.Forms
 {

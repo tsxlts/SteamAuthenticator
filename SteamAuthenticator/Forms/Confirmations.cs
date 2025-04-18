@@ -1,9 +1,9 @@
-﻿using Steam_Authenticator.Controls;
+﻿using System.Drawing.Drawing2D;
+using Steam_Authenticator.Controls;
 using Steam_Authenticator.Model;
 using SteamKit;
 using SteamKit.Model;
 using SteamKit.WebClient;
-using System.Drawing.Drawing2D;
 using static Steam_Authenticator.Internal.Utils;
 
 namespace Steam_Authenticator.Forms
