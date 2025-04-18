@@ -52,7 +52,7 @@ namespace Steam_Authenticator.Internal
                 }, item));
             }
 
-            var result = await Task.WhenAll(tasks);
+            var result = await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public static async Task<bool> HandleConfirmation(SteamCommunityClient webClient, Guard guard, IEnumerable<Confirmation> confirmations, bool accept, CancellationToken cancellationToken)
@@ -72,11 +72,11 @@ namespace Steam_Authenticator.Internal
             {
                 if (accept)
                 {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
                 }
                 else
                 {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret);
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
                 }
 
                 AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
@@ -97,7 +97,7 @@ namespace Steam_Authenticator.Internal
 
         SingleConfirm:
             var tasks = confirmations.Select(confirm => HandleConfirmation(webClient, guard, confirm, accept, cancellationToken));
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             success = !results.All(c => c == false);
 
             return success;
@@ -110,11 +110,11 @@ namespace Steam_Authenticator.Internal
             {
                 if (accept)
                 {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
                 }
                 else
                 {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret);
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
                 }
 
                 AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
