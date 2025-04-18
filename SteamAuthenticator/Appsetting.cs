@@ -643,6 +643,16 @@ namespace Steam_Authenticator
         {
             return await C5Api.CheckOffers(User?.AppKey, offers.ToList(), cancellationToken);
         }
+
+        public async Task<IWebResponse<C5Response<QuerySellerOrdersResponse>>> QuerySellerOrders(int status = 1, CancellationToken cancellationToken = default)
+        {
+            return await C5Api.QuerySellerOrders(User?.AppKey, status, cancellationToken);
+        }
+
+        public async Task<IWebResponse<C5Response<object>>> Deliver(IEnumerable<string> orders, CancellationToken cancellationToken = default)
+        {
+            return await C5Api.Deliver(User?.AppKey, orders.ToList(), cancellationToken);
+        }
     }
 
     /// <summary>

@@ -242,5 +242,12 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public string Nickname { get; set; }
+
+        public C5UserSetting Setting { get; set; } = new C5UserSetting();
+    }
+
+    public class C5UserSetting
+    {
+        public bool AutoSendOffer { get; set; } = false;
     }
 }
