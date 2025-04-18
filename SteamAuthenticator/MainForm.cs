@@ -1070,7 +1070,8 @@ namespace Steam_Authenticator
                 var buffIds = Appsetting.Instance.BuffClients.Select(c => c.User.UserId);
                 var ecoIds = Appsetting.Instance.EcoClients.Select(c => c.User.UserId);
                 var youpinIds = Appsetting.Instance.YouPinClients.Select(c => c.User.UserId);
-                var response = await AuthenticatorApi.Report(version: currentVersion, machineId, steamIds, buffIds, ecoIds, youpinIds);
+                var c5Ids = Appsetting.Instance.C5Clients.Select(c => c.User.UserId);
+                var response = await AuthenticatorApi.Report(version: currentVersion, machineId, steamIds, buffIds, ecoIds, youpinIds, c5Ids);
             }
             catch
             {
