@@ -9,6 +9,7 @@ namespace Steam_Authenticator.Model
         private readonly string buffUserPath = "sda/buffUser";
         private readonly string ecoUserPath = "sda/ecoUser";
         private readonly string youpinUserPath = "sda/youpinUser";
+        private readonly string c5UserPath = "sda/c5User";
         private readonly Manifest manifest;
 
         public AppManifest()
@@ -150,6 +151,31 @@ namespace Steam_Authenticator.Model
         public IEnumerable<string> GetYouPinUser()
         {
             return manifest.GetEntries(youpinUserPath);
+        }
+        #endregion
+
+        #region C5User
+        public void SaveC5User(string userId, C5User entry)
+        {
+            string password = GetPassword();
+            manifest.SaveEntry(c5UserPath, userId, password, entry);
+        }
+
+        public bool RemoveC5User(string userId, out C5User entry)
+        {
+            string password = GetPassword();
+            return manifest.RemoveEntry(c5UserPath, userId, password, out entry);
+        }
+
+        public C5User GetC5User(string userId)
+        {
+            string password = GetPassword();
+            return manifest.GetEntry<C5User>(c5UserPath, userId, password);
+        }
+
+        public IEnumerable<string> GetC5User()
+        {
+            return manifest.GetEntries(c5UserPath);
         }
         #endregion
 

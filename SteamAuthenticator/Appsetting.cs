@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.BUFF;
+using Steam_Authenticator.Model.C5;
 using Steam_Authenticator.Model.ECO;
 using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
@@ -37,6 +38,9 @@ namespace Steam_Authenticator
 
         [JsonIgnore]
         public List<YouPinClient> YouPinClients { get; private set; } = new List<YouPinClient>();
+
+        [JsonIgnore]
+        public List<C5Client> C5Clients { get; private set; } = new List<C5Client>();
 
         [JsonIgnore]
         public AppManifest Manifest { get; private set; } = new AppManifest();
@@ -458,7 +462,7 @@ namespace Steam_Authenticator
             {
                 User.Nickname = userData.UserName;
                 User.Avatar = userData.UserHead;
-                User.SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>();
+                User.SteamIds = steamIds;
                 Appsetting.Instance.Manifest.SaveEcoUser(User.UserId, User);
             }
 
@@ -523,8 +527,8 @@ namespace Steam_Authenticator
 
         protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
         {
-            var userRespnse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
-            if (string.IsNullOrWhiteSpace(userRespnse.Body?.GetData()?.UserId))
+            var userResponse = await YouPin898Api.GetUserInfo(User?.Token, cancellationToken);
+            if (string.IsNullOrWhiteSpace(userResponse.Body?.GetData()?.UserId))
             {
                 return new ClientRefreshResponse
                 {
@@ -533,7 +537,7 @@ namespace Steam_Authenticator
                 };
             }
 
-            var user = userRespnse.Body.GetData();
+            var user = userResponse.Body.GetData();
 
             bool changed = User.Nickname != user.NickName
                 || User.Avatar != user.Avatar
@@ -564,6 +568,80 @@ namespace Steam_Authenticator
         public async Task<IWebResponse<YouPin898Response<GetOfferListResponse>>> GetOfferList(CancellationToken cancellationToken = default)
         {
             return await YouPin898Api.GetOfferList(User?.Token, cancellationToken);
+        }
+    }
+
+    public class C5Client : BaseUserClient
+    {
+        public static C5Client None = new C5Client(new C5User(), false);
+
+        public C5Client(C5User user, bool logged) : base(logged)
+        {
+            User = user;
+        }
+
+        public C5User User { get; private set; }
+
+        public override string Key => User?.UserId;
+
+        protected override async Task<bool> InternalLoginAsync(CancellationToken cancellationToken = default)
+        {
+            var refresh = await InternalRefreshClientAsync(cancellationToken);
+            return refresh.LoggedIn;
+        }
+
+        protected override async Task<ClientRefreshResponse> InternalRefreshClientAsync(CancellationToken cancellationToken = default)
+        {
+            var userResponse = await C5Api.QueryUserInfo(User?.AppKey, cancellationToken);
+            if (userResponse.Body?.errorCode == 400001)
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = false,
+                    Changed = true
+                };
+            }
+
+            var userData = userResponse.Body.data;
+            if (string.IsNullOrWhiteSpace(userData?.uid))
+            {
+                return new ClientRefreshResponse
+                {
+                    LoggedIn = LoggedIn,
+                    Changed = false
+                };
+            }
+
+            var steamIds = userData.steamList?.Select(c => c.steamId).ToList() ?? new List<string>();
+
+            bool changed = User.Nickname != userData.nickname
+                || User.Avatar != userData.avatar
+                || string.Join(",", User.SteamIds.OrderBy(c => c)) != string.Join(",", steamIds.OrderBy(c => c));
+            if (changed)
+            {
+                User.Nickname = userData.nickname;
+                User.Avatar = userData.avatar;
+                User.SteamIds = steamIds ?? new List<string>();
+                Appsetting.Instance.Manifest.SaveC5User(User.UserId, User);
+            }
+
+            return new ClientRefreshResponse
+            {
+                LoggedIn = true,
+                Changed = changed
+            };
+        }
+
+        protected override Task InternalLogoutAsync(CancellationToken cancellationToken = default)
+        {
+            User.AppKey = null;
+            Appsetting.Instance.Manifest.SaveC5User(User.UserId, User);
+            return Task.CompletedTask;
+        }
+
+        public async Task<IWebResponse<C5Response<List<string>>>> CheckOffers(IEnumerable<string> offers, CancellationToken cancellationToken = default)
+        {
+            return await C5Api.CheckOffers(User?.AppKey, offers.ToList(), cancellationToken);
         }
     }
 

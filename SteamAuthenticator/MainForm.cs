@@ -134,6 +134,7 @@ namespace Steam_Authenticator
                 new BUFFUserPanelHandler(buffUsersPanel),
                 new ECOUserPanelHandler(ecoUsersPanel),
                 new YouPinUserPanelHandler(youpinUsersPanel),
+                new C5UserPanelHandler(c5UsersPanel),
             };
 
             var loadUsers = new List<Task> { LoadUsers() };
@@ -364,7 +365,8 @@ namespace Steam_Authenticator
                 var checkClients = Appsetting.Instance.Clients.Where(c => c.User.Setting.PeriodicCheckingConfirmation).ToList();
                 var buffClients = Appsetting.Instance.BuffClients;
                 var ecoClients = Appsetting.Instance.EcoClients;
-                var youpinClinets = Appsetting.Instance.YouPinClients;
+                var youpinClients = Appsetting.Instance.YouPinClients;
+                var c5Clients = Appsetting.Instance.C5Clients;
                 foreach (var itemClient in checkClients)
                 {
                     if (itemClient == null)
@@ -379,12 +381,14 @@ namespace Steam_Authenticator
                         var user = client.User;
                         var buffClient = buffClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
                         var ecoClient = ecoClients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
-                        var youpinClient = youpinClinets.FirstOrDefault(c => c.User.SteamId == user.SteamId);
+                        var youpinClient = youpinClients.FirstOrDefault(c => c.User.SteamId == user.SteamId);
+                        var c5Client = c5Clients.FirstOrDefault(c => c.User.SteamIds?.Contains(user.SteamId) ?? false);
 
                         bool acceptAll = user.Setting.AutoAcceptGiveOffer;
                         bool accpetBuff = acceptAll || user.Setting.AutoAcceptGiveOffer_Buff;
                         bool accectEco = acceptAll || user.Setting.AutoAcceptGiveOffer_Eco;
                         bool accectYouPin = acceptAll || user.Setting.AutoAcceptGiveOffer_YouPin;
+                        bool accectC5 = acceptAll || user.Setting.AutoAcceptGiveOffer_C5;
                         bool accpetOther = acceptAll || user.Setting.AutoAcceptGiveOffer_Other;
                         bool acceptCustom = acceptAll || user.Setting.AutoAcceptGiveOffer_Custom;
 
@@ -392,6 +396,7 @@ namespace Steam_Authenticator
                         bool confirmBuff = confirmAll || user.Setting.AutoConfirmTrade_Buff;
                         bool confirmEco = confirmAll || user.Setting.AutoConfirmTrade_Eco;
                         bool confirmYouPin = confirmAll || user.Setting.AutoConfirmTrade_YouPin;
+                        bool confirmC5 = confirmAll || user.Setting.AutoConfirmTrade_C5;
                         bool confirmOther = confirmAll || user.Setting.AutoConfirmTrade_Other;
                         bool confirmCustom = confirmAll || user.Setting.AutoConfirmTrade_Custom;
 
@@ -402,6 +407,7 @@ namespace Steam_Authenticator
                         int? buffOfferCount = null;
                         int? ecoOfferCount = null;
                         int? youpinOfferCount = null;
+                        int? c5OfferCount = null;
                         try
                         {
                             if (!webClient.LoggedIn)
@@ -435,6 +441,7 @@ namespace Steam_Authenticator
                             var buffGiveOffers = new List<Offer>();
                             var ecoGiveOffers = new List<Offer>();
                             var youpinGiveOffers = new List<Offer>();
+                            var c5GiveOffers = new List<Offer>();
                             var otherGiveOffers = giveOffers.ToList();
 
                             #region 自定义报价
@@ -586,6 +593,33 @@ namespace Steam_Authenticator
                             }
                             #endregion
 
+                            #region C5报价
+                            c5OfferCount = 0;
+                            if (giveOffers.Any() && c5Client != null)
+                            {
+                                c5OfferCount = null;
+                                var c5Offer = c5Client.CheckOffers(giveOffers.Select(c => c.TradeOfferId)).Result;
+                                if (c5Offer.Body?.success ?? false)
+                                {
+                                    var c5OfferIds = c5Offer.Body.data ?? new List<string>();
+                                    c5GiveOffers = giveOffers.Where(c => c5OfferIds.Any(offerId => c.TradeOfferId == offerId)).ToList();
+
+                                    otherGiveOffers.RemoveAll(c => c5OfferIds.Contains(c.TradeOfferId));
+
+                                    c5OfferCount = receivedOffers.Count(c => c5OfferIds.Any(offerId => c.TradeOfferId == offerId));
+                                }
+                                else
+                                {
+                                    otherGiveOffers = new List<Offer>();
+                                }
+
+                                AppLogger.Instance.Debug("queryOffer", user.SteamId, $"###查询 C5Game 报价###" +
+                                   $"{Environment.NewLine}C5响应: httpStatusCode:{c5Offer.HttpStatusCode}, code:{c5Offer.Body?.errorCode}, msg:{c5Offer.Body?.errorMsg}" +
+                                   $"{Environment.NewLine}订单报价信息: [{string.Join(",", c5Offer.Body?.data?.Select(c => $"{c}") ?? new List<string>())}]" +
+                                   $"{Environment.NewLine}发货报价: [{string.Join(",", c5GiveOffers.Select(c => c.TradeOfferId))}]");
+                            }
+                            #endregion
+
                             List<Offer> autoAcceptOffers = new List<Offer>();
                             if (acceptAll)
                             {
@@ -610,6 +644,11 @@ namespace Steam_Authenticator
                             if (!acceptAll && accectYouPin)
                             {
                                 var acceptItemOffers = youpinGiveOffers.ToList();
+                                autoAcceptOffers.AddRange(acceptItemOffers);
+                            }
+                            if (!acceptAll && accectC5)
+                            {
+                                var acceptItemOffers = c5GiveOffers.ToList();
                                 autoAcceptOffers.AddRange(acceptItemOffers);
                             }
                             if (!acceptAll && accpetOther)
@@ -642,6 +681,10 @@ namespace Steam_Authenticator
                             {
                                 autoConfirmOffers.AddRange(youpinGiveOffers);
                             }
+                            if (!confirmAll && confirmC5)
+                            {
+                                autoConfirmOffers.AddRange(c5GiveOffers);
+                            }
                             if (!confirmAll && confirmOther)
                             {
                                 autoConfirmOffers.AddRange(otherGiveOffers);
@@ -654,6 +697,7 @@ namespace Steam_Authenticator
                                 $"{Environment.NewLine}BUFF发货报价: [{string.Join(",", buffGiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}ECO发货报价: [{string.Join(",", ecoGiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}悠悠发货报价: [{string.Join(",", youpinGiveOffers.Select(c => c.TradeOfferId))}]" +
+                                $"{Environment.NewLine}C5发货报价: [{string.Join(",", c5GiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}其他发货报价: [{string.Join(",", otherGiveOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}自动接受报价: [{string.Join(",", autoAcceptOffers.Select(c => c.TradeOfferId))}]" +
                                 $"{Environment.NewLine}自动确认报价: [{string.Join(",", autoConfirmOffers.Select(c => c.TradeOfferId))}]");
@@ -679,6 +723,7 @@ namespace Steam_Authenticator
                             buffUsersPanel.SetOffer(buffClient, buffOfferCount);
                             ecoUsersPanel.SetOffer(ecoClient, ecoOfferCount);
                             youpinUsersPanel.SetOffer(youpinClient, youpinOfferCount);
+                            c5UsersPanel.SetOffer(c5Client, c5OfferCount);
 
                             if (user.SteamId == currentClient?.User.SteamId)
                             {

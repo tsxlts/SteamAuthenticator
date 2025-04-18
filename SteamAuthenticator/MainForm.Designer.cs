@@ -35,6 +35,8 @@ namespace Steam_Authenticator
             importSecretAuthenticatorMenuItem = new ToolStripMenuItem();
             exportAuthenticatorMenuItem = new ToolStripMenuItem();
             removeAuthenticatorMenuItem = new ToolStripMenuItem();
+            其他工具ToolStripMenuItem = new ToolStripMenuItem();
+            transferAssetsMenuItem = new ToolStripMenuItem();
             contactUsMenuItem = new ToolStripMenuItem();
             submitRequirementsMenuItem = new ToolStripMenuItem();
             submitBugMenuItem = new ToolStripMenuItem();
@@ -83,8 +85,9 @@ namespace Steam_Authenticator
             pictureBox3 = new PictureBox();
             aboutLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
-            其他工具ToolStripMenuItem = new ToolStripMenuItem();
-            transferAssetsMenuItem = new ToolStripMenuItem();
+            tabPage1 = new TabPage();
+            c5UsersPanel = new C5UserCollectionPanel();
+            pictureBox9 = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -106,6 +109,9 @@ namespace Steam_Authenticator
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            tabPage1.SuspendLayout();
+            c5UsersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox9).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -169,21 +175,21 @@ namespace Steam_Authenticator
             // guardMenuItem
             // 
             guardMenuItem.Name = "guardMenuItem";
-            guardMenuItem.Size = new Size(180, 22);
+            guardMenuItem.Size = new Size(124, 22);
             guardMenuItem.Text = "令牌";
             guardMenuItem.Click += guardMenuItem_Click;
             // 
             // addAuthenticatorMenuItem
             // 
             addAuthenticatorMenuItem.Name = "addAuthenticatorMenuItem";
-            addAuthenticatorMenuItem.Size = new Size(180, 22);
+            addAuthenticatorMenuItem.Size = new Size(124, 22);
             addAuthenticatorMenuItem.Text = "添加令牌";
             addAuthenticatorMenuItem.Click += addAuthenticatorMenuItem_Click;
             // 
             // moveAuthenticatorMenuItem
             // 
             moveAuthenticatorMenuItem.Name = "moveAuthenticatorMenuItem";
-            moveAuthenticatorMenuItem.Size = new Size(180, 22);
+            moveAuthenticatorMenuItem.Size = new Size(124, 22);
             moveAuthenticatorMenuItem.Text = "移动令牌";
             moveAuthenticatorMenuItem.Click += moveAuthenticatorMenuItem_Click;
             // 
@@ -191,7 +197,7 @@ namespace Steam_Authenticator
             // 
             importAuthenticatorMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFileAuthenticatorMenuItem, importSecretAuthenticatorMenuItem });
             importAuthenticatorMenuItem.Name = "importAuthenticatorMenuItem";
-            importAuthenticatorMenuItem.Size = new Size(180, 22);
+            importAuthenticatorMenuItem.Size = new Size(124, 22);
             importAuthenticatorMenuItem.Text = "导入令牌";
             // 
             // importFileAuthenticatorMenuItem
@@ -211,16 +217,30 @@ namespace Steam_Authenticator
             // exportAuthenticatorMenuItem
             // 
             exportAuthenticatorMenuItem.Name = "exportAuthenticatorMenuItem";
-            exportAuthenticatorMenuItem.Size = new Size(180, 22);
+            exportAuthenticatorMenuItem.Size = new Size(124, 22);
             exportAuthenticatorMenuItem.Text = "导出令牌";
             exportAuthenticatorMenuItem.Click += exportAuthenticatorMenuItem_Click;
             // 
             // removeAuthenticatorMenuItem
             // 
             removeAuthenticatorMenuItem.Name = "removeAuthenticatorMenuItem";
-            removeAuthenticatorMenuItem.Size = new Size(180, 22);
+            removeAuthenticatorMenuItem.Size = new Size(124, 22);
             removeAuthenticatorMenuItem.Text = "解绑令牌";
             removeAuthenticatorMenuItem.Click += removeAuthenticatorMenuItem_Click;
+            // 
+            // 其他工具ToolStripMenuItem
+            // 
+            其他工具ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { transferAssetsMenuItem });
+            其他工具ToolStripMenuItem.Name = "其他工具ToolStripMenuItem";
+            其他工具ToolStripMenuItem.Size = new Size(68, 21);
+            其他工具ToolStripMenuItem.Text = "其他工具";
+            // 
+            // transferAssetsMenuItem
+            // 
+            transferAssetsMenuItem.Name = "transferAssetsMenuItem";
+            transferAssetsMenuItem.Size = new Size(124, 22);
+            transferAssetsMenuItem.Text = "库存转移";
+            transferAssetsMenuItem.Click += transferAssetsMenuItem_Click;
             // 
             // contactUsMenuItem
             // 
@@ -524,6 +544,7 @@ namespace Steam_Authenticator
             tabControl.Controls.Add(buffPage);
             tabControl.Controls.Add(ecoPage);
             tabControl.Controls.Add(youpinPage);
+            tabControl.Controls.Add(tabPage1);
             tabControl.Location = new Point(12, 144);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -765,19 +786,38 @@ namespace Steam_Authenticator
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 
-            // 其他工具ToolStripMenuItem
+            // tabPage1
             // 
-            其他工具ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { transferAssetsMenuItem });
-            其他工具ToolStripMenuItem.Name = "其他工具ToolStripMenuItem";
-            其他工具ToolStripMenuItem.Size = new Size(68, 21);
-            其他工具ToolStripMenuItem.Text = "其他工具";
+            tabPage1.Controls.Add(c5UsersPanel);
+            tabPage1.Location = new Point(4, 26);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(791, 304);
+            tabPage1.TabIndex = 4;
+            tabPage1.Text = "C5Game 帐号";
+            tabPage1.UseVisualStyleBackColor = true;
             // 
-            // transferAssetsMenuItem
+            // c5UsersPanel
             // 
-            transferAssetsMenuItem.Name = "transferAssetsMenuItem";
-            transferAssetsMenuItem.Size = new Size(180, 22);
-            transferAssetsMenuItem.Text = "库存转移";
-            transferAssetsMenuItem.Click += transferAssetsMenuItem_Click;
+            c5UsersPanel.AutoScroll = true;
+            c5UsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            c5UsersPanel.Controls.Add(pictureBox9);
+            c5UsersPanel.Dock = DockStyle.Fill;
+            c5UsersPanel.Location = new Point(3, 3);
+            c5UsersPanel.Name = "c5UsersPanel";
+            c5UsersPanel.Size = new Size(785, 298);
+            c5UsersPanel.TabIndex = 10;
+            // 
+            // pictureBox9
+            // 
+            pictureBox9.Anchor = AnchorStyles.None;
+            pictureBox9.Image = Properties.Resources.loading;
+            pictureBox9.Location = new Point(340, 87);
+            pictureBox9.Name = "pictureBox9";
+            pictureBox9.Size = new Size(100, 100);
+            pictureBox9.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox9.TabIndex = 0;
+            pictureBox9.TabStop = false;
             // 
             // MainForm
             // 
@@ -823,6 +863,9 @@ namespace Steam_Authenticator
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            tabPage1.ResumeLayout(false);
+            c5UsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox9).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -895,5 +938,8 @@ namespace Steam_Authenticator
         private PictureBox pictureBox8;
         private ToolStripMenuItem 其他工具ToolStripMenuItem;
         private ToolStripMenuItem transferAssetsMenuItem;
+        private TabPage tabPage1;
+        private C5UserCollectionPanel c5UsersPanel;
+        private PictureBox pictureBox9;
     }
 }
