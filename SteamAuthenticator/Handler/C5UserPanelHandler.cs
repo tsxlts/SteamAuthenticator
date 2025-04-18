@@ -44,7 +44,7 @@ namespace Steam_Authenticator.Handler
                 panel.Offer.Hide();
             }
 
-            var tasks = Appsetting.Instance.YouPinClients.Select(c => c.LoginAsync());
+            var tasks = Appsetting.Instance.C5Clients.Select(c => c.LoginAsync());
             await Task.WhenAll(tasks);
 
             return panels;
