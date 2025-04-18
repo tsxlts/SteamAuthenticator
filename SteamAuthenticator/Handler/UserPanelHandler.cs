@@ -126,7 +126,7 @@ namespace Steam_Authenticator.Handler
             return client.LogoutAsync();
         }
 
-        private (TItemPanel Panel, TClient Client) GetClient(ToolStripMenuItem menuItem)
+        protected (TItemPanel Panel, TClient Client) GetClient(ToolStripMenuItem menuItem)
         {
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
 

@@ -89,7 +89,16 @@ namespace Steam_Authenticator.Handler
         {
             C5UserPanel panel = UsersPanel.AddItemPanel(true, client);
 
-            panel.ItemIcon.ContextMenuStrip = UserMenu;
+            var userMenu = new ContextMenuStrip();
+            userMenu.Items.AddRange(UserMenu.Items.OfType<ToolStripItem>().Where(c => c.Text != "退出登录").ToArray());
+            userMenu.Items.Add("设置").Click += (sender, e) =>
+            {
+                var client = GetClient(sender as ToolStripMenuItem);
+                var setting = new C5GameSetting(client.Client.User);
+                setting.ShowDialog();
+            };
+
+            panel.ItemIcon.ContextMenuStrip = userMenu;
 
             panel.Client
                 .WithStartLogin(() =>
@@ -153,7 +162,7 @@ namespace Steam_Authenticator.Handler
         {
             try
             {
-                var clients = Appsetting.Instance.C5Clients.ToList();
+                var clients = Appsetting.Instance.C5Clients.Where(c => c.User.Setting?.AutoSendOffer ?? false).ToList();
 
                 TaskFactory taskFactory = new TaskFactory();
                 List<Task> tasks = new List<Task>();
