@@ -150,13 +150,34 @@ namespace Steam_Authenticator.Forms
                 using (new Loading(defaultInventory))
                 {
                     SteamId.Text = client.Client.SteamId;
-                    UserName.Text = client.GetAccount();
+                    UserName.Text = $"{client.GetAccount()} （{client.User.NickName}）";
 
                     var contextsResponse = await SteamApi.GetAppInventoryContextsAsync(client.Client.SteamId, client.Client.WebCookie);
                     var contexts = contextsResponse.Body;
+                    inventoryPages.TabPages.Clear();
                     if (!contexts.Any())
                     {
-                        defaultApp.Controls.Clear();
+                        var tab = new TabPage
+                        {
+                            Text = "Steam",
+                        };
+                        var inventoryPanel = new InventoryCollectionPanel(new AppInventoryContextsResponse { AppId = "753", Name = "Steam" })
+                        {
+                            Name = "inventoryPanel",
+                            TabIndex = 100,
+                            AutoScroll = true,
+                            Dock = DockStyle.Fill,
+                            Location = new Point(3, 3),
+                            BackColor = Color.White,
+                            ContextMenuStrip = inventoryPanelContextMenuStrip
+                        };
+                        inventoryPanel.SizeChanged += (sender, args) =>
+                        {
+                            inventoryPanel.Reset();
+                        };
+
+                        tab.Controls.Add(inventoryPanel);
+                        inventoryPages.TabPages.Add(tab);
                         return;
                     }
 

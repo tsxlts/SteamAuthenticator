@@ -992,7 +992,7 @@ namespace Steam_Authenticator
             }
 
             Confirmations confirmation = new Confirmations(this, currentClient);
-            confirmation.Show();
+            confirmation.ShowDialog();
         }
 
         private void offersBtn_Click(object sender, EventArgs e)
@@ -1007,7 +1007,7 @@ namespace Steam_Authenticator
                 }
 
                 Offers offersForm = new Offers(this, currentClient);
-                offersForm.Show();
+                offersForm.ShowDialog();
             }
             catch (Exception ex)
             {

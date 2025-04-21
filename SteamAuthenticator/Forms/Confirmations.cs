@@ -23,15 +23,13 @@ namespace Steam_Authenticator.Forms
             this.client = client;
             this.webClient = client.Client;
 
-            Width = this.mainForm.Width;
-            Height = this.mainForm.Height;
+            Width = this.mainForm.Width - 30;
+            Height = this.mainForm.Height - 60;
+            Location = new Point(this.mainForm.Location.X + 15, this.mainForm.Location.Y + 30);
         }
 
         private async void Confirmations_Load(object sender, EventArgs e)
         {
-            Location = this.mainForm.Location;
-            mainForm.Hide();
-
             if (!webClient.LoggedIn)
             {
                 return;
@@ -42,12 +40,6 @@ namespace Steam_Authenticator.Forms
             await RefreshConfirmations(false, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token);
 
             confirmationsPanel.AutoScroll = true;
-        }
-
-        private void Confirmations_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            mainForm.Location = this.Location;
-            mainForm.Show();
         }
 
         private async void refreshBtn_Click(object sender, EventArgs e)

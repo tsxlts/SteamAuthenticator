@@ -28,19 +28,27 @@ namespace Steam_Authenticator.Handler
             }, UsersPanel, -1, -1);
 
             UserMenu = new ContextMenuStrip();
-            UserMenu.Items.Add("重新登录").Click += async (sender, e) =>
+            var relogin = UserMenu.Items.Add("重新登录");
+            relogin.Name = "relogin";
+            relogin.Click += async (sender, e) =>
             {
                 (TItemPanel panel, TClient client) = GetClient(sender as ToolStripMenuItem);
                 await ReloginInternal(panel, client);
             };
-            UserMenu.Items.Add("退出登录").Click += async (sender, e) =>
+
+            var logout = UserMenu.Items.Add("退出登录");
+            logout.Name = "logout";
+            logout.Click += async (sender, e) =>
             {
                 (TItemPanel panel, TClient client) = GetClient(sender as ToolStripMenuItem);
                 await LogoutInternal(panel, client);
 
                 refreshUserTimer.Change(TimeSpan.FromSeconds(0), RefreshUserInterval);
             };
-            UserMenu.Items.Add("移除帐号").Click += async (sender, e) =>
+
+            var removeUser = UserMenu.Items.Add("移除帐号");
+            removeUser.Name = "removeUser";
+            removeUser.Click += async (sender, e) =>
             {
                 (TItemPanel panel, TClient client) = GetClient(sender as ToolStripMenuItem);
                 await RemoveUserInternal(panel, client);

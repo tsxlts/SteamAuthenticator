@@ -108,7 +108,6 @@
             Name = "Confirmations";
             StartPosition = FormStartPosition.CenterParent;
             Text = "令牌确认";
-            FormClosed += Confirmations_FormClosed;
             Load += Confirmations_Load;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();

@@ -161,6 +161,12 @@ namespace Steam_Authenticator.Controls
                 return $"1分";
             }
 
+            if (!asset.Description.Tradable)
+            {
+                color = Color.Red;
+                return "不可交易";
+            }
+
             color = Color.Green;
             return "可交易";
         }

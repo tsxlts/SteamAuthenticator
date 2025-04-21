@@ -216,6 +216,13 @@ namespace Steam_Authenticator.Model
         public string Avatar { get; set; }
 
         public string Nickname { get; set; }
+
+        public EcoUserSetting Setting { get; set; } = new EcoUserSetting();
+    }
+
+    public class EcoUserSetting
+    {
+        public bool AutoSendOffer { get; set; } = false;
     }
 
     public class YouPinUser : JsonStreamSerializer

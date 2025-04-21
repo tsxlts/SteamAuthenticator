@@ -90,7 +90,8 @@ namespace Steam_Authenticator.Handler
             C5UserPanel panel = UsersPanel.AddItemPanel(true, client);
 
             var userMenu = new ContextMenuStrip();
-            userMenu.Items.AddRange(UserMenu.Items.OfType<ToolStripItem>().Where(c => c.Text != "退出登录").ToArray());
+            userMenu.Items.AddRange(UserMenu.Items.OfType<ToolStripItem>().ToArray());
+            userMenu.Items.RemoveByKey("logout");
             userMenu.Items.Add("设置").Click += (sender, e) =>
             {
                 var client = GetClient(sender as ToolStripMenuItem);
