@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label2.Text" xml:space="preserve">
+    <value>
+一、开启自动接受报价、自动令牌确认
+    1、在 文件-&gt;全局设置 菜单下 开启 全局自动刷新报价/确认信息 开关；
+    2、在 Steam帐号右键菜单-&gt;设置 菜单下 开启 自动刷新报价/确认信息 开关，同时开启 需要自动发货平台的 自动接受报价 和 自动令牌确认 开关。
+
+    开启以上开关后，由对方（买家）向你发起的报价，将会自动接受并令牌确认，完成自动发货；
+    如果是需要你（卖家）发送报价的情况（例如C5Game平台的订单、部分ECO平台的订单），还需进行以下设置。
+
+二、开启自动发送报价功能
+    1、ECO平台订单自动发送报价：开启ECO平台订单自动发送报价功能，在 ECO帐号右键菜单-&gt;设置 菜单下 开启 自动发送报价 开关；
+    2、C5Game平台订单自动发送报价：开启C5Game平台订单自动发送报价功能，在 C5Game帐号右键菜单-&gt;设置 菜单下 开启 自动发送报价 开关；
+    3、BUFF平台订单暂不支持自动发送报价功能，但你可以打开BUFF网页版的个人设置页面，并勾上偏好设置中的 出售限定买家先发报价；
+    4、悠悠有品平台订单暂不支持自动发送报价功能，如果是卖家发送报价的订单需要你先手动发送报价，然后才能帮你自动令牌确认，完成自动发货。</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

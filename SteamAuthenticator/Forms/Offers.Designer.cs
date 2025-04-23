@@ -141,7 +141,6 @@
             Name = "Offers";
             StartPosition = FormStartPosition.CenterParent;
             Text = "报价";
-            FormClosed += Offers_FormClosed;
             Load += Offers_Load;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();

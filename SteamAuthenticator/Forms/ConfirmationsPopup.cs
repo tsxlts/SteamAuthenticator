@@ -96,7 +96,8 @@ namespace Steam_Authenticator.Forms
             Confirmations confirmation = new Confirmations(this, client)
             {
                 Width = 600,
-                Height = 400
+                Height = 400,
+                StartPosition = FormStartPosition.CenterParent
             };
             confirmation.ShowDialog();
         }

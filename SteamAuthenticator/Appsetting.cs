@@ -504,6 +504,11 @@ namespace Steam_Authenticator
         {
             return await EcoApi.QueryOffers(this, gameId, cancellationToken);
         }
+
+        public async Task<EcoResponse<object>> ResolveOffers(IEnumerable<string> orderIds, CancellationToken cancellationToken = default)
+        {
+            return await EcoApi.ResolveOffers(this, orderIds.ToList(), cancellationToken);
+        }
     }
 
     public class YouPinClient : BaseUserClient
