@@ -41,6 +41,8 @@ namespace Steam_Authenticator
             submitRequirementsMenuItem = new ToolStripMenuItem();
             submitBugMenuItem = new ToolStripMenuItem();
             aboutMenuItem = new ToolStripMenuItem();
+            helpMenuItem = new ToolStripMenuItem();
+            autoDeliverMenuItem = new ToolStripMenuItem();
             UserImg = new PictureBox();
             UserName = new Label();
             Balance = new Label();
@@ -74,6 +76,9 @@ namespace Steam_Authenticator
             youpinPage = new TabPage();
             youpinUsersPanel = new YouPinUserCollectionPanel();
             pictureBox8 = new PictureBox();
+            tabPage1 = new TabPage();
+            c5UsersPanel = new C5UserCollectionPanel();
+            pictureBox9 = new PictureBox();
             statusPanel = new Panel();
             label11 = new Label();
             pictureBox7 = new PictureBox();
@@ -85,9 +90,6 @@ namespace Steam_Authenticator
             pictureBox3 = new PictureBox();
             aboutLabel = new LinkLabel();
             mainNotifyIcon = new NotifyIcon(components);
-            tabPage1 = new TabPage();
-            c5UsersPanel = new C5UserCollectionPanel();
-            pictureBox9 = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)UserImg).BeginInit();
             panel1.SuspendLayout();
@@ -104,19 +106,19 @@ namespace Steam_Authenticator
             youpinPage.SuspendLayout();
             youpinUsersPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox8).BeginInit();
+            tabPage1.SuspendLayout();
+            c5UsersPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox9).BeginInit();
             statusPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            tabPage1.SuspendLayout();
-            c5UsersPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox9).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, 其他工具ToolStripMenuItem, contactUsMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { UserToolStripMenuItem, authenticatorMenuItem, 其他工具ToolStripMenuItem, contactUsMenuItem, helpMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(819, 25);
@@ -252,23 +254,37 @@ namespace Steam_Authenticator
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(124, 22);
+            submitRequirementsMenuItem.Size = new Size(180, 22);
             submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // submitBugMenuItem
             // 
             submitBugMenuItem.Name = "submitBugMenuItem";
-            submitBugMenuItem.Size = new Size(124, 22);
+            submitBugMenuItem.Size = new Size(180, 22);
             submitBugMenuItem.Text = "问题反馈";
             submitBugMenuItem.Click += submitBugMenuItem_Click;
             // 
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new Size(124, 22);
+            aboutMenuItem.Size = new Size(180, 22);
             aboutMenuItem.Text = "关于我们";
             aboutMenuItem.Click += aboutMenuItem_Click;
+            // 
+            // helpMenuItem
+            // 
+            helpMenuItem.DropDownItems.AddRange(new ToolStripItem[] { autoDeliverMenuItem });
+            helpMenuItem.Name = "helpMenuItem";
+            helpMenuItem.Size = new Size(44, 21);
+            helpMenuItem.Text = "帮助";
+            // 
+            // autoDeliverMenuItem
+            // 
+            autoDeliverMenuItem.Name = "autoDeliverMenuItem";
+            autoDeliverMenuItem.Size = new Size(148, 22);
+            autoDeliverMenuItem.Text = "自动发货配置";
+            autoDeliverMenuItem.Click += autoDeliverMenuItem_Click;
             // 
             // UserImg
             // 
@@ -661,6 +677,39 @@ namespace Steam_Authenticator
             pictureBox8.TabIndex = 0;
             pictureBox8.TabStop = false;
             // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(c5UsersPanel);
+            tabPage1.Location = new Point(4, 26);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(791, 304);
+            tabPage1.TabIndex = 4;
+            tabPage1.Text = "C5Game 帐号";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // c5UsersPanel
+            // 
+            c5UsersPanel.AutoScroll = true;
+            c5UsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
+            c5UsersPanel.Controls.Add(pictureBox9);
+            c5UsersPanel.Dock = DockStyle.Fill;
+            c5UsersPanel.Location = new Point(3, 3);
+            c5UsersPanel.Name = "c5UsersPanel";
+            c5UsersPanel.Size = new Size(785, 298);
+            c5UsersPanel.TabIndex = 10;
+            // 
+            // pictureBox9
+            // 
+            pictureBox9.Anchor = AnchorStyles.None;
+            pictureBox9.Image = Properties.Resources.loading;
+            pictureBox9.Location = new Point(340, 87);
+            pictureBox9.Name = "pictureBox9";
+            pictureBox9.Size = new Size(100, 100);
+            pictureBox9.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox9.TabIndex = 0;
+            pictureBox9.TabStop = false;
+            // 
             // statusPanel
             // 
             statusPanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -786,39 +835,6 @@ namespace Steam_Authenticator
             mainNotifyIcon.Visible = true;
             mainNotifyIcon.MouseDoubleClick += mainNotifyIcon_MouseDoubleClick;
             // 
-            // tabPage1
-            // 
-            tabPage1.Controls.Add(c5UsersPanel);
-            tabPage1.Location = new Point(4, 26);
-            tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(791, 304);
-            tabPage1.TabIndex = 4;
-            tabPage1.Text = "C5Game 帐号";
-            tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // c5UsersPanel
-            // 
-            c5UsersPanel.AutoScroll = true;
-            c5UsersPanel.BackgroundImageLayout = ImageLayout.Zoom;
-            c5UsersPanel.Controls.Add(pictureBox9);
-            c5UsersPanel.Dock = DockStyle.Fill;
-            c5UsersPanel.Location = new Point(3, 3);
-            c5UsersPanel.Name = "c5UsersPanel";
-            c5UsersPanel.Size = new Size(785, 298);
-            c5UsersPanel.TabIndex = 10;
-            // 
-            // pictureBox9
-            // 
-            pictureBox9.Anchor = AnchorStyles.None;
-            pictureBox9.Image = Properties.Resources.loading;
-            pictureBox9.Location = new Point(340, 87);
-            pictureBox9.Name = "pictureBox9";
-            pictureBox9.Size = new Size(100, 100);
-            pictureBox9.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox9.TabIndex = 0;
-            pictureBox9.TabStop = false;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -857,15 +873,15 @@ namespace Steam_Authenticator
             youpinPage.ResumeLayout(false);
             youpinUsersPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox8).EndInit();
+            tabPage1.ResumeLayout(false);
+            c5UsersPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox9).EndInit();
             statusPanel.ResumeLayout(false);
             statusPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            tabPage1.ResumeLayout(false);
-            c5UsersPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox9).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -941,5 +957,7 @@ namespace Steam_Authenticator
         private TabPage tabPage1;
         private C5UserCollectionPanel c5UsersPanel;
         private PictureBox pictureBox9;
+        private ToolStripMenuItem helpMenuItem;
+        private ToolStripMenuItem autoDeliverMenuItem;
     }
 }

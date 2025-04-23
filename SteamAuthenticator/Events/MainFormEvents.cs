@@ -998,6 +998,11 @@ namespace Steam_Authenticator
             transferAssets.ShowDialog();
         }
 
+        private void autoDeliverMenuItem_Click(object sender, EventArgs e)
+        {
+            new AutoDeliverSetting().Show();
+        }
+
         private void confirmationBtn_Click(object sender, EventArgs e)
         {
             var webClient = currentClient?.Client;
