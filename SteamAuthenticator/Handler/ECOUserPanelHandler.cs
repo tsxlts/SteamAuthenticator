@@ -171,7 +171,7 @@ namespace Steam_Authenticator.Handler
                         try
                         {
                             var queryOrders = client.QueryOffers("730").GetAwaiter().GetResult();
-                            var orders = queryOrders?.StatusData?.ResultData?.Where(c => c.State == 1)?.ToList() ?? new List<QueryOffersResponse>();
+                            var orders = queryOrders?.StatusData?.ResultData?.Where(c => c.IsSeller && c.State == 1)?.ToList() ?? new List<QueryOffersResponse>();
                             AppLogger.Instance.Debug(client.User.UserId, "ECO-queryOrder", $"###查询 ECO 订单###" +
                                 $"{Environment.NewLine}ECO响应: code:{queryOrders?.StatusData?.ResultCode}, msg:{queryOrders?.StatusData?.ResultMsg}" +
                                 $"{Environment.NewLine}发货订单信息: [{string.Join(",", orders.Select(c => $"{c.OrderNum}") ?? new List<string>())}]");

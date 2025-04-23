@@ -102,7 +102,7 @@ namespace Steam_Authenticator.Forms
                     Title = "导出令牌",
                     Filter = "SA文件 (*.saEntry)|*.saEntry",
                     DefaultExt = ".saEntry",
-                    FileName = $"{guards[0].AccountName}.saEntry",
+                    FileName = $"SA_{DateTime.Now:yyyyMMdd.HHmm}.saEntry",
                     InitialDirectory = Appsetting.Instance.AppSetting.Entry.InitialDirectory ?? AppContext.BaseDirectory,
                     CheckPathExists = true
                 };

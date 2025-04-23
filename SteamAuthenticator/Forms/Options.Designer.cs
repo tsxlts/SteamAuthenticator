@@ -32,13 +32,13 @@
             msg = new Label();
             panel2 = new Panel();
             okBtn = new Button();
-            panel0 = new GroupBox();
+            form = new GroupBox();
             dataPanel = new Panel();
             panel1 = new Panel();
             reverseSelectBtn = new Label();
             selectAllBtn = new Label();
             panel2.SuspendLayout();
-            panel0.SuspendLayout();
+            form.SuspendLayout();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -72,17 +72,17 @@
             okBtn.UseVisualStyleBackColor = true;
             okBtn.Click += okBtn_Click;
             // 
-            // panel0
+            // form
             // 
-            panel0.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panel0.Controls.Add(dataPanel);
-            panel0.Controls.Add(panel1);
-            panel0.Location = new Point(12, 50);
-            panel0.Name = "panel0";
-            panel0.Size = new Size(371, 212);
-            panel0.TabIndex = 11;
-            panel0.TabStop = false;
-            panel0.Text = "请在下方选择";
+            form.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            form.Controls.Add(dataPanel);
+            form.Controls.Add(panel1);
+            form.Location = new Point(12, 50);
+            form.Name = "form";
+            form.Size = new Size(371, 212);
+            form.TabIndex = 11;
+            form.TabStop = false;
+            form.Text = "请在下方选择";
             // 
             // dataPanel
             // 
@@ -133,7 +133,7 @@
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(395, 304);
-            Controls.Add(panel0);
+            Controls.Add(form);
             Controls.Add(panel2);
             Controls.Add(msg);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -145,7 +145,7 @@
             Text = "选择";
             Load += Options_Load;
             panel2.ResumeLayout(false);
-            panel0.ResumeLayout(false);
+            form.ResumeLayout(false);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -155,7 +155,7 @@
         private Label msg;
         private Panel panel2;
         private Button okBtn;
-        private GroupBox panel0;
+        private GroupBox form;
         private Panel dataPanel;
         private Panel panel1;
         private Label selectAllBtn;

@@ -16,5 +16,15 @@
         /// 令牌确认=3
         /// </summary>
         public int State { get; set; }
+
+        /// <summary>
+        /// 是否卖家
+        /// </summary>
+        public bool IsSeller { get; set; }
+
+        /// <summary>
+        /// 是否买家
+        /// </summary>
+        public bool IsBuyer { get; set; }
     }
 }

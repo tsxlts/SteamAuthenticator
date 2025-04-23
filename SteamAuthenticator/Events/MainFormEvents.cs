@@ -743,6 +743,7 @@ namespace Steam_Authenticator
                             stream.Read(salt);
                         }
 
+                        List<Guard> guards = new List<Guard>();
                         while (stream.Position != stream.Length)
                         {
                             dataBuffer = new byte[stream.ReadInt32()];
@@ -754,8 +755,30 @@ namespace Steam_Authenticator
 
                             Guard guard = new Guard();
                             guard.Deserialize(new MemoryStream(dataBuffer));
-                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
+                            guards.Add(guard);
+                        }
 
+                        var options = new Options("选择令牌", $"请选择你需要导入的令牌")
+                        {
+                            Width = 650,
+                            Height = 400,
+                            ItemSize = new Size(100, 20),
+                            Multiselect = true,
+                            Datas = guards.Select(c => new SelectOption { Text = c.AccountName, Value = c.AccountName, Checked = false }).OrderBy(c => c.Text).ToList(),
+                        };
+                        if (options.ShowDialog() != DialogResult.OK || options.Selected.Count == 0)
+                        {
+                            return;
+                        }
+
+                        foreach (var guard in guards)
+                        {
+                            if (!options.Selected.Any(c => c.Value == guard.AccountName))
+                            {
+                                continue;
+                            }
+
+                            Appsetting.Instance.Manifest.AddGuard(guard.AccountName, guard);
                             success.Add(guard.AccountName);
                         }
                     }
@@ -809,7 +832,7 @@ namespace Steam_Authenticator
 
                 MessageBox.Show($"令牌导入结果" +
                     $"{Environment.NewLine}" +
-                    $"成功导入令牌 {success.Count} 个", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    $"成功导入 {success.Count} 个令牌", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
