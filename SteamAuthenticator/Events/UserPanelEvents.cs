@@ -120,7 +120,11 @@ namespace Steam_Authenticator
             SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
             UserClient userClient = panel.Client;
 
-            var accountInfo = new AccountInfo(userClient);
+            var accountInfo = new AccountInfo(userClient)
+            {
+                Width = 800,
+                Height = 500
+            };
             accountInfo.ShowDialog();
         }
 

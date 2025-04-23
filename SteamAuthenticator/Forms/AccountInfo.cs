@@ -68,6 +68,7 @@ namespace Steam_Authenticator.Forms
                 emailBox.Text = "";
                 phoneBox.Text = "";
                 guardStatusBox.Text = "";
+                guardTimeBox.Text = "";
                 tradeLinkBox.Text = "";
                 apikeyBox.Text = "";
                 tradeStatusBox.Text = "";
@@ -118,6 +119,7 @@ namespace Steam_Authenticator.Forms
                             break;
                         case SteamEnum.SteamGuardScheme.Device:
                             guardStatusBox.Text = $"手机验证器 ({result.DeviceId})";
+                            guardTimeBox.Text = $"{DateTime.UnixEpoch.AddSeconds(Math.Max(result.TimeCreated, result.TimeTransferred)).ToLocalTime():yyyy-MM-dd HH:mm:ss}";
                             break;
                     }
                 });
