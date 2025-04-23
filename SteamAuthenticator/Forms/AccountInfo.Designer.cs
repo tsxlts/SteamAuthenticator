@@ -66,6 +66,8 @@
             phoneBox = new Label();
             label13 = new Label();
             label2 = new Label();
+            guardTimeBox = new Label();
+            label15 = new Label();
             ((System.ComponentModel.ISupportInitialize)tradeLinkLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)apikeyLoading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tradeStatusLoading).BeginInit();
@@ -297,7 +299,7 @@
             guardStatusBox.ImageAlign = ContentAlignment.MiddleLeft;
             guardStatusBox.Location = new Point(107, 157);
             guardStatusBox.Name = "guardStatusBox";
-            guardStatusBox.Size = new Size(351, 16);
+            guardStatusBox.Size = new Size(126, 16);
             guardStatusBox.TabIndex = 32;
             guardStatusBox.Text = "**********";
             guardStatusBox.TextAlign = ContentAlignment.MiddleLeft;
@@ -520,11 +522,36 @@
             label2.Text = "邮箱：";
             label2.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // guardTimeBox
+            // 
+            guardTimeBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            guardTimeBox.AutoEllipsis = true;
+            guardTimeBox.ImageAlign = ContentAlignment.MiddleLeft;
+            guardTimeBox.Location = new Point(321, 157);
+            guardTimeBox.Name = "guardTimeBox";
+            guardTimeBox.Size = new Size(137, 16);
+            guardTimeBox.TabIndex = 50;
+            guardTimeBox.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label15
+            // 
+            label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label15.ForeColor = SystemColors.ControlText;
+            label15.ImageAlign = ContentAlignment.MiddleLeft;
+            label15.Location = new Point(239, 153);
+            label15.Name = "label15";
+            label15.Size = new Size(76, 23);
+            label15.TabIndex = 49;
+            label15.Text = "绑定时间：";
+            label15.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // AccountInfo
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(520, 338);
+            Controls.Add(guardTimeBox);
+            Controls.Add(label15);
             Controls.Add(label2);
             Controls.Add(label13);
             Controls.Add(phoneBox);
@@ -617,5 +644,7 @@
         private Label phoneBox;
         private Label label13;
         private Label label2;
+        private Label guardTimeBox;
+        private Label label15;
     }
 }
