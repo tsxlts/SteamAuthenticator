@@ -77,6 +77,7 @@ namespace Steam_Authenticator.Handler
             YouPinUserPanel panel = UsersPanel.AddItemPanel(true, client);
 
             panel.ItemIcon.ContextMenuStrip = UserMenu;
+            panel.ItemIcon.MouseClick += user_MouseClick;
 
             panel.Client
                 .WithStartLogin(() =>
@@ -116,6 +117,24 @@ namespace Steam_Authenticator.Handler
             Appsetting.Instance.YouPinClients.Add(client);
 
             return AddUserPanel(client);
+        }
+
+        private async void user_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            var control = sender as Control;
+            var userPanel = control.Parent as YouPinUserPanel;
+            var userClient = userPanel.Client;
+            if (userClient.LoggedIn)
+            {
+                return;
+            }
+
+            await ReloginInternal(userPanel, userClient);
         }
     }
 }

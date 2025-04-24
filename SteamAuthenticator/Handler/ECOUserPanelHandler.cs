@@ -99,6 +99,8 @@ namespace Steam_Authenticator.Handler
             var steamUserResponse = await EcoApi.QuerySteamUserAsync(authResponse.Token);
             var steamUserData = steamUserResponse?.StatusData?.ResultData;
 
+            var localUser = Appsetting.Instance.Manifest.GetEcoUser(authResponse.UserId);
+
             var user = new EcoUser
             {
                 UserId = authResponse.UserId,
@@ -106,6 +108,8 @@ namespace Steam_Authenticator.Handler
                 Avatar = authResponse.Avatar ?? "",
                 SteamIds = steamUserData?.Select(c => c.SteamId).ToList() ?? new List<string>(),
                 ClientId = authResponse.ClientId,
+
+                Setting = localUser?.Setting ?? new EcoUserSetting(),
 
                 RefreshToken = authResponse.RefreshToken,
                 RefreshTokenExpireTime = authResponse.RefreshTokenExpireDate
@@ -136,6 +140,7 @@ namespace Steam_Authenticator.Handler
             };
 
             panel.ItemIcon.ContextMenuStrip = userMenu;
+            panel.ItemIcon.MouseClick += user_MouseClick;
 
             panel.Client
                 .WithStartLogin(() =>
@@ -206,6 +211,24 @@ namespace Steam_Authenticator.Handler
             {
                 autoDeliverTimer?.Change(autoDeliverTimerMinPeriod, autoDeliverTimerMinPeriod * 3);
             }
+        }
+
+        private async void user_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            var control = sender as Control;
+            var userPanel = control.Parent as EcoUserPanel;
+            var userClient = userPanel.Client;
+            if (userClient.LoggedIn)
+            {
+                return;
+            }
+
+            await ReloginInternal(userPanel, userClient);
         }
     }
 }
