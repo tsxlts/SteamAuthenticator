@@ -19,10 +19,10 @@ namespace Steam_Authenticator
 
         private async void addUserBtn_Click(object sender, EventArgs e)
         {
-            await Login(false, null);
+            await Login(null);
         }
 
-        private async void btnUser_Click(object sender, MouseEventArgs e)
+        private void btnUser_Click(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
             {
@@ -33,7 +33,7 @@ namespace Steam_Authenticator
             SteamUserPanel panel = control.Parent as SteamUserPanel;
             UserClient userClient = panel.Client;
 
-            await SwitchUser(userClient);
+            SetCurrentClient(userClient);
         }
 
         private void copyCookieMenuItem_Click(object sender, EventArgs e)
@@ -89,7 +89,7 @@ namespace Steam_Authenticator
             Utils.CopyText(refreshToken);
         }
 
-        private async void setCurrentClientMenuItem_Click(object sender, EventArgs e)
+        private void setCurrentClientMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
             ContextMenuStrip menuStrip = (ContextMenuStrip)menuItem.GetCurrentParent();
@@ -97,7 +97,7 @@ namespace Steam_Authenticator
             SteamUserPanel panel = menuStrip.SourceControl.Parent as SteamUserPanel;
             UserClient userClient = panel.Client;
 
-            await SwitchUser(userClient);
+            SetCurrentClient(userClient);
         }
 
         private void settingMenuItem_Click(object sender, EventArgs e)
@@ -157,7 +157,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            await Login(false, userClient.GetAccount());
+            await Login(userClient.GetAccount());
         }
 
         private async void logoutMenuItem_Click(object sender, EventArgs e)
@@ -190,7 +190,7 @@ namespace Steam_Authenticator
 
             if (userClient.User.SteamId == currentClient?.User?.SteamId)
             {
-                SetCurrentClient(Appsetting.Instance.Clients.FirstOrDefault() ?? userClient, true);
+                SetCurrentClient(Appsetting.Instance.Clients.FirstOrDefault());
             }
         }
 
@@ -279,121 +279,84 @@ namespace Steam_Authenticator
             }
         }
 
-        private async Task<UserClient> Login(bool relogin, string account)
+        private async Task<UserClient> Login(string defaultAccount)
         {
-            if (relogin)
+            Login login = new Login(defaultAccount);
+            if (login.ShowDialog() != DialogResult.OK || !(login.Client?.LoggedIn ?? false))
             {
-                if (MessageBox.Show($"帐号 {account} 已掉线，是否请重新登录", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                {
-                    return null;
-                }
+                return null;
             }
 
-            Login login = new Login(account);
-            if (login.ShowDialog() == DialogResult.OK && (login.Client?.LoggedIn ?? false))
+            var client = login.Client;
+            client.SetLanguage(Language.Schinese);
+
+            var account = await client.GetAccountNameAsync();
+
+            var players = await SteamApi.QueryPlayerSummariesAsync(null, client.WebApiToken, new[] { client.SteamId });
+            var player = players.Body?.Players?.FirstOrDefault();
+
+            var localUser = Appsetting.Instance.Manifest.GetSteamUser(client.SteamId);
+
+            var user = new User
             {
-                var userClient = await SaveUser(login.Client);
-                var user = userClient.User;
+                Account = !string.IsNullOrWhiteSpace(account) ? account : localUser?.Account,
 
-                if (Appsetting.Instance.Clients.Count == 1)
-                {
-                    SetCurrentClient(Appsetting.Instance.Clients[0]);
-                }
+                SteamId = client.SteamId,
+                RefreshToken = client.RefreshToken,
 
-                AddUserPanel(userClient);
+                NickName = player?.SteamName ?? localUser?.NickName ?? client.SteamId,
+                Avatar = player?.AvatarFull ?? localUser?.Avatar ?? "",
 
-                return userClient;
-            }
+                Setting = localUser?.Setting ?? new Model.UserSetting()
+            };
+            UserClient userClient = new UserClient(user, client, true);
 
-            return null;
-        }
+            Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
+            Appsetting.Instance.Clients.RemoveAll(c => c.User.SteamId == user.SteamId);
+            Appsetting.Instance.Clients.Add(userClient);
 
-        private async Task<UserClient> SaveUser(SteamCommunityClient client)
-        {
-            if (client?.LoggedIn ?? false)
+            AddUserPanel(userClient);
+
+            if (Appsetting.Instance.Clients.Count == 1 || currentClient.User.SteamId == userClient.User.SteamId)
             {
-                var localUser = Appsetting.Instance.Manifest.GetSteamUser(client.SteamId);
-
-                client.SetLanguage(Language.Schinese);
-
-                var players = await SteamApi.QueryPlayerSummariesAsync(null, client.WebApiToken, new[] { client.SteamId });
-                var player = players.Body?.Players?.FirstOrDefault();
-
-                string account = await client.GetAccountNameAsync();
-                var user = new User
-                {
-                    Account = !string.IsNullOrWhiteSpace(account) ? account : localUser?.Account,
-
-                    SteamId = client.SteamId,
-                    RefreshToken = client.RefreshToken,
-
-                    NickName = player?.SteamName ?? localUser?.NickName ?? client.SteamId,
-                    Avatar = player?.AvatarFull ?? localUser?.Avatar ?? "",
-
-                    Setting = localUser?.Setting ?? new Model.UserSetting()
-                };
-
-                UserClient userClient = new UserClient(user, client, true);
-
-                Appsetting.Instance.Manifest.SaveSteamUser(client.SteamId, user);
-
-                Appsetting.Instance.Clients.RemoveAll(c => c.User.SteamId == user.SteamId);
-                Appsetting.Instance.Clients.Add(userClient);
-                return userClient;
-
-            }
-            return null;
-        }
-
-        private async Task SwitchUser(UserClient userClient)
-        {
-            try
-            {
-                if (!userClient.Client.LoggedIn)
-                {
-                    if (!await userClient.LoginAsync())
-                    {
-                        userClient = await Login(true, userClient.GetAccount()) ?? userClient;
-                    }
-                }
-
                 SetCurrentClient(userClient);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"切换用户失败{Environment.NewLine}{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            return userClient;
         }
 
-        private void SetCurrentClient(UserClient userClient, bool reload = false)
+        private void SetCurrentClient(UserClient userClient)
         {
-            if (!reload)
+            try
             {
                 if (userClient?.User?.SteamId == currentClient?.User?.SteamId && userClient.Client.LoggedIn == currentClient?.Client.LoggedIn)
                 {
                     return;
                 }
+
+                usersPanel.SetChecked(userClient, true);
+
+                UserName.Text = userClient?.User == null ? "---" : $"{userClient.GetAccount()} [{userClient.User.NickName}]";
+                SteamId.Text = userClient?.User == null ? "---" : $"{userClient.User.SteamId}";
+
+                UserImg.Image = Properties.Resources.userimg;
+                if (!string.IsNullOrWhiteSpace(userClient?.User?.Avatar))
+                {
+                    UserImg.LoadAsync(userClient.User.Avatar);
+                }
+
+                Balance.Text = "---";
+                DelayedBalance.Text = "---";
+                OfferCountLabel.Text = "---";
+                ConfirmationCountLable.Text = "---";
+
+                currentClient = userClient;
+                Appsetting.Instance.AppSetting.Entry.CurrentUser = currentClient?.User?.SteamId;
+                Appsetting.Instance.AppSetting.Save();
             }
-
-            usersPanel.SetChecked(userClient, true);
-
-            UserName.Text = userClient?.User == null ? "---" : $"{userClient.GetAccount()} [{userClient.User.NickName}]";
-            SteamId.Text = userClient?.User == null ? "---" : $"{userClient.User.SteamId}";
-
-            UserImg.Image = Properties.Resources.userimg;
-            if (!string.IsNullOrWhiteSpace(userClient?.User?.Avatar))
+            catch (Exception ex)
             {
-                UserImg.LoadAsync(userClient.User.Avatar);
+                MessageBox.Show($"切换用户失败{Environment.NewLine}{ex.Message}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            Balance.Text = "---";
-            DelayedBalance.Text = "---";
-            OfferCountLabel.Text = "---";
-            ConfirmationCountLable.Text = "---";
-
-            currentClient = userClient;
-            Appsetting.Instance.AppSetting.Entry.CurrentUser = currentClient.User.SteamId;
-            Appsetting.Instance.AppSetting.Save();
         }
 
         private SteamUserPanel AddUserPanel(UserClient userClient)
@@ -415,7 +378,7 @@ namespace Steam_Authenticator
 
                 if (client.User.SteamId == currentClient?.User?.SteamId)
                 {
-                    SetCurrentClient(client, true);
+                    SetCurrentClient(client);
                 }
             };
 

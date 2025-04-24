@@ -105,6 +105,7 @@ namespace Steam_Authenticator.Handler
             BuffUserPanel panel = UsersPanel.AddItemPanel(true, buffClient);
 
             panel.ItemIcon.ContextMenuStrip = UserMenu;
+            panel.ItemIcon.MouseClick += user_MouseClick;
 
             panel.Client
                 .WithStartLogin(() =>
@@ -117,6 +118,24 @@ namespace Steam_Authenticator.Handler
                 });
 
             return panel;
+        }
+
+        private async void user_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            var control = sender as Control;
+            var userPanel = control.Parent as BuffUserPanel;
+            var userClient = userPanel.Client;
+            if (userClient.LoggedIn)
+            {
+                return;
+            }
+
+            await ReloginInternal(userPanel, userClient);
         }
     }
 }

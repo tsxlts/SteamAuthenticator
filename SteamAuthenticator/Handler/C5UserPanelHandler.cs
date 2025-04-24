@@ -100,6 +100,7 @@ namespace Steam_Authenticator.Handler
             };
 
             panel.ItemIcon.ContextMenuStrip = userMenu;
+            panel.ItemIcon.MouseClick += user_MouseClick;
 
             panel.Client
                 .WithStartLogin(() =>
@@ -140,12 +141,17 @@ namespace Steam_Authenticator.Handler
 
             var userInfo = userResponse.Body.data;
 
+            var localUser = Appsetting.Instance.Manifest.GetC5User(userInfo.uid);
+
             var user = new C5User
             {
                 UserId = userInfo.uid,
                 Nickname = userInfo.nickname,
                 Avatar = userInfo.avatar,
                 SteamIds = userInfo.steamList.Select(c => c.steamId)?.ToList() ?? new List<string>(),
+
+                Setting = localUser?.Setting ?? new C5UserSetting(),
+
                 AppKey = appkey
             };
             var client = new C5Client(user, true)
@@ -215,6 +221,24 @@ namespace Steam_Authenticator.Handler
             {
                 autoDeliverTimer?.Change(autoDeliverTimerMinPeriod, autoDeliverTimerMinPeriod * 3);
             }
+        }
+
+        private async void user_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            var control = sender as Control;
+            var userPanel = control.Parent as C5UserPanel;
+            var userClient = userPanel.Client;
+            if (userClient.LoggedIn)
+            {
+                return;
+            }
+
+            await ReloginInternal(userPanel, userClient);
         }
     }
 }
