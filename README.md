@@ -63,14 +63,10 @@
 ![buffQrAuth](images/5_buffQrAuth.png)<br />
 ![offer](images/6_offer.png)<br />
 ![confirmation](images/7_confirmation.png)<br />
-![confirmationpopup](images/8_confirmationpopup.png)<br />
 ![guard](images/9_guard.png)<br />
 ![setting](images/10_setting.png)<br />
 ![steamSetting](images/11_steamSetting.png)<br />
-![confirmLogin](images/12_confirm_login.png)<br />
 ![accountInfo1](images/13_account_info_1.png)<br />
-![accountInfo2](images/13_account_info_2.png)<br />
-![accountInfo3](images/13_account_info_3.png)<br />
 
 
 
