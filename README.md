@@ -52,21 +52,29 @@
 <br /><br />
 <p><strong>本工具部分功能截图</strong></p>
 
-![main](images/1_main.png)<br />
-![main](images/1_main_menu1.png)<br />
-![main](images/1_main_menu2.png)<br />
-![main](images/1_main_steam_menu.png)<br />
-![main](images/2_main_buff.png)<br />
-![main](images/2_main_buff_menu.png)<br />
-![login](images/3_login.png)<br />
-![qrAuth](images/4_qrAuth.png)<br />
-![buffQrAuth](images/5_buffQrAuth.png)<br />
-![offer](images/6_offer.png)<br />
-![confirmation](images/7_confirmation.png)<br />
-![guard](images/9_guard.png)<br />
-![setting](images/10_setting.png)<br />
-![steamSetting](images/11_steamSetting.png)<br />
-![accountInfo1](images/13_account_info_1.png)<br />
+![steamAccount](images/1.00_main.png)<br />
+![steamAccount](images/1.01_main.png)<br />
+![steamAccount](images/1.02_main.png)<br />
+![steamAccount](images/1.03_main.png)<br />
+![steamAccount](images/1.04_steamSetting.png)<br />
+![steamAccount](images/1.05_account_info.png)<br />
+![steamAccount](images/1.06_login.png)<br />
+![steamAccount](images/1.07_qrAuth.png)<br />
+![buffAccount](images/2.00_buff.png)<br />
+![buffAccount](images/2.01_buff_menu.png)<br />
+![buffAccount](images/2.02_buff_qrAuth.png)<br />
+![ecoAccount](images/3.00_eco.png)<br />
+![ecoAccount](images/3.01_eco_menu.png)<br />
+![ecoAccount](images/3.02_eco_setting.png)<br />
+![ecoAccount](images/3.03_eco_qrAuth.png)<br />
+![c5Account](images/4.00_c5.png)<br />
+![c5Account](images/4.01_c5_menu.png)<br />
+![c5Account](images/4.02_c5_setting.png)<br />
+![c5Account](images/4.03_c5_appkeyAuth.png)<br />
+![steamOffer](images/8.00_offer.png)<br />
+![steamConfirmation](images/8.01_confirmation.png)<br />
+![steamGuad](images/9.01_guard.png)<br />
+![setting](images/10.00_setting.png)<br />
 
 
 
