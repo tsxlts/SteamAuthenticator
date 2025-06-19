@@ -2,6 +2,7 @@
 ## Steam身份验证器 Steam桌面令牌
 ### Steam自动发货工具 Steam自动收货工具
 ### BUFF、ECOSteam、悠悠有品、C5GAME 自动发货工具
+### 库存组件自动存取工具
 
 <div>
   <p><strong>官方服务群：1030346616（QQ群）</strong></p>
@@ -24,6 +25,7 @@
   <p>11、支持自定义接受报价和令牌确认规则，自动处理指定规则的报价</p>
   <p>12、支持查看交易链接、Apikey等帐户信息</p>
   <p>13、支持Steam帐号状态检测，交易限制、交易暂挂、VAC封禁等</p>
+  <p>14、支持库存存储组件自动存取</p>
 </div>
 
 <div>
@@ -75,6 +77,8 @@
 ![steamConfirmation](images/8.01_confirmation.png)<br />
 ![steamGuad](images/9.01_guard.png)<br />
 ![setting](images/10.00_setting.png)<br />
+![inventoryAutoMove](images/11.00_inventoryAutoMove.png)<br />
+![inventoryAutoMove](images/11.00_inventoryAutoMovePackage.png)<br />
 
 
 
