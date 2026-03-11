@@ -5,10 +5,9 @@
 ### 库存组件自动存取工具
 
 <div>
-  <p><strong>官方服务群：1030346616（QQ群）</strong></p>
-  <p><strong>联系方式：2570096963（QQ）</strong></p>
-  <p><strong>扫描下方二维码加入官方服务群</strong></p>
-  <p><img src="/images/qqGroup.jpg" width="300" height="300" ></p>
+  <p><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
+  <p><strong>微信扫描下方二维码添加我们</strong></p>
+  <p><img src="/images/wechat.png" width="300" height="410" ></p>
 </div>
 
 <div>
