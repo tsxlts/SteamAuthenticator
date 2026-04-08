@@ -5,7 +5,13 @@
 ### 库存组件自动存取工具
 
 <div>
-  <p><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
+  <p>
+    <strong>该项目所引用nuget包Steamkit尚未公开和开源，如需使用请联系我们</strong>
+  </p>
+</div>
+
+<div>
+  <p style="color: #FF0000;"><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
   <p><strong>微信扫描下方二维码添加我们</strong></p>
   <p><img src="/images/wechat.png" width="300" height="410" ></p>
 </div>
