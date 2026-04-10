@@ -10,7 +10,7 @@
 
 ---
 
-> ⚠️ **该项目所引用 nuget 包 Steamkit 尚未公开和开源，如需使用请联系我们**
+> ⚠️ **该项目所引用项目 [SlimSteamApi](https://github.com/tsxlts/SlimSteamApi) 尚未公开和开源，如需使用请联系我们**
 
 ---
 
