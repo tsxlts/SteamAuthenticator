@@ -4,17 +4,17 @@
 ### BUFF、ECOSteam、悠悠有品、C5GAME 自动发货工具
 ### 库存组件自动存取工具
 
-<div>
-  <p>
-    <strong>该项目所引用nuget包Steamkit尚未公开和开源，如需使用请联系我们</strong>
-  </p>
-</div>
+---
+
+> ⚠️ **该项目所引用 nuget 包 Steamkit 尚未公开和开源，如需使用请联系我们**
 
 <div>
-  <p style="color: #FF0000;"><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
+  <p><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
   <p><strong>微信扫描下方二维码添加我们</strong></p>
   <p><img src="/images/wechat.png" width="300" height="410" ></p>
 </div>
+
+---
 
 <div>
   <p>1、支持无15天交易限制转移令牌！！！</p>
@@ -42,7 +42,7 @@
 <div>
   <p><strong>工具使用提示！！！</strong></p>
   <p>为了你的账号安全，我们不会在保存你的任何账号数据，本工具所有数据都存放在你使用本工具的计算机上，为了以防你的令牌数据丢失，请务必定期备份你的令牌数据，以备不时之需。</p>
-  <p style="color: #FF0000;"><strong>如果你在某某云服务器上使用本工具，请未必在你的本地电脑上备份所有账号令牌数据！！！！！</strong></p>
+  <p><strong>如果你在某某云服务器上使用本工具，请未必在你的本地电脑上备份所有账号令牌数据！！！！！</strong></p>
   <p>一、备份令牌数据的方法如下：</p>
   <p>1、在“令牌验证器->导出令牌”菜单下，打开导出令牌页面；</p>
   <p>2、选择导出“所有账号令牌”；</p>
