@@ -57,6 +57,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SlimSteamApi\SteamKit\SteamKit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Controls\Collection\EcoUserCollectionPanel.cs" />
     <Compile Update="Forms\PhoneInput.cs">
       <SubType>Form</SubType>

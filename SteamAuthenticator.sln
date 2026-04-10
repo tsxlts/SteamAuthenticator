@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Install", "Install\Install.csproj", "{40575D4B-968E-4476-BFE1-D9C301DBBFC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamKit", "SlimSteamApi\SteamKit\SteamKit.csproj", "{2EBF05F4-7900-DA62-9E80-2DB99C110246}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{40575D4B-968E-4476-BFE1-D9C301DBBFC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40575D4B-968E-4476-BFE1-D9C301DBBFC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40575D4B-968E-4476-BFE1-D9C301DBBFC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EBF05F4-7900-DA62-9E80-2DB99C110246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EBF05F4-7900-DA62-9E80-2DB99C110246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EBF05F4-7900-DA62-9E80-2DB99C110246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EBF05F4-7900-DA62-9E80-2DB99C110246}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
