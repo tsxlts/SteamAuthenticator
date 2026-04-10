@@ -16,7 +16,7 @@ namespace Steam_Authenticator
         [STAThread]
         static void Main()
         {
-            using (Mutex instance = new Mutex(true, "sda", out bool createdNew))
+            using (Mutex instance = new Mutex(true, "SlimSA", out bool createdNew))
             {
                 ApplicationConfiguration.Initialize();
 

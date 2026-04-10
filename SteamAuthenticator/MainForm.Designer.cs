@@ -254,21 +254,21 @@ namespace Steam_Authenticator
             // submitRequirementsMenuItem
             // 
             submitRequirementsMenuItem.Name = "submitRequirementsMenuItem";
-            submitRequirementsMenuItem.Size = new Size(180, 22);
+            submitRequirementsMenuItem.Size = new Size(124, 22);
             submitRequirementsMenuItem.Text = "功能定制";
             submitRequirementsMenuItem.Click += submitRequirementsMenuItem_Click;
             // 
             // submitBugMenuItem
             // 
             submitBugMenuItem.Name = "submitBugMenuItem";
-            submitBugMenuItem.Size = new Size(180, 22);
+            submitBugMenuItem.Size = new Size(124, 22);
             submitBugMenuItem.Text = "问题反馈";
             submitBugMenuItem.Click += submitBugMenuItem_Click;
             // 
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new Size(180, 22);
+            aboutMenuItem.Size = new Size(124, 22);
             aboutMenuItem.Text = "关于我们";
             aboutMenuItem.Click += aboutMenuItem_Click;
             // 
@@ -852,7 +852,7 @@ namespace Steam_Authenticator
             MinimumSize = new Size(835, 550);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Steam验证器";
+            Text = "Steam验证器（SlimSA）";
             FormClosing += MainForm_FormClosing;
             Load += MainForm_Load;
             menuStrip1.ResumeLayout(false);

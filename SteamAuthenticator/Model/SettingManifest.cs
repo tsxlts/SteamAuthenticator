@@ -12,7 +12,7 @@ namespace Steam_Authenticator.Model
         public SettingManifest()
         {
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string file = Path.Combine(commonAppDataPath, "SA", "Manifest", "sda.setting.manifest");
+            string file = Path.Combine(commonAppDataPath, "SlimSA", "Manifest", "sda.setting.manifest");
             manifest = Manifest.FromFile(file);
             setting = manifest.GetEntry<Setting>(path, "setting", null) ?? new Setting();
         }

@@ -1,6 +1,4 @@
 ﻿using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using SteamKit.Factory;
 
 namespace Steam_Authenticator.Factory
@@ -15,12 +13,11 @@ namespace Steam_Authenticator.Factory
         /// <returns></returns>
         public HttpClient GetHttpClient(Uri uri, IWebProxy proxy = null)
         {
-            HttpClientHandler httpClientHandler = new HttpClientHandler
+            SocketsHttpHandler httpClientHandler = new SocketsHttpHandler
             {
                 UseCookies = false,
                 AutomaticDecompression = DecompressionMethods.All,
                 AllowAutoRedirect = false,
-                ServerCertificateCustomValidationCallback = (HttpRequestMessage request, X509Certificate2 certificate2, X509Chain chain, SslPolicyErrors errors) => true
             };
 
             if (proxy != null)
@@ -30,12 +27,8 @@ namespace Steam_Authenticator.Factory
             }
             else
             {
-                var systemProxyInfo = typeof(HttpClient).Assembly.GetType("System.Net.Http.SystemProxyInfo");
-                var getSystemProxy = systemProxyInfo.GetMethod("ConstructSystemProxy");
-                var sysProxy = getSystemProxy.Invoke(null, null) as IWebProxy;
-
-                httpClientHandler.Proxy = sysProxy;
-                httpClientHandler.UseProxy = sysProxy != null;
+                httpClientHandler.UseProxy = true;
+                httpClientHandler.PooledConnectionLifetime = TimeSpan.FromMinutes(2);
             }
 
             return new HttpClient(httpClientHandler);

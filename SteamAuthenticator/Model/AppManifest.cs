@@ -15,7 +15,7 @@ namespace Steam_Authenticator.Model
         public AppManifest()
         {
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string file = Path.Combine(commonAppDataPath, "SA", "Manifest", "sda.manifest");
+            string file = Path.Combine(commonAppDataPath, "SlimSA", "Manifest", "sda.manifest");
             manifest = Manifest.FromFile(file);
         }
 

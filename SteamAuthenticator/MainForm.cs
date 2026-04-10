@@ -204,7 +204,6 @@ namespace Steam_Authenticator
 
                 using (CancellationTokenSource tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
                 {
-                    tasks.Add(QueryAuthSessionsForAccount(tokenSource.Token));
                     tasks.Add(QueryWalletDetails(tokenSource.Token));
 
                     Task.WaitAll(tasks.ToArray());
@@ -246,81 +245,6 @@ namespace Steam_Authenticator
                 TimeSpan period = TimeSpan.FromSeconds(Math.Max(refreshClientInfoTimerMinPeriod.TotalSeconds, setting.AutoRefreshInternal * 2));
                 ResetRefreshClientInfoTimer(dueTime, period);
             }
-        }
-
-        private async Task QueryAuthSessionsForAccount(CancellationToken cancellationToken)
-        {
-            List<Task> tasks = new List<Task>();
-
-            var userClients = Appsetting.Instance.Clients;
-            foreach (var itemClient in userClients)
-            {
-                if (itemClient == null)
-                {
-                    continue;
-                }
-                if (!itemClient.LoginConfirmLocker.Wait(0))
-                {
-                    continue;
-                }
-
-                var task = taskFactory.StartNew((obj) =>
-                {
-                    var userClient = obj as UserClient;
-                    try
-                    {
-                        var webClient = userClient.Client;
-
-                        Guard guard = Appsetting.Instance.Manifest.GetGuard(userClient.GetAccount());
-                        if (string.IsNullOrWhiteSpace(guard?.SharedSecret))
-                        {
-                            return;
-                        }
-
-                        var queryAuthSessions = SteamAuthentication.QueryAuthSessionsForAccountAsync(webClient.WebApiToken, cancellationToken).GetAwaiter().GetResult();
-                        var clients = queryAuthSessions.Body?.ClientIds;
-                        if (clients?.Count > 0)
-                        {
-                            var querySession = SteamAuthentication.QueryAuthSessionInfoAsync(webClient.WebApiToken, clients[0], cancellationToken).GetAwaiter().GetResult();
-                            var sessionInfo = querySession.Body;
-                            if (sessionInfo == null)
-                            {
-                                return;
-                            }
-
-                            this.Invoke(() =>
-                            {
-                                string clientType = sessionInfo.PlatformType switch
-                                {
-                                    var platform when platform == AuthTokenPlatformType.SteamClient => "SteamClient",
-                                    var platform when platform == AuthTokenPlatformType.MobileApp => "Steam App",
-                                    var platform when platform == AuthTokenPlatformType.WebBrowser => "网页浏览器",
-                                    _ => "未知设备"
-                                };
-                                var regions = new[] { sessionInfo.Country, sessionInfo.State, sessionInfo.City }.Where(c => !string.IsNullOrWhiteSpace(c));
-
-                                MobileConfirmationLogin mobileConfirmationLogin = new MobileConfirmationLogin(userClient, (ulong)clients[0], sessionInfo.Version);
-                                mobileConfirmationLogin.ConfirmLoginTitle.Text = $"{userClient.GetAccount()} 有新的登录请求";
-                                mobileConfirmationLogin.ConfirmLoginClientType.Text = clientType;
-                                mobileConfirmationLogin.ConfirmLoginIP.Text = $"IP 地址：{sessionInfo.IP}";
-                                mobileConfirmationLogin.ConfirmLoginRegion.Text = $"{string.Join("，", regions)}";
-
-                                mobileConfirmationLogin.ShowDialog();
-                            });
-                        }
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        userClient?.LoginConfirmLocker.Release();
-                    }
-                }, itemClient);
-                tasks.Add(task);
-            }
-
-            await Task.WhenAll(tasks);
         }
 
         private async Task QueryWalletDetails(CancellationToken cancellationToken)
