@@ -6,7 +6,13 @@
 
 ---
 
+> ⚠️ **此项目版本为轻量级Steam令牌工具（SlimSA），功能已不再维护和升级，完整功能请使用 [SteamAuthenticator](https://github.com/tsxlts/SteamAuthenticator-Releases/releases)**
+
+---
+
 > ⚠️ **该项目所引用 nuget 包 Steamkit 尚未公开和开源，如需使用请联系我们**
+
+---
 
 <div>
   <p><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
