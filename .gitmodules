@@ -1,0 +1,3 @@
+[submodule "SlimSteamApi"]
+	path = SlimSteamApi
+	url = https://github.com/tsxlts/SlimSteamApi.git
