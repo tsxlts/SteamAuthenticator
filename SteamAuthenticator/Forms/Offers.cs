@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using Steam_Authenticator.Controls;
 using SteamKit;
+using SteamKit.Builder;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using static Steam_Authenticator.Internal.Utils;
@@ -200,7 +201,7 @@ namespace Steam_Authenticator.Forms
                 }
                 else
                 {
-                    offerUrl = new Uri($"{SteamBulider.DefaultSteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
+                    offerUrl = new Uri($"{ProxyBulider.DefaultSteamCommunity}/tradeoffer/{offer.TradeOfferId}/");
                 }
 
                 browser.SetCookies($"{offerUrl.Scheme}://{offerUrl.Host}", webClient.WebCookie.ToArray());
@@ -231,7 +232,7 @@ namespace Steam_Authenticator.Forms
                 var queryOffers = await webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true,
                     cancellationToken: cancellationToken);
 
-                var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
+                var descriptions = queryOffers?.Descriptions ?? new List<TagDescription>();
                 var offers = new List<Offer>();
 
                 if (sentOffer.Checked)
@@ -265,7 +266,7 @@ namespace Steam_Authenticator.Forms
 
                 try
                 {
-                    var queryPlayerSummaries = await webClient.User.QueryPlayerSummariesAsync(offers.Select(c => Extension.GetSteamId(c.AccountIdOther.ToString())), cancellationToken);
+                    var queryPlayerSummaries = await webClient.User.QueryPlayerSummariesAsync(offers.Select(c => Extensions.GetSteamId(c.AccountIdOther.ToString())), cancellationToken);
                     if (queryPlayerSummaries.Players?.Any() ?? false)
                     {
                         playerSummaries = queryPlayerSummaries.Players;
@@ -287,7 +288,7 @@ namespace Steam_Authenticator.Forms
                 {
                     giveDescription = descriptions.Where(c => offer.ItemsToGive?.Any(a => a.ClassId == c.ClassId && a.InstanceId == c.InstanceId) ?? false);
                     receiveDescription = descriptions.Where(c => offer.ItemsToReceive?.Any(a => a.ClassId == c.ClassId && a.InstanceId == c.InstanceId) ?? false);
-                    player = playerSummaries.FirstOrDefault(c => c.SteamId == Extension.GetSteamId(offer.AccountIdOther.ToString()));
+                    player = playerSummaries.FirstOrDefault(c => c.SteamId == Extensions.GetSteamId(offer.AccountIdOther.ToString()));
 
                     Panel panel = new Panel() { Dock = DockStyle.Top, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding { Bottom = 10 } };
                     panel.Paint += (s, e) =>

@@ -9,9 +9,11 @@ using Steam_Authenticator.Handler;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 using static Steam_Authenticator.Internal.Utils;
-using static SteamKit.SteamEnum;
+using static SteamKit.Enums;
+using static SteamKit.Extensions;
 
 namespace Steam_Authenticator
 {
@@ -340,7 +342,7 @@ namespace Steam_Authenticator
                             }
 
                             var queryOffers = webClient.TradeOffer.QueryOffersAsync(sentOffer: true, receivedOffer: true, onlyActive: true, cancellationToken: cancellationToken).Result;
-                            var descriptions = queryOffers?.Descriptions ?? new List<BaseDescription>();
+                            var descriptions = queryOffers?.Descriptions ?? new List<TagDescription>();
                             receivedOffers = queryOffers?.TradeOffersReceived ?? new List<Offer>();
                             sentOffer = queryOffers?.TradeOffersSent ?? new List<Offer>();
 
@@ -733,7 +735,7 @@ namespace Steam_Authenticator
                             StartPosition = FormStartPosition.CenterScreen
                         });
 
-                        var steamNotifications = SteamApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
+                        var steamNotifications = SteamNotificationApi.QuerySteamNotificationsAsync(webClient.WebApiToken, includeHidden: false,
                             includeConfirmation: true,
                             includePinned: false,
                             includeRead: false,
@@ -763,7 +765,7 @@ namespace Steam_Authenticator
                             return;
                         }
 
-                        var queryConfirmations = webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, cancellationToken).Result;
+                        var queryConfirmations = webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, GetSystemTimestamp(), cancellationToken).Result;
                         if (!(queryConfirmations?.Success ?? false))
                         {
                             AppLogger.Instance.Debug("queryConfirmation", user.SteamId, $"###查询待确认信息失败###" +

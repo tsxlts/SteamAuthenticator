@@ -4,6 +4,7 @@ using Steam_Authenticator.Factory;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Forms
@@ -250,6 +251,7 @@ namespace Steam_Authenticator.Forms
                                         partnerToken: "",
                                         appId: gameId,
                                         contextId: contextId,
+                                        language: Enums.Language.Schinese,
                                         receiver.Client.WebCookie).GetAwaiter().GetResult();
                                     if (inventoryResponse.Body == null || !inventoryResponse.Body.Success)
                                     {
@@ -258,16 +260,16 @@ namespace Steam_Authenticator.Forms
                                         {
                                             PrivacySettings = new AccountPrivacySettings
                                             {
-                                                PrivacyProfile = SteamEnum.CommunityVisibilityState.公开,
-                                                PrivacyInventory = SteamEnum.CommunityVisibilityState.公开,
-                                                PrivacyFriendsList = SteamEnum.CommunityVisibilityState.私密,
-                                                PrivacyInventoryGifts = SteamEnum.CommunityVisibilityState.私密,
-                                                PrivacyOwnedGames = SteamEnum.CommunityVisibilityState.私密,
-                                                PrivacyPlaytime = SteamEnum.CommunityVisibilityState.私密,
+                                                PrivacyProfile = Enums.CommunityVisibilityState.公开,
+                                                PrivacyInventory = Enums.CommunityVisibilityState.公开,
+                                                PrivacyFriendsList = Enums.CommunityVisibilityState.私密,
+                                                PrivacyInventoryGifts = Enums.CommunityVisibilityState.私密,
+                                                PrivacyOwnedGames = Enums.CommunityVisibilityState.私密,
+                                                PrivacyPlaytime = Enums.CommunityVisibilityState.私密,
                                             },
-                                            CommentPermission = SteamEnum.CommentPermission.私密,
+                                            CommentPermission = Enums.CommentPermission.私密,
                                         }, deliverer.Client.WebCookie).GetAwaiter().GetResult();
-                                        if (setPrivacySettingResponse.Body?.Privacy?.PrivacySettings?.PrivacyInventory != SteamEnum.CommunityVisibilityState.公开)
+                                        if (setPrivacySettingResponse.Body?.Privacy?.PrivacySettings?.PrivacyInventory != Enums.CommunityVisibilityState.公开)
                                         {
                                             msgLabel.Text = $"公开库存失败, 需要你手动公开库存";
                                             msgLabel.ForeColor = Color.Red;
@@ -279,6 +281,7 @@ namespace Steam_Authenticator.Forms
                                            partnerToken: "",
                                            appId: gameId,
                                            contextId: contextId,
+                                           language: Enums.Language.Schinese,
                                            receiver.Client.WebCookie).GetAwaiter().GetResult();
                                         if (inventoryResponse.Body == null || !inventoryResponse.Body.Success)
                                         {
@@ -369,6 +372,7 @@ namespace Steam_Authenticator.Forms
                                         var queryConfirmResponse = SteamApi.QueryConfirmationsAsync(deliverer.Client.SteamId,
                                             deviceId: guard.DeviceId,
                                             identitySecret: guard.IdentitySecret,
+                                            timestamp: Extensions.GetSystemTimestamp(),
                                             deliverer.Client.WebCookie).GetAwaiter().GetResult();
                                         confirmation = queryConfirmResponse.Body?.Confirmations?.FirstOrDefault(c => $"{c.CreatorId}" == sendOfferResponse.Body.TradeOfferId);
                                         if (confirmation == null)
@@ -397,6 +401,7 @@ namespace Steam_Authenticator.Forms
                                             confirmationKey: confirmation.Key,
                                             deviceId: guard.DeviceId,
                                             identitySecret: guard.IdentitySecret,
+                                            timestamp: Extensions.GetSystemTimestamp(),
                                             deliverer.Client.WebCookie).GetAwaiter().GetResult();
                                         if (confirmOfferResponse.HttpStatusCode != System.Net.HttpStatusCode.OK || !confirmOfferResponse.Body)
                                         {
@@ -423,6 +428,7 @@ namespace Steam_Authenticator.Forms
                                         partnerToken: "",
                                         appId: gameId,
                                         contextId: contextId,
+                                        language: Enums.Language.Schinese,
                                         receiver.Client.WebCookie).GetAwaiter().GetResult();
                                     if (inventoryResponse.Body == null || !inventoryResponse.Body.Success)
                                     {

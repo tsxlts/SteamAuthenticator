@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <Nullable>disable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -49,11 +49,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="134.3.90" />
-    <PackageReference Include="protobuf-net" Version="3.2.56" />
-    <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="System.Management" Version="9.0.3" />
-    <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.21" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="151.3.240" />
+    <PackageReference Include="protobuf-net" Version="3.4.21" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+    <PackageReference Include="System.Management" Version="10.0.12" />
+    <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.24" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,15 +101,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="127.3.5" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="151.3.24" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="127.3.5" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="151.3.24" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="127.3.5" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="151.3.24" />
   </ItemGroup>
 
 </Project>

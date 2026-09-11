@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using Steam_Authenticator.Model.C5;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Internal

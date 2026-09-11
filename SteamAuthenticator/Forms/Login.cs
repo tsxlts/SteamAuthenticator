@@ -1,5 +1,6 @@
 ﻿using SteamKit;
 using SteamKit.Model;
+using SteamKit.Proto;
 using SteamKit.WebClient;
 
 namespace Steam_Authenticator.Forms
@@ -36,8 +37,8 @@ namespace Steam_Authenticator.Forms
                 }
 
                 var steamWebClient = new SteamCommunityClient();
-                var login = await steamWebClient.BeginLoginAsync(user, password, null, platformType: AuthTokenPlatformType.MobileApp);
-                if (string.IsNullOrWhiteSpace(login?.SteamId) || string.IsNullOrWhiteSpace(login?.ClientId) || string.IsNullOrWhiteSpace(login?.RequestId))
+                var login = await steamWebClient.BeginLoginAsync(user, password, null, platformType: EAuthTokenPlatformType.k_EAuthTokenPlatformType_MobileApp);
+                if (login == null || login?.steamid == 0 || login?.client_id == 0)
                 {
                     MessageBox.Show($"登录失败，请检查用户名和密码是否正确");
                     return;
@@ -53,7 +54,7 @@ namespace Steam_Authenticator.Forms
                     {
                         try
                         {
-                            bool loginSuccess = steamWebClient.PollLoginStatusAsync(login.SteamId!, login.ClientId!, login.RequestId!, default).GetAwaiter().GetResult();
+                            bool loginSuccess = steamWebClient.PollLoginStatusAsync(login.steamid!, login.client_id!, login.request_id!, default).GetAwaiter().GetResult();
                             if (loginSuccess)
                             {
                                 cts.Cancel();
@@ -91,7 +92,7 @@ namespace Steam_Authenticator.Forms
 
                         waitTime = 1200;
 
-                        if (login.AllowedConfirmations!.Any(c => c.ConfirmationType == AuthConfirmationType.DeviceCode))
+                        if (login.allowed_confirmations!.Any(c => c.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode))
                         {
                             string code = null;
                             if (!string.IsNullOrWhiteSpace(guard?.SharedSecret))
@@ -100,7 +101,7 @@ namespace Steam_Authenticator.Forms
                                     $"{Environment.NewLine}" +
                                     $"如果你已经转移了你的令牌, 请在令牌页面删除本设备上的令牌";
 
-                                code = GuardCodeGenerator.GenerateSteamGuardCode(Extension.GetSteamTimestampAsync().Result, guard.SharedSecret);
+                                code = GuardCodeGenerator.GenerateAuthCode(Extensions.GetSteamTimestampAsync().Result, guard.SharedSecret);
 
                                 if (errorTimes > 3)
                                 {
@@ -135,7 +136,7 @@ namespace Steam_Authenticator.Forms
                                 code = input.InputValue;
                             }
 
-                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.DeviceCode, code, default);
+                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.steamid, login.client_id, EAuthSessionGuardType.k_EAuthSessionGuardType_DeviceCode, code, default);
                             if (checkCode)
                             {
                                 waitTime = 0;
@@ -146,7 +147,7 @@ namespace Steam_Authenticator.Forms
                             continue;
                         }
 
-                        if (login.AllowedConfirmations!.Any(c => c.ConfirmationType == AuthConfirmationType.EmailCode))
+                        if (login.allowed_confirmations!.Any(c => c.confirmation_type == EAuthSessionGuardType.k_EAuthSessionGuardType_EmailCode))
                         {
                             input = new Input("确认登录", "请输入邮箱令牌", required: true, errorMsg: "请输入邮箱令牌");
                             if (input.ShowDialog() != DialogResult.OK)
@@ -158,7 +159,7 @@ namespace Steam_Authenticator.Forms
                             error = "请确认你输入的邮箱令牌是否有效";
 
                             string code = input.InputValue;
-                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.SteamId, login.ClientId, AuthConfirmationType.EmailCode, code, default);
+                            bool checkCode = await steamWebClient.ConfirmLoginWithGuardCodeAsync(login.steamid, login.client_id, EAuthSessionGuardType.k_EAuthSessionGuardType_EmailCode, code, default);
                             if (checkCode)
                             {
                                 waitTime = 0;

@@ -2,6 +2,7 @@
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Model;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 using SteamKit.WebClient;
 using static Steam_Authenticator.Internal.Utils;
@@ -250,7 +251,7 @@ namespace Steam_Authenticator.Forms
                 };
                 browser.Show();
 
-                var detail = await SteamApi.ConfirmationDetailAsync(webClient.SteamId, confirmation.Id, guard.DeviceId, guard.IdentitySecret, webClient.WebCookie);
+                var detail = await SteamApi.ConfirmationDetailAsync(webClient.SteamId, confirmation.Id, guard.DeviceId, guard.IdentitySecret, Extensions.GetSystemTimestamp(), webClient.WebCookie);
                 browser.SetCookies($"{detail.RequestUri.Scheme}://{detail.RequestUri.Host}", webClient.WebCookie.ToArray());
                 await browser.LoadUrl(detail.RequestUri);
             }
@@ -291,7 +292,7 @@ namespace Steam_Authenticator.Forms
                         QueryConfirmationsResponse confirm;
                         while (true)
                         {
-                            confirm = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret);
+                            confirm = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret, SteamKit.Extensions.GetSystemTimestamp());
 
                             if (tokenSource.IsCancellationRequested || (confirm?.Success ?? false))
                             {

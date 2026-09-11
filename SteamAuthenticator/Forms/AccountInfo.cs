@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Steam_Authenticator.Internal;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.WebClient;
 using static Steam_Authenticator.Internal.Configuration;
 
@@ -98,7 +99,7 @@ namespace Steam_Authenticator.Forms
                 });
                 tasks.Add(accountSettingTask);
 
-                var authenticatorStatusTask = SteamAuthenticator.QueryAuthenticatorStatusAsync(client.Client.WebApiToken, client.User.SteamId).ContinueWith(status =>
+                var authenticatorStatusTask = SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(client.Client.WebApiToken, client.User.SteamId).ContinueWith(status =>
                 {
                     guardStatusLoading.Hide();
                     guardStatusBox.Text = "**********";
@@ -111,13 +112,13 @@ namespace Steam_Authenticator.Forms
 
                     switch (result.GuardScheme)
                     {
-                        case SteamEnum.SteamGuardScheme.None:
+                        case Enums.SteamGuardScheme.None:
                             guardStatusBox.Text = "未绑定令牌验证器";
                             break;
-                        case SteamEnum.SteamGuardScheme.Email:
+                        case Enums.SteamGuardScheme.Email:
                             guardStatusBox.Text = "邮箱验证器";
                             break;
-                        case SteamEnum.SteamGuardScheme.Device:
+                        case Enums.SteamGuardScheme.Device:
                             guardStatusBox.Text = $"手机验证器 ({result.DeviceId})";
                             guardTimeBox.Text = $"{DateTime.UnixEpoch.AddSeconds(Math.Max(result.TimeCreated, result.TimeTransferred)).ToLocalTime():yyyy-MM-dd HH:mm:ss}";
                             break;
@@ -162,7 +163,7 @@ namespace Steam_Authenticator.Forms
                 //tradePermissionBox.Text = "**********";
                 if (!string.IsNullOrWhiteSpace(DefaultPartnerTradeLink))
                 {
-                    var tradePermissionsTask = SteamApi.QueryTradePermissionsAsync(client.Client.WebCookie, DefaultPartnerTradeLink).ContinueWith(tradePermissions =>
+                    var tradePermissionsTask = SteamApi.GetTradePermissionsAsync(client.Client.WebCookie, DefaultPartnerTradeLink).ContinueWith(tradePermissions =>
                     {
                         tradePermissionLoading.Hide();
 
@@ -316,7 +317,7 @@ namespace Steam_Authenticator.Forms
 
                     var tradeHoldDurations = await SteamApi.QueryTradeHoldDurationsAsync(null,
                     client.Client.WebApiToken,
-                    Extension.GetSteamId(partner),
+                    Extensions.GetSteamId(partner),
                     token);
                     var myEscrow = tradeHoldDurations.Body?.MyEscrow;
                     if (myEscrow?.EscrowEndDurationSeconds > 0)

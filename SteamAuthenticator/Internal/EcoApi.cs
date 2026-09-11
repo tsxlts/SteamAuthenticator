@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Steam_Authenticator.Model.ECO;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Internal

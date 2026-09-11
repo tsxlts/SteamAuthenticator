@@ -72,11 +72,11 @@ namespace Steam_Authenticator.Internal
             {
                 if (accept)
                 {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret, SteamKit.Extensions.GetSystemTimestamp()).ConfigureAwait(false);
                 }
                 else
                 {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmations, guard.DeviceId, guard.IdentitySecret, SteamKit.Extensions.GetSystemTimestamp()).ConfigureAwait(false);
                 }
 
                 AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +
@@ -110,11 +110,11 @@ namespace Steam_Authenticator.Internal
             {
                 if (accept)
                 {
-                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
+                    success = await webClient.Confirmation.AllowConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret, SteamKit.Extensions.GetSystemTimestamp()).ConfigureAwait(false);
                 }
                 else
                 {
-                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret).ConfigureAwait(false);
+                    success = await webClient.Confirmation.CancelConfirmationAsync(confirmation, guard.DeviceId, guard.IdentitySecret, SteamKit.Extensions.GetSystemTimestamp()).ConfigureAwait(false);
                 }
 
                 AppLogger.Instance.Debug("handleConfirmation", webClient.SteamId, $"###{(accept ? "令牌确认" : "取消确认")}###" +

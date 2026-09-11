@@ -2,6 +2,8 @@
 using Steam_Authenticator.Controls;
 using Steam_Authenticator.Model.Steam;
 using SteamKit;
+using SteamKit.Api;
+using SteamKit.Builder;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Forms
@@ -115,7 +117,7 @@ namespace Steam_Authenticator.Forms
                     return;
                 }
 
-                string url = $"{SteamBulider.DefaultSteamCommunity}" +
+                string url = $"{ProxyBulider.DefaultSteamCommunity}" +
                     $"/market/listings" +
                     $"/{inventoryPanel.Client.Description.AppId}" +
                     $"/{Uri.EscapeDataString(inventoryPanel.Client.Description.MarketHashName)}";
@@ -237,7 +239,7 @@ namespace Steam_Authenticator.Forms
                 {
                     if (!appInventory.TryGetValue(context.AppId, out var inventoryResponse))
                     {
-                        inventoryResponse = await client.Client.Inventory.QueryInventoryAsync(context.AppId, context.Contexts.FirstOrDefault()?.Id ?? "2", cancellationToken);
+                        inventoryResponse = await client.Client.Inventory.QueryInventoryAsync(context.AppId, context.Contexts.FirstOrDefault()?.Id ?? "2", cancellationToken: cancellationToken);
                         if (!inventoryResponse.Success)
                         {
                             return;
@@ -256,7 +258,7 @@ namespace Steam_Authenticator.Forms
                     List<SteamInventory> inventoryContext = new List<SteamInventory>();
                     foreach (var item in inventories)
                     {
-                        InventoryDescription description = descriptions.FirstOrDefault(c => c.ClassId == item.ClassId && c.InstanceId == item.InstanceId);
+                        SelfInventoryDescription description = descriptions.FirstOrDefault(c => c.ClassId == item.ClassId && c.InstanceId == item.InstanceId);
                         inventoryContext.Add(new SteamInventory(item, description));
                     }
                     var panels = page.AddItemPanels(true, inventoryContext);

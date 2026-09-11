@@ -135,7 +135,7 @@ namespace Steam_Authenticator.Controls
                     continue;
                 }
 
-                var time = Extension.GetAssetTradableExpires(item.Value);
+                var time = Extensions.GetAssetTradableExpires(item.Value);
                 if (!time.HasValue)
                 {
                     continue;

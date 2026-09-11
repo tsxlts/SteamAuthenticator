@@ -5,9 +5,9 @@ namespace Steam_Authenticator.Model.Steam
     public class SteamInventory : IClient
     {
         private readonly Inventory inventory;
-        private readonly InventoryDescription description;
+        private readonly SelfInventoryDescription description;
 
-        public SteamInventory(Inventory inventory, InventoryDescription description)
+        public SteamInventory(Inventory inventory, SelfInventoryDescription description)
         {
             this.inventory = inventory;
             this.description = description;
@@ -17,6 +17,6 @@ namespace Steam_Authenticator.Model.Steam
 
         public Inventory Asset => inventory;
 
-        public InventoryDescription Description => description;
+        public SelfInventoryDescription Description => description;
     }
 }

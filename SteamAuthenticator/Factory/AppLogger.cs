@@ -15,7 +15,7 @@ namespace Steam_Authenticator.Factory
         private readonly string logPath;
         private readonly string errorLogPath;
         private readonly string debugLogPath;
-        private readonly AsyncLocker asyncLocker;
+        private readonly AsyncLock asyncLocker;
 
         private readonly int logRetentionTime = 24;
         private readonly System.Threading.Timer timer;
@@ -25,7 +25,7 @@ namespace Steam_Authenticator.Factory
             logPath = Path.Combine(AppContext.BaseDirectory, "logs");
             errorLogPath = Path.Combine(logPath, "error");
             debugLogPath = Path.Combine(logPath, "debug");
-            asyncLocker = new AsyncLocker();
+            asyncLocker = new AsyncLock();
 
             timer = new System.Threading.Timer((obj) =>
             {

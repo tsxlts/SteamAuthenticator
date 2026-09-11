@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Internal

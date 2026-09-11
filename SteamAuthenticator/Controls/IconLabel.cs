@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator.Controls
+﻿using System.ComponentModel;
+
+namespace Steam_Authenticator.Controls
 {
     internal class IconLabel : Label
     {
@@ -35,6 +37,7 @@
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Size IconSize { get; init; } = new Size(16, 16);
 
         public new bool AutoSize => false;

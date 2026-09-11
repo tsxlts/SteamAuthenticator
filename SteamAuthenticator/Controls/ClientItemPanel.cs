@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator.Controls
+﻿using System.ComponentModel;
+
+namespace Steam_Authenticator.Controls
 {
     internal abstract class ClientItemPanel<TClient> : ItemPanel where TClient : IClient
     {
@@ -7,6 +9,7 @@
         {
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TClient Client { get; set; }
 
         public void SetChecked(bool isChecked)

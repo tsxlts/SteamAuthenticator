@@ -1,5 +1,6 @@
 ﻿using QRCoder;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Forms
@@ -8,7 +9,7 @@ namespace Steam_Authenticator.Forms
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private (string RequestId, string ClientId) authSessionViaQRResponse = default;
+        private (byte[] RequestId, ulong ClientId) authSessionViaQRResponse = default;
 
         public QrAuth()
         {
@@ -28,26 +29,26 @@ namespace Steam_Authenticator.Forms
                     {
                         Task.Delay(1000).Wait();
 
-                        if (string.IsNullOrWhiteSpace(authSessionViaQRResponse.ClientId))
+                        if (authSessionViaQRResponse.ClientId == 0)
                         {
                             continue;
                         }
 
                         var sessionStatusReault = SteamAuthentication.PollAuthSessionStatusAsync(authSessionViaQRResponse.ClientId, authSessionViaQRResponse.RequestId).GetAwaiter().GetResult();
-                        if (!string.IsNullOrWhiteSpace(sessionStatusReault.Body?.RefreshToken))
+                        if (!string.IsNullOrWhiteSpace(sessionStatusReault.Body?.refresh_token))
                         {
-                            RefreshToken = sessionStatusReault.Body.RefreshToken;
+                            RefreshToken = sessionStatusReault.Body.refresh_token;
                             DialogResult = DialogResult.OK;
                             break;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(sessionStatusReault.Body?.NewClientId))
+                        if (sessionStatusReault.Body?.new_client_id == 0)
                         {
-                            authSessionViaQRResponse.ClientId = sessionStatusReault.Body.NewClientId;
+                            authSessionViaQRResponse.ClientId = sessionStatusReault.Body.new_client_id;
                         }
-                        if (!string.IsNullOrWhiteSpace(sessionStatusReault?.Body?.NewChallengeUrl))
+                        if (!string.IsNullOrWhiteSpace(sessionStatusReault?.Body?.new_challenge_url))
                         {
-                            LoadQrCode(sessionStatusReault?.Body.NewChallengeUrl);
+                            LoadQrCode(sessionStatusReault?.Body.new_challenge_url);
                         }
                     }
                     catch
@@ -64,11 +65,11 @@ namespace Steam_Authenticator.Forms
             {
                 using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
                 {
-                    var qrResult = await SteamAuthentication.BeginAuthSessionViaQRAsync(AuthTokenPlatformType.MobileApp, cts.Token);
-                    if (!string.IsNullOrWhiteSpace(qrResult.Body?.ChallengeUrl))
+                    var qrResult = await SteamAuthentication.BeginAuthSessionViaQRAsync(SteamKit.Proto.EAuthTokenPlatformType.k_EAuthTokenPlatformType_MobileApp, cts.Token);
+                    if (!string.IsNullOrWhiteSpace(qrResult.Body?.challenge_url))
                     {
-                        LoadQrCode(qrResult.Body?.ChallengeUrl);
-                        authSessionViaQRResponse = (qrResult.Body.RequestId, qrResult.Body.ClientId);
+                        LoadQrCode(qrResult.Body?.challenge_url);
+                        authSessionViaQRResponse = (qrResult.Body.request_id, qrResult.Body.client_id);
                     }
                 }
             }

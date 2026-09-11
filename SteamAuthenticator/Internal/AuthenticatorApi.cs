@@ -1,6 +1,7 @@
 ﻿
 using System.Net.Http.Json;
 using SteamKit;
+using SteamKit.Api;
 using static Steam_Authenticator.Factory.HttpClientFactory;
 
 namespace Steam_Authenticator.Internal

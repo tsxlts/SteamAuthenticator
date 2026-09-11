@@ -1,5 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using SteamKit.Model;
+﻿using SteamKit.Model;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace Steam_Authenticator.Forms
 {
@@ -84,7 +85,7 @@ namespace Steam_Authenticator.Forms
             int selectIndex = 0;
 
             List<Country> list = new List<Country>();
-            var countryResponse = await SteamKit.SteamApi.QueryCountryAsync();
+            var countryResponse = await SteamKit.Api.SteamApi.QueryCountryAsync();
             var countries = countryResponse.Body?.Countries ?? new List<Country> { new Country { Name = "中国", CountryCode = "CN" } };
             countries = countries.OrderBy(x => x.Name).ToList();
             for (int index = 0; index < countries.Count; index++)
@@ -105,8 +106,10 @@ namespace Steam_Authenticator.Forms
             CountryBox.SelectedIndex = selectIndex;
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Phone { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string CountryCode { get; set; } = "CN";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Steam_Authenticator.Internal;
+using System.ComponentModel;
 
 namespace Steam_Authenticator.Controls
 {
@@ -6,6 +7,7 @@ namespace Steam_Authenticator.Controls
     {
         private bool readOnly = true;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool ReadOnly
         {
             get { return readOnly; }

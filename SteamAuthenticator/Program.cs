@@ -1,10 +1,10 @@
-using System.Diagnostics;
-using System.Net;
 using Steam_Authenticator.Factory;
 using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
-using static SteamKit.HttpBulider;
-using static SteamKit.SteamBulider;
+using System.Diagnostics;
+using System.Net;
+using SteamKit;
+using static SteamKit.Builder.ProxyBulider;
 
 namespace Steam_Authenticator
 {
@@ -35,7 +35,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                WithProxy((s, m) =>
+                EnvironmentBuilder.Instance.WithProxy((s, m) =>
                 {
                     var setting = Appsetting.Instance.AppSetting.Entry;
                     var proxy = Proxy.Instance;
@@ -82,7 +82,7 @@ namespace Steam_Authenticator
                     return proxy;
                 });
 
-                WithHttpClientFactory(new HttpClientFactory());
+                EnvironmentBuilder.Instance.WithHttpClientFactory(new HttpClientFactory());
 
                 if (Appsetting.Instance.AppSetting.Entry.FirstUsed)
                 {

@@ -55,9 +55,9 @@ namespace Steam_Authenticator.Forms
                 return;
             }
 
-            long timestamp = Extension.GetSystemTimestamp();
+            ulong timestamp = Extensions.GetSystemTimestamp();
 
-            string code = GuardCodeGenerator.GenerateSteamGuardCode(timestamp, guard.SharedSecret);
+            string code = GuardCodeGenerator.GenerateAuthCode(timestamp, guard.SharedSecret);
             GuardText.Text = code;
             ExpireText.Text = $"{30 - (timestamp % 30)}秒";
         }

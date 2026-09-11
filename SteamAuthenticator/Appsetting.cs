@@ -8,6 +8,7 @@ using Steam_Authenticator.Model.C5;
 using Steam_Authenticator.Model.ECO;
 using Steam_Authenticator.Model.YouPin898;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 using SteamKit.WebClient;
 
@@ -342,7 +343,7 @@ namespace Steam_Authenticator
 
         public BuffUser User { get; private set; }
 
-        public CookieCollection Cookies => Extension.GetCookies(User?.BuffCookies ?? "");
+        public CookieCollection Cookies => Extensions.GetCookies(User?.BuffCookies ?? "");
 
         public override string Key => User?.UserId;
 

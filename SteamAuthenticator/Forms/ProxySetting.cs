@@ -45,7 +45,7 @@ namespace Steam_Authenticator.Forms
                         webProxy = new WebProxy(proxyHostBox.Text, (int)proxyPortBox.Value);
                     }
 
-                    var testProxy = await SteamKit.SteamApi.GetAsync("https://www.baidu.com", proxy: webProxy);
+                    var testProxy = await SteamKit.Api.SteamApi.GetAsync("https://www.baidu.com", proxy: webProxy);
                 }
 
                 Appsetting.Instance.AppSetting.Entry.UseCustomerProxy = useCustomerProxy.Checked;

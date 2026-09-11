@@ -1,4 +1,4 @@
-﻿using static SteamKit.SteamEnum;
+﻿using static SteamKit.Enums;
 
 namespace Steam_Authenticator.Model
 {

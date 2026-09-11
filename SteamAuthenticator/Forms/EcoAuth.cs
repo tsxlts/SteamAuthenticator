@@ -4,6 +4,7 @@ using SkiaSharp;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model.ECO;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 
 namespace Steam_Authenticator.Forms

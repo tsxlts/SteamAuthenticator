@@ -1,4 +1,6 @@
-﻿namespace Steam_Authenticator.Forms
+﻿using System.ComponentModel;
+
+namespace Steam_Authenticator.Forms
 {
     public partial class RichTextInput : Form
     {
@@ -52,6 +54,7 @@
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string InputValue { get; set; }
     }
 }

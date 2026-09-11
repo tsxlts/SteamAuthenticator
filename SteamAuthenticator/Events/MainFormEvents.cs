@@ -5,9 +5,10 @@ using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using Steam_Authenticator.Model.Other;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.Model;
 using static Steam_Authenticator.Internal.Utils;
-using static SteamKit.SteamEnum;
+using static SteamKit.Enums;
 
 namespace Steam_Authenticator
 {
@@ -150,7 +151,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            var authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+            var authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.Device)
             {
@@ -168,7 +169,7 @@ namespace Steam_Authenticator
 
             while (true)
             {
-                var addAuthenticator = await SteamAuthenticator.AddAuthenticatorAsync(webClient.WebApiToken, webClient.SteamId, Extension.GetDeviceId(webClient.SteamId));
+                var addAuthenticator = await SteamAuthenticatorV1.AddAuthenticatorAsync(webClient.WebApiToken, webClient.SteamId, Extensions.GetDeviceId(webClient.SteamId), SteamAuthenticatorV1.AuthenticatorV2, (long)Extensions.GetSystemTimestamp());
                 if (addAuthenticator.ResultCode != SteamKit.Model.ErrorCodes.OK)
                 {
                     MessageBox.Show($"绑定令牌失败[{addAuthenticator.ResultCode}]", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -197,7 +198,7 @@ namespace Steam_Authenticator
 
                             string phone = input.Phone;
                             string country = input.CountryCode;
-                            var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
+                            var setAccountPhone = await SteamPhoneApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {
                                 return;
@@ -215,7 +216,7 @@ namespace Steam_Authenticator
                                     }
                                 }
 
-                                var waitingForEmailConfirmation = await SteamApi.IsAccountWaitingForEmailConfirmationAsync(webClient.WebApiToken);
+                                var waitingForEmailConfirmation = await SteamPhoneApi.IsAccountWaitingForEmailConfirmationAsync(webClient.WebApiToken);
                                 if (!waitingForEmailConfirmation.Body.AwaitingEmailConfirmation)
                                 {
                                     break;
@@ -228,7 +229,7 @@ namespace Steam_Authenticator
 
                     case AddAuthenticatorStatus.AwaitingFinalization:
                         {
-                            authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                            authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                             authenticatorStatusResponse = authenticatorStatus.Body;
 
                             guard = new Guard
@@ -268,8 +269,8 @@ namespace Steam_Authenticator
                             string smsCode = input.InputValue;
 
                         GenerateSteamGuardCode:
-                            string guardCode = GuardCodeGenerator.GenerateSteamGuardCode(await Extension.GetSteamTimestampAsync(), guard.SharedSecret);
-                            var finalizeAddAuthenticator = await SteamAuthenticator.FinalizeAddAuthenticatorAsync(webClient.WebApiToken, webClient.SteamId, smsCode, guardCode);
+                            string guardCode = GuardCodeGenerator.GenerateAuthCode(await Extensions.GetSteamTimestampAsync(), guard.SharedSecret);
+                            var finalizeAddAuthenticator = await SteamAuthenticatorV1.FinalizeAddAuthenticatorAsync(webClient.WebApiToken, webClient.SteamId, smsCode, guardCode, (long)(await Extensions.GetSteamTimestampAsync()));
                             var finalizeAddAuthenticatorResponse = finalizeAddAuthenticator.Body;
                             switch (finalizeAddAuthenticatorResponse?.Status)
                             {
@@ -283,7 +284,7 @@ namespace Steam_Authenticator
                                     goto InputSmsCode;
 
                                 case SteamKit.Model.FinalizeAddAuthenticatorResponse.FinalizeAuthenticatorStatus.Finalize:
-                                    authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                                    authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                                     authenticatorStatusResponse = authenticatorStatus.Body;
                                     guard = new Guard
                                     {
@@ -330,7 +331,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            var authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+            var authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
             {
@@ -374,7 +375,7 @@ namespace Steam_Authenticator
                 {
                     case MoveAuthenticatorResult.Begin:
                         {
-                            var accountPhoneStatus = await SteamApi.QueryAccountPhoneStatusAsync(webClient.WebApiToken);
+                            var accountPhoneStatus = await SteamPhoneApi.QueryAccountPhoneStatusAsync(webClient.WebApiToken);
                             if (accountPhoneStatus?.Body?.VerifiedPhone ?? true)
                             {
                                 moveAuthenticatorResult = MoveAuthenticatorResult.AddPhoneFailure;
@@ -405,7 +406,7 @@ namespace Steam_Authenticator
 
                             string phone = phoneInput.Phone;
                             string country = phoneInput.CountryCode;
-                            var setAccountPhone = await SteamApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
+                            var setAccountPhone = await SteamPhoneApi.SetAccountPhoneNumberAsync(webClient.WebApiToken, phone, country);
                             if (string.IsNullOrWhiteSpace(setAccountPhone.Body?.ConfirmationEmailAddress))
                             {
                                 MessageBox.Show($"添加手机号失败",
@@ -422,14 +423,14 @@ namespace Steam_Authenticator
                         {
                             MessageBox.Show($"请进行邮箱确认",
                                 "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                            var waitingForEmailConfirmation = await SteamApi.IsAccountWaitingForEmailConfirmationAsync(webClient.WebApiToken);
+                            var waitingForEmailConfirmation = await SteamPhoneApi.IsAccountWaitingForEmailConfirmationAsync(webClient.WebApiToken);
                             if (waitingForEmailConfirmation.Body.AwaitingEmailConfirmation)
                             {
                                 await Task.Delay(1000);
                                 break;
                             }
 
-                            var sendSmsCode = await SteamApi.SendPhoneVerificationCodeAsync(webClient.WebApiToken);
+                            var sendSmsCode = await SteamPhoneApi.SendPhoneVerificationCodeAsync(webClient.WebApiToken);
                             if (sendSmsCode.ResultCode != SteamKit.Model.ErrorCodes.OK)
                             {
                                 MessageBox.Show($"发送验证码失败,{sendSmsCode.ResultCode}");
@@ -456,7 +457,7 @@ namespace Steam_Authenticator
                             }
 
                             string smsCode = input.InputValue;
-                            var finalizationAddPhone = await SteamApi.VerifyAccountPhoneWithCodeAsync(webClient.WebApiToken, smsCode);
+                            var finalizationAddPhone = await SteamPhoneApi.VerifyAccountPhoneWithCodeAsync(webClient.WebApiToken, smsCode);
                             switch (finalizationAddPhone.ResultCode)
                             {
                                 case ErrorCodes.OK:
@@ -513,7 +514,7 @@ namespace Steam_Authenticator
                             }
 
                             string smsCode = input.InputValue;
-                            var finalizeMoveAuthenticator = await SteamAuthenticator.FinalizeMoveAuthenticatorAsync(webClient.WebApiToken, smsCode);
+                            var finalizeMoveAuthenticator = await SteamAuthenticatorV1.FinalizeMoveAuthenticatorAsync(webClient.WebApiToken, smsCode);
                             if (string.IsNullOrWhiteSpace(finalizeMoveAuthenticator.Body?.ReplacementToken?.SharedSecret))
                             {
                                 switch (finalizeMoveAuthenticator.ResultCode)
@@ -534,7 +535,7 @@ namespace Steam_Authenticator
 
                             try
                             {
-                                authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                                authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                                 authenticatorStatusResponse = authenticatorStatus.Body;
                             }
                             catch
@@ -576,7 +577,7 @@ namespace Steam_Authenticator
                 return;
             }
 
-            var authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+            var authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
             var authenticatorStatusResponse = authenticatorStatus.Body;
             if (authenticatorStatusResponse.GuardScheme == SteamGuardScheme.None)
             {
@@ -659,7 +660,7 @@ namespace Steam_Authenticator
                             return;
                         }
 
-                        authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                        authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                         authenticatorStatusResponse = authenticatorStatus.Body;
                         if (authenticatorStatusResponse?.GuardScheme == SteamGuardScheme.None)
                         {
@@ -677,7 +678,7 @@ namespace Steam_Authenticator
             }
             finally
             {
-                authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                 authenticatorStatusResponse = authenticatorStatus.Body;
                 if (authenticatorStatusResponse != null && authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
                 {
@@ -876,7 +877,7 @@ namespace Steam_Authenticator
                     return;
                 }
 
-                var authenticatorStatus = await SteamAuthenticator.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
+                var authenticatorStatus = await SteamAuthenticatorV1.QueryAuthenticatorStatusAsync(webClient.WebApiToken, webClient.SteamId);
                 var authenticatorStatusResponse = authenticatorStatus.Body;
                 if (authenticatorStatusResponse.GuardScheme != SteamGuardScheme.Device)
                 {
@@ -909,27 +910,6 @@ namespace Steam_Authenticator
                     IdentitySecret = importAuthenticator.IdentitySecret,
                     SharedSecret = importAuthenticator.SharedSecret,
                 };
-
-                if (!string.IsNullOrWhiteSpace(guard.SharedSecret))
-                {
-                    string code = GuardCodeGenerator.GenerateSteamGuardCode(await Extension.GetSteamTimestampAsync(), guard.SharedSecret);
-                    var validateToken = await SteamAuthenticator.ValidateTokenAsync(webClient.WebApiToken, code);
-                    if (!validateToken.Body.Valid)
-                    {
-                        MessageBox.Show($"你提供的登录秘钥似乎有误，请确认登录秘钥是否可用", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(guard.IdentitySecret))
-                {
-                    var queryConfirmations = await webClient.Confirmation.QueryConfirmationsAsync(guard.DeviceId, guard.IdentitySecret);
-                    if (!queryConfirmations.Success)
-                    {
-                        MessageBox.Show($"你提供的身份秘钥似乎有误，请确认身份秘钥是否可用", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-                }
 
                 Appsetting.Instance.Manifest.AddGuard(currentClient.GetAccount(), guard);
 

@@ -106,11 +106,11 @@ namespace Steam_Authenticator.Forms
         {
             try
             {
-                int tradeCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.Trade);
-                int marketCount = confirmations.Count(c => c.ConfType == SteamEnum.ConfirmationType.MarketListing);
+                int tradeCount = confirmations.Count(c => c.ConfType == Enums.ConfirmationType.Trade);
+                int marketCount = confirmations.Count(c => c.ConfType == Enums.ConfirmationType.MarketListing);
                 var otherConfirms = confirmations.Where(c => !new[]
                 {
-                    SteamEnum.ConfirmationType.Trade, SteamEnum.ConfirmationType.MarketListing
+                    Enums.ConfirmationType.Trade, Enums.ConfirmationType.MarketListing
                 }.Contains(c.ConfType)).ToList();
 
                 StringBuilder stringBuilder = new StringBuilder();

@@ -1,4 +1,5 @@
 ﻿using Steam_Authenticator.Model;
+using System.ComponentModel;
 
 namespace Steam_Authenticator.Forms
 {
@@ -15,12 +16,16 @@ namespace Steam_Authenticator.Forms
             Selected = new List<SelectOption>();
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<SelectOption> Datas { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Multiselect { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Size ItemSize { get; set; } = new Size(100, 20);
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<SelectOption> Selected { get; init; }
 
         private void Options_Load(object sender, EventArgs e)

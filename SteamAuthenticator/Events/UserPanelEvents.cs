@@ -5,8 +5,9 @@ using Steam_Authenticator.Forms;
 using Steam_Authenticator.Internal;
 using Steam_Authenticator.Model;
 using SteamKit;
+using SteamKit.Api;
 using SteamKit.WebClient;
-using static SteamKit.SteamEnum;
+using static SteamKit.Enums;
 
 namespace Steam_Authenticator
 {
