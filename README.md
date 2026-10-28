@@ -17,6 +17,11 @@
 > 👉 **推荐使用代理  🚀 [一分机场](https://xn--4gqx1hgtfdmt.com/#/register?code=HmVvjNN1)** 👈
 
 ---
+<div>
+  <p><strong>可定制功能开发</strong></p>
+</div>
+
+---
 
 <div>
   <p><strong>联系方式：SteamAuthenticator（WeChat）（微信）</strong></p>
